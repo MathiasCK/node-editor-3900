@@ -1,0 +1,58 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.app {
+  width: 100vw;
+  height: 100vh;
+  background-color: #1e1e1e;
+  background-image: linear-gradient(
+      0deg,
+      transparent 24%,
+      rgba(255, 255, 255, 0.04) 25%,
+      rgba(255, 255, 255, 0.04) 26%,
+      transparent 27%,
+      transparent 74%,
+      rgba(255, 255, 255, 0.04) 75%,
+      rgba(255, 255, 255, 0.04) 76%,
+      transparent 77%,
+      transparent
+    ),
+    linear-gradient(
+      90deg,
+      transparent 24%,
+      rgba(255, 255, 255, 0.04) 25%,
+      rgba(255, 255, 255, 0.04) 26%,
+      transparent 27%,
+      transparent 74%,
+      rgba(255, 255, 255, 0.04) 75%,
+      rgba(255, 255, 255, 0.04) 76%,
+      transparent 77%,
+      transparent
+    );
+  background-size: 50px 50px;
+  color: #d0d0d0;
+  font-family: "Consolas", "Monaco", monospace;
+}
+
+.button {
+  padding: 10px 20px;
+  border: 2px solid #5f5fff;
+  background-color: transparent;
+  color: #5f5fff;
+  text-transform: uppercase;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  outline: none;
+  font-family: "Consolas", "Monaco", monospace;
+  margin: 20px;
+}
+
+.button:hover {
+  background-color: #5f5fff;
+  color: #1e1e1e;
+  border-color: transparent;
+}
