@@ -1,30 +1,56 @@
-# React + TypeScript + Vite
+## Prerequisites 📋
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Before you get started, make sure you have the following requirements in place:
 
-Currently, two official plugins are available:
+- [npm](https://www.npmjs.com/) (v9.8.1) - Verify by running `npm --version` ✔️
+- [node](https://nodejs.org/en) (v17.0.0) - Verify by running `node --version` ✔️
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Setup ⚙️
 
-## Expanding the ESLint configuration
+To get a local copy up and running, follow these simple steps from your terminal:
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+1. **Clone the repository**:
 
-- Configure the top-level `parserOptions` property like this:
+   ```bash
+   git clone https://github.com/MathiasCK/node-editor-react.git
+   ```
 
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-  },
-}
-```
+2. **Navigate to the project folder**
 
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+   ```bash
+   cd node-editor-react
+   ```
+
+3. **Install dependencies**
+
+   ```bash
+   npm install
+   ```
+
+## Running the Project 🚀
+
+### Development Mode 🔧
+
+1. **Start the application**:
+
+   ```bash
+   npm run dev
+   ```
+
+The application will be accessible at [http://localhost:5173](http://localhost:5173).
+
+### Production Mode 🌐
+
+1. **Build the application**:
+
+   ```bash
+   npm run build
+   ```
+
+2. **Start the application**:
+
+   ```bash
+   npm start
+   ```
+
+The server will be accessible at [http://localhost:5173](http://localhost:5173).
