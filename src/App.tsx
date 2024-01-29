@@ -7,32 +7,34 @@ import ReactFlow, {
   useEdgesState,
   addEdge,
 } from "reactflow";
+import type { Edge, Connection } from "reactflow";
 
 import "reactflow/dist/style.css";
 import { Block, Connector, Terminal } from "./components/Nodes";
 import "./App.scss";
+import { Node } from "./types";
 
-const initialNodes = [
+const initialNodes: Node[] = [
   {
     id: "1",
     type: "block",
     position: { x: 500, y: 200 },
-    data: { label: "1" },
+    data: { label: "Block 1" },
   },
   {
     id: "2",
     type: "connector",
     position: { x: 500, y: 300 },
-    data: { label: "2" },
+    data: { label: "Connector 2" },
   },
   {
     id: "3",
     type: "terminal",
     position: { x: 500, y: 400 },
-    data: { label: "3" },
+    data: { label: "Terminal 3" },
   },
 ];
-const initialEdges = [
+const initialEdges: Edge[] = [
   { id: "e1-2", source: "1", target: "2" },
   { id: "e2-3", source: "2", target: "3" },
 ];
@@ -45,10 +47,10 @@ export default function App() {
 
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
-  const [nodeCount, setNodeCount] = useState(3); // State to keep track of node count
+  const [nodeCount, setNodeCount] = useState(3);
 
   const onConnect = useCallback(
-    params => setEdges(eds => addEdge(params, eds)),
+    (params: Edge | Connection) => setEdges(eds => addEdge(params, eds)),
     [setEdges],
   );
 
@@ -102,6 +104,7 @@ export default function App() {
       >
         <Controls />
         <MiniMap />
+        {/* @ts-ignore */}
         <Background variant="dots" gap={12} size={1} />
       </ReactFlow>
     </div>

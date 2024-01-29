@@ -1,21 +1,41 @@
 import { Handle, Position } from "reactflow";
+import { NodeData } from "../../types";
 
-const handleStyle = { left: 10 };
-
-const Connector = ({ data }) => {
+const Connector = ({ data }: NodeData) => {
   return (
     <>
-      <Handle type="target" position={Position.Top} />
       <div className="connector">
-        <h1>Connector {data.label}</h1>
+        <h1>{data.label}</h1>
       </div>
-      <Handle type="source" position={Position.Bottom} id="a" />
+      <Handle type="target" position={Position.Top} id="tm" />
+      <Handle
+        type="source"
+        position={Position.Top}
+        id="tl"
+        style={{ left: 10 }}
+      />
+      <Handle
+        type="source"
+        position={Position.Top}
+        id="tr"
+        style={{ left: 190 }}
+      />
+
+      <Handle type="source" position={Position.Bottom} id="bm" />
       <Handle
         type="source"
         position={Position.Bottom}
-        id="b"
-        style={handleStyle}
+        id="bl"
+        style={{ left: 10 }}
       />
+      <Handle
+        type="source"
+        position={Position.Bottom}
+        id="br"
+        style={{ left: 190 }}
+      />
+      <Handle type="source" position={Position.Right} id="r" />
+      <Handle type="source" position={Position.Left} id="l" />
     </>
   );
 };
