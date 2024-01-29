@@ -11,9 +11,8 @@ import type { Edge, Connection } from "reactflow";
 
 import "reactflow/dist/style.css";
 import { Block, Connector, Terminal } from "./components/Nodes";
-import "./App.scss";
 import { canConnect } from "./utils";
-import { INITIAL_EDGES, INITIAL_NODES } from "./config";
+import { INITIAL_EDGES, INITIAL_NODES, buttonVariants } from "./config";
 import { NodeType } from "./types";
 
 export default function App() {
@@ -49,30 +48,22 @@ export default function App() {
   };
 
   return (
-    <div style={{ width: "100vw", height: "100vh", background: "black" }}>
-      <div
-        style={{
-          position: "absolute",
-          zIndex: 10,
-          display: "flex",
-          justifyContent: "center",
-          width: "100%",
-        }}
-      >
+    <main className="w-screen h-screen bg-black">
+      <div className="absolute z-10 flex justify-center w-full">
         <button
-          className="block_button"
+          className={buttonVariants.block}
           onClick={() => addNode(NodeType.Block)}
         >
           Add block
         </button>
         <button
-          className="connector_button"
+          className={buttonVariants.connector}
           onClick={() => addNode(NodeType.Connector)}
         >
           Add connector
         </button>
         <button
-          className="terminal_button"
+          className={buttonVariants.terminal}
           onClick={() => addNode(NodeType.Terminal)}
         >
           Add terminal
@@ -91,6 +82,6 @@ export default function App() {
         {/* @ts-ignore */}
         <Background variant="dots" gap={12} size={1} />
       </ReactFlow>
-    </div>
+    </main>
   );
 }

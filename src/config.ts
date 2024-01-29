@@ -135,3 +135,14 @@ export const INITIAL_EDGES: Edge[] = [
     id: "reactflow__edge-6block_right_source-11connector_left_target",
   },
 ];
+
+export const buttonVariants = {
+  button:
+    "px-5 py-2.5 border-2 border-black bg-transparent text-black uppercase font-bold cursor-pointer transition duration-300 ease-in-out outline-none m-5 hover:bg-black hover:text-white hover:border-transparent",
+  block:
+    "px-5 py-2.5 border-2 border-block bg-transparent text-block uppercase font-bold cursor-pointer transition duration-300 ease-in-out outline-none m-5 hover:bg-block hover:text-white hover:border-transparent",
+  connector:
+    "px-5 py-2.5 border-2 border-connector bg-transparent text-connector uppercase font-bold cursor-pointer transition duration-300 ease-in-out outline-none m-5 hover:bg-connector hover:text-white hover:border-transparent",
+  terminal:
+    "px-5 py-2.5 border-2 border-terminal bg-transparent text-terminal uppercase font-bold cursor-pointer transition duration-300 ease-in-out outline-none m-5 hover:bg-terminal hover:text-white hover:border-transparent",
+};

@@ -4,7 +4,7 @@ import { NodeData } from "../../types";
 const Connector = ({ data }: NodeData) => {
   return (
     <>
-      <div className="connector">
+      <div className="h-8 w-8 rounded-3xl bg-connector">
         <h1 style={{ display: "none" }}>{data.label}</h1>
       </div>
 

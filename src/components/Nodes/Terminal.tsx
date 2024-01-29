@@ -4,7 +4,7 @@ import { NodeData } from "../../types";
 const Terminal = ({ data }: NodeData) => {
   return (
     <>
-      <div className="terminal">
+      <div className="h-3 w-3 bg-terminal">
         <h1 style={{ display: "none" }}>{data.label}</h1>
       </div>
       <Handle type="target" position={Position.Top} id="terminal_top_target" />

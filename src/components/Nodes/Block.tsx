@@ -4,7 +4,7 @@ import { NodeData } from "../../types";
 const Block = ({ data }: NodeData) => {
   return (
     <>
-      <div className="block">
+      <div className="h-12 w-24 rounded-xl bg-block">
         <h1 style={{ display: "none" }}>{data.label}</h1>
       </div>
       <Handle
