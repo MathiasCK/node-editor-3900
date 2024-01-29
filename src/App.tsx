@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useState } from "react";
 import ReactFlow, {
   MiniMap,
   Controls,
@@ -17,10 +17,7 @@ import { INITIAL_EDGES, INITIAL_NODES } from "./config";
 import { NodeType } from "./types";
 
 export default function App() {
-  const nodeTypes = useMemo(
-    () => ({ block: Block, connector: Connector, terminal: Terminal }),
-    [],
-  );
+  const nodeTypes = { block: Block, connector: Connector, terminal: Terminal };
 
   const [nodes, setNodes, onNodesChange] = useNodesState(INITIAL_NODES);
   const [edges, setEdges, onEdgesChange] = useEdgesState(INITIAL_EDGES);
