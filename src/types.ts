@@ -1,3 +1,9 @@
+export enum NodeType {
+  Block = "block",
+  Connector = "connector",
+  Terminal = "terminal",
+}
+
 export type NodeData = {
   data: {
     label: string;
@@ -6,7 +12,7 @@ export type NodeData = {
 
 export type Node = {
   id: string;
-  type: "block" | "connector" | "terminal";
+  type: NodeType;
   width: number;
   height: number;
   selected?: boolean;

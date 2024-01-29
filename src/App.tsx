@@ -14,6 +14,7 @@ import { Block, Connector, Terminal } from "./components/Nodes";
 import "./App.scss";
 import { canConnect } from "./utils";
 import { INITIAL_EDGES, INITIAL_NODES } from "./config";
+import { NodeType } from "./types";
 
 export default function App() {
   const nodeTypes = useMemo(
@@ -34,7 +35,7 @@ export default function App() {
     [setEdges],
   );
 
-  const addNode = (type: string) => {
+  const addNode = (type: NodeType) => {
     const newNodeId = (nodeCount + 1).toString();
     const newNode = {
       id: newNodeId,
@@ -61,16 +62,22 @@ export default function App() {
           width: "100%",
         }}
       >
-        <button className="block_button" onClick={() => addNode("block")}>
+        <button
+          className="block_button"
+          onClick={() => addNode(NodeType.Block)}
+        >
           Add block
         </button>
         <button
           className="connector_button"
-          onClick={() => addNode("connector")}
+          onClick={() => addNode(NodeType.Connector)}
         >
           Add connector
         </button>
-        <button className="terminal_button" onClick={() => addNode("terminal")}>
+        <button
+          className="terminal_button"
+          onClick={() => addNode(NodeType.Terminal)}
+        >
           Add terminal
         </button>
       </div>

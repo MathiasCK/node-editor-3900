@@ -1,10 +1,10 @@
 import type { Edge } from "reactflow";
-import type { Node } from "./types";
+import { Node, NodeType } from "./types";
 
 export const INITIAL_NODES: Node[] = [
   {
     id: "6",
-    type: "block",
+    type: NodeType.Block,
     position: { x: 442.85013677640416, y: 129.74870636700842 },
     data: { label: "block 6" },
     width: 100,
@@ -15,7 +15,7 @@ export const INITIAL_NODES: Node[] = [
   },
   {
     id: "9",
-    type: "terminal",
+    type: NodeType.Terminal,
     position: { x: 601.3317996161815, y: 130.82827799564245 },
     data: { label: "terminal 9" },
     width: 10,
@@ -26,7 +26,7 @@ export const INITIAL_NODES: Node[] = [
   },
   {
     id: "11",
-    type: "connector",
+    type: NodeType.Connector,
     position: { x: 561.6553743792239, y: 249.54701649316326 },
     data: { label: "connector 11" },
     width: 30,
@@ -37,7 +37,7 @@ export const INITIAL_NODES: Node[] = [
   },
   {
     id: "13",
-    type: "connector",
+    type: NodeType.Connector,
     position: { x: 729.9448590216551, y: 114.51568059574194 },
     data: { label: "connector 13" },
     width: 30,
@@ -48,7 +48,7 @@ export const INITIAL_NODES: Node[] = [
   },
   {
     id: "14",
-    type: "terminal",
+    type: NodeType.Terminal,
     position: { x: 823.1985637248258, y: 143.10128651276682 },
     data: { label: "terminal 14" },
     width: 10,
@@ -59,7 +59,7 @@ export const INITIAL_NODES: Node[] = [
   },
   {
     id: "15",
-    type: "block",
+    type: NodeType.Block,
     position: { x: 836.175122834657, y: 123.1396294622898 },
     data: { label: "block 15" },
     width: 100,
@@ -70,7 +70,7 @@ export const INITIAL_NODES: Node[] = [
   },
   {
     id: "16",
-    type: "terminal",
+    type: NodeType.Terminal,
     position: { x: 938.3637564687866, y: 143.57058008652427 },
     data: { label: "terminal 16" },
     width: 10,
