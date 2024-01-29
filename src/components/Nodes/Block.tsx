@@ -5,7 +5,7 @@ const Block = ({ data }: NodeData) => {
   return (
     <>
       <div className="block">
-        <h1>{data.label}</h1>
+        <h1 style={{ display: "none" }}>{data.label}</h1>
       </div>
       <Handle type="target" position={Position.Top} id="tm" />
       <Handle
@@ -18,7 +18,7 @@ const Block = ({ data }: NodeData) => {
         type="source"
         position={Position.Top}
         id="tr"
-        style={{ left: 190 }}
+        style={{ left: 90 }}
       />
 
       <Handle type="source" position={Position.Bottom} id="bm" />
@@ -32,7 +32,7 @@ const Block = ({ data }: NodeData) => {
         type="source"
         position={Position.Bottom}
         id="br"
-        style={{ left: 190 }}
+        style={{ left: 90 }}
       />
       <Handle type="source" position={Position.Right} id="r" />
       <Handle type="source" position={Position.Left} id="l" />
