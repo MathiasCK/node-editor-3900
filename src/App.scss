@@ -1,0 +1,93 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --block-color: #ff5f5f;
+  --connector-color: #5f5fff;
+  --terminal-color: #5fff5f;
+}
+
+.button {
+  padding: 10px 20px;
+  border: 2px solid black;
+  background-color: transparent;
+  color: black;
+  text-transform: uppercase;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  outline: none;
+  font-family: "Consolas", "Monaco", monospace;
+  margin: 20px;
+
+  &:hover {
+    background-color: black;
+    color: white;
+    border-color: transparent;
+  }
+}
+
+.block_button {
+  @extend .button;
+  border-color: var(--block-color);
+  color: var(--block-color);
+  &:hover {
+    background-color: var(--block-color);
+    color: white;
+  }
+}
+
+.connector_button {
+  @extend .button;
+  border-color: var(--connector-color);
+  color: var(--connector-color);
+  &:hover {
+    background-color: var(--connector-color);
+    color: white;
+  }
+}
+
+.terminal_button {
+  @extend .button;
+  border-color: var(--terminal-color);
+  color: var(--terminal-color);
+  &:hover {
+    background-color: var(--terminal-color);
+    color: white;
+  }
+}
+
+.node {
+  background: black;
+  min-width: 200px;
+  height: 50px;
+  border-radius: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  font-family: "Consolas", "Monaco", monospace;
+  font-weight: bold;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  outline: none;
+}
+
+.block {
+  @extend .node;
+  background: var(--block-color);
+}
+
+.connector {
+  @extend .node;
+  background: var(--connector-color);
+}
+
+.terminal {
+  @extend .node;
+  background: var(--terminal-color);
+}
