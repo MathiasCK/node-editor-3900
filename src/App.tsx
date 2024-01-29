@@ -12,32 +12,8 @@ import type { Edge, Connection } from "reactflow";
 import "reactflow/dist/style.css";
 import { Block, Connector, Terminal } from "./components/Nodes";
 import "./App.scss";
-import { Node } from "./types";
-
-const initialNodes: Node[] = [
-  {
-    id: "1",
-    type: "block",
-    position: { x: 500, y: 200 },
-    data: { label: "Block 1" },
-  },
-  {
-    id: "2",
-    type: "connector",
-    position: { x: 500, y: 300 },
-    data: { label: "Connector 2" },
-  },
-  {
-    id: "3",
-    type: "terminal",
-    position: { x: 500, y: 400 },
-    data: { label: "Terminal 3" },
-  },
-];
-const initialEdges: Edge[] = [
-  { id: "e1-2", source: "1", target: "2" },
-  { id: "e2-3", source: "2", target: "3" },
-];
+import { canConnect } from "./utils";
+import { INITIAL_EDGES, INITIAL_NODES } from "./config";
 
 export default function App() {
   const nodeTypes = useMemo(
@@ -45,12 +21,16 @@ export default function App() {
     [],
   );
 
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+  const [nodes, setNodes, onNodesChange] = useNodesState(INITIAL_NODES);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(INITIAL_EDGES);
   const [nodeCount, setNodeCount] = useState(3);
 
   const onConnect = useCallback(
-    (params: Edge | Connection) => setEdges(eds => addEdge(params, eds)),
+    (params: Edge | Connection) => {
+      if (canConnect(params)) {
+        return setEdges(eds => addEdge(params, eds));
+      }
+    },
     [setEdges],
   );
 
