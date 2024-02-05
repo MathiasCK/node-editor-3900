@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import ReactFlow, {
   Controls,
   Background,
@@ -7,11 +7,12 @@ import ReactFlow, {
   addEdge,
 } from "reactflow";
 import type { Edge, Connection } from "reactflow";
+import { v4 as uuidv4 } from "uuid";
 
 import "reactflow/dist/style.css";
 import { Block, Connector, Terminal } from "./components/Nodes";
 import { canConnect } from "./utils";
-import { INITIAL_EDGES, INITIAL_NODES, buttonVariants } from "./config";
+import { buttonVariants } from "./config";
 import { NodeType } from "./types";
 
 const nodeTypes = { block: Block, connector: Connector, terminal: Terminal };
@@ -22,8 +23,16 @@ export default function App() {
     strokeDasharray: false,
   });
 
-  const [nodes, setNodes, onNodesChange] = useNodesState(INITIAL_NODES);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(INITIAL_EDGES);
+  const [nodes, setNodes, onNodesChange] = useNodesState(
+    localStorage.getItem("nodes")
+      ? JSON.parse(localStorage.getItem("nodes")!)
+      : [],
+  );
+  const [edges, setEdges, onEdgesChange] = useEdgesState(
+    localStorage.getItem("edges")
+      ? JSON.parse(localStorage.getItem("edges")!)
+      : [],
+  );
   const [nodeCount, setNodeCount] = useState(3);
 
   const onConnect = useCallback(
@@ -44,20 +53,25 @@ export default function App() {
   );
 
   const addNode = (type: NodeType) => {
-    const newNodeId = (nodeCount + 1).toString();
+    const id = uuidv4();
     const newNode = {
-      id: newNodeId,
+      id,
       type,
       position: {
         x: window.innerWidth / 2,
         y: window.innerHeight / 2,
       },
-      data: { label: `${type} ${newNodeId}` },
+      data: { label: `${type} ${id}` },
     };
 
     setNodes(nds => nds.concat(newNode));
     setNodeCount(nodeCount + 1);
   };
+
+  useEffect(() => {
+    localStorage.setItem("nodes", JSON.stringify(nodes));
+    localStorage.setItem("edges", JSON.stringify(edges));
+  }, [nodes, edges]);
 
   return (
     <main className="w-screen h-screen bg-black">
