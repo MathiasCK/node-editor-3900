@@ -137,6 +137,22 @@ export const INITIAL_EDGES: Edge[] = [
 ];
 
 export const buttonVariants = {
+  connections: {
+    part_of:
+      "border-2 border-green-400 bg-transparent text-green-400 uppercase font-bold cursor-pointer transition duration-300 ease-in-out outline-none m-5 hover:bg-green-400 hover:text-white hover:border-transparent",
+    connected_to:
+      "border-2 border-blue-200 bg-transparent text-blue-200 uppercase font-bold cursor-pointer transition duration-300 ease-in-out outline-none m-5 hover:bg-blue-200 hover:text-white hover:border-transparent",
+    transfers_to:
+      "border-2 border-blue-400 bg-transparent text-blue-400 uppercase font-bold cursor-pointer transition duration-300 ease-in-out outline-none m-5 hover:bg-blue-400 hover:text-white hover:border-transparent",
+    brown:
+      "border-2 border-amber-300 bg-transparent text-amber-300 uppercase font-bold cursor-pointer transition duration-300 ease-in-out outline-none m-5 hover:bg-amber-300 hover:text-white hover:border-transparent",
+    light_gray: {
+      default:
+        "border-2 border-gray-200 bg-transparent text-gray-200 uppercase font-bold cursor-pointer transition duration-300 ease-in-out outline-none m-5 hover:bg-gray-200 hover:text-white hover:border-transparent",
+      dotted_border:
+        "border-2 border-dotted border-gray-200 bg-transparent text-gray-200 uppercase font-bold cursor-pointer transition duration-300 ease-in-out outline-none m-5 hover:bg-gray-200 hover:text-white hover:border-transparent",
+    },
+  },
   button:
     "px-5 py-2.5 border-2 border-black bg-transparent text-black uppercase font-bold cursor-pointer transition duration-300 ease-in-out outline-none m-5 hover:bg-black hover:text-white hover:border-transparent",
   block:
