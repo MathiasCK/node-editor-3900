@@ -14,13 +14,13 @@ import { canConnect } from "./utils";
 import { INITIAL_EDGES, INITIAL_NODES, buttonVariants } from "./config";
 import { NodeType } from "./types";
 
+const nodeTypes = { block: Block, connector: Connector, terminal: Terminal };
+
 export default function App() {
   const [relation, setRelation] = useState({
     color: "white",
     strokeDasharray: false,
   });
-
-  const nodeTypes = { block: Block, connector: Connector, terminal: Terminal };
 
   const [nodes, setNodes, onNodesChange] = useNodesState(INITIAL_NODES);
   const [edges, setEdges, onEdgesChange] = useEdgesState(INITIAL_EDGES);
