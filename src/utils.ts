@@ -21,3 +21,5 @@ export const isBlock = (id: string): boolean => id.includes("block");
 export const isConnector = (id: string): boolean => id.includes("connector");
 
 export const isTerminal = (id: string): boolean => id.includes("terminal");
+
+export const isTextBox = (id: string): boolean => id.includes("textbox");

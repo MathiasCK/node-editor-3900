@@ -10,12 +10,12 @@ import type { Edge, Connection } from "reactflow";
 import { v4 as uuidv4 } from "uuid";
 
 import "reactflow/dist/style.css";
-import { Block, Connector, Terminal } from "./components/Nodes";
+import { Block, Connector, Terminal, TextBox } from "./components/Nodes";
 import { canConnect } from "./utils";
 import { buttonVariants } from "./config";
 import { NodeType } from "./types";
 
-const nodeTypes = { block: Block, connector: Connector, terminal: Terminal };
+const nodeTypes = { block: Block, connector: Connector, terminal: Terminal, textbox: TextBox };
 
 export default function App() {
   const [relation, setRelation] = useState({
@@ -152,6 +152,12 @@ export default function App() {
           onClick={() => addNode(NodeType.Terminal)}
         >
           Add terminal
+        </button>
+        <button
+          className={buttonVariants.textbox}
+          onClick={() => addNode(NodeType.TextBox)}
+        >
+          Add TextBox
         </button>
       </div>
       <ReactFlow

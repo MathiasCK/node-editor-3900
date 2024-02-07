@@ -161,4 +161,6 @@ export const buttonVariants = {
     "px-5 py-2.5 border-2 border-connector bg-transparent text-connector uppercase font-bold cursor-pointer transition duration-300 ease-in-out outline-none m-5 hover:bg-connector hover:text-white hover:border-transparent",
   terminal:
     "px-5 py-2.5 border-2 border-terminal bg-transparent text-terminal uppercase font-bold cursor-pointer transition duration-300 ease-in-out outline-none m-5 hover:bg-terminal hover:text-white hover:border-transparent",
+  textbox: 
+  "px-5 py-2.5 border-2 border-white bg-transparent text-white uppercase font-bold cursor-pointer transition duration-300 ease-in-out outline-none m-5 hover:bg-white hover:text-black hover:border-transparent",
 };
