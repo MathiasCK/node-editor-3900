@@ -12,14 +12,14 @@ import { v4 as uuidv4 } from "uuid";
 import "reactflow/dist/style.css";
 import { Block, Connector, Terminal, TextBox } from "./components/Nodes";
 import { canConnect } from "./utils";
-import { buttonVariants } from "./config";
+import { buttonVariants, cn } from "./config";
 import { NodeType } from "./types";
 
 const nodeTypes = { block: Block, connector: Connector, terminal: Terminal, textbox: TextBox };
 
 export default function App() {
   const [relation, setRelation] = useState({
-    color: "white",
+    color: "rgb(74 222 128)",
     strokeDasharray: false,
   });
 
@@ -77,7 +77,13 @@ export default function App() {
     <main className="w-screen h-screen bg-black">
       <div className="h-10 min-w-10 absolute right-0 bottom-50 flex flex-col z-20">
         <button
-          className={buttonVariants.connections.part_of}
+          className={cn(
+            `${buttonVariants.edge} border-green-400 text-green-400 hover:bg-green-400 `,
+            {
+              "bg-green-400 text-white border-transparent":
+                relation.color === "rgb(74 222 128)",
+            },
+          )}
           onClick={() =>
             setRelation({ color: "rgb(74 222 128)", strokeDasharray: false })
           }
@@ -85,7 +91,13 @@ export default function App() {
           Part of
         </button>
         <button
-          className={buttonVariants.connections.connected_to}
+          className={cn(
+            `${buttonVariants.edge} border-blue-200 text-blue-200 hover:bg-blue-200 `,
+            {
+              "bg-blue-200 text-white border-transparent":
+                relation.color === "rgb(191 219 254)",
+            },
+          )}
           onClick={() =>
             setRelation({ color: "rgb(191 219 254)", strokeDasharray: false })
           }
@@ -93,7 +105,13 @@ export default function App() {
           Connected to
         </button>
         <button
-          className={buttonVariants.connections.transfers_to}
+          className={cn(
+            `${buttonVariants.edge} border-blue-400 text-blue-400 hover:bg-blue-400 `,
+            {
+              "bg-blue-400 text-white border-transparent":
+                relation.color === "rgb(96 165 250)",
+            },
+          )}
           onClick={() =>
             setRelation({ color: "rgb(96 165 250)", strokeDasharray: false })
           }
@@ -101,7 +119,13 @@ export default function App() {
           Transfer to
         </button>
         <button
-          className={buttonVariants.connections.brown}
+          className={cn(
+            `${buttonVariants.edge} border-amber-300 text-amber-300 hover:bg-amber-300 `,
+            {
+              "bg-amber-300 text-white border-transparent":
+                relation.color === "rgb(252 211 77)",
+            },
+          )}
           onClick={() =>
             setRelation({ color: "rgb(252 211 77)", strokeDasharray: false })
           }
@@ -109,23 +133,41 @@ export default function App() {
           Specialisation of
         </button>
         <button
-          className={buttonVariants.connections.brown}
+          className={cn(
+            `${buttonVariants.edge} border-amber-300 text-amber-300 hover:bg-amber-300 `,
+            {
+              "bg-amber-300 text-white border-transparent":
+                relation.color === "rgb(252 211 76)",
+            },
+          )}
           onClick={() =>
-            setRelation({ color: "rgb(252 211 77)", strokeDasharray: false })
+            setRelation({ color: "rgb(252 211 76)", strokeDasharray: false })
           }
         >
           Fulfilled by
         </button>
         <button
-          className={buttonVariants.connections.light_gray.default}
+          className={cn(
+            `${buttonVariants.edge} border-gray-200 text-gray-200 hover:bg-gray-200 `,
+            {
+              "bg-gray-200 text-white border-transparent":
+                relation.color === "rgb(229 231 236)",
+            },
+          )}
           onClick={() =>
-            setRelation({ color: "rgb(229 231 235)", strokeDasharray: true })
+            setRelation({ color: "rgb(229 231 236)", strokeDasharray: true })
           }
         >
           Proxy
         </button>
         <button
-          className={buttonVariants.connections.light_gray.dotted_border}
+          className={cn(
+            `${buttonVariants.edge} border-dotted border-gray-200 text-gray-200 hover:bg-gray-200`,
+            {
+              "bg-gray-200 text-white border-transparent":
+                relation.color === "rgb(229 231 235)",
+            },
+          )}
           onClick={() =>
             setRelation({ color: "rgb(229 231 235)", strokeDasharray: true })
           }
