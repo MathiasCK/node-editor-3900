@@ -15,7 +15,12 @@ import { canConnect } from "./utils";
 import { buttonVariants, cn } from "./config";
 import { NodeType } from "./types";
 
-const nodeTypes = { block: Block, connector: Connector, terminal: Terminal, textbox: TextBox };
+const nodeTypes = {
+  block: Block,
+  connector: Connector,
+  terminal: Terminal,
+  textbox: TextBox,
+};
 
 export default function App() {
   const [relation, setRelation] = useState({
@@ -33,7 +38,7 @@ export default function App() {
       ? JSON.parse(localStorage.getItem("edges")!)
       : [],
   );
-  const [nodeCount, setNodeCount] = useState(3);
+  const [nodeCount, setNodeCount] = useState(nodes.length);
 
   const onConnect = useCallback(
     (params: Edge | Connection) => {
@@ -211,8 +216,7 @@ export default function App() {
         nodeTypes={nodeTypes}
       >
         <Controls />
-        {/* @ts-ignore */}
-        <Background variant="dots" gap={12} size={1} />
+        <Background gap={12} size={1} />
       </ReactFlow>
     </main>
   );
