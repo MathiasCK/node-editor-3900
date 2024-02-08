@@ -5,6 +5,7 @@ import ReactFlow, {
   useNodesState,
   useEdgesState,
   addEdge,
+  MarkerType,
 } from "reactflow";
 import type { Edge, Connection } from "reactflow";
 import { v4 as uuidv4 } from "uuid";
@@ -22,10 +23,17 @@ const nodeTypes = {
   textbox: TextBox,
 };
 
+interface AppState {
+  color: string;
+  strokeDasharray: boolean;
+  markerType: MarkerType | null;
+}
+
 export default function App() {
-  const [relation, setRelation] = useState({
-    color: "rgb(74 222 128)",
+  const [relation, setRelation] = useState<AppState>({
+    color: "#4ade80",
     strokeDasharray: false,
+    markerType: null,
   });
 
   const [nodes, setNodes, onNodesChange] = useNodesState(
@@ -51,10 +59,19 @@ export default function App() {
             strokeDasharray: relation.strokeDasharray ? "5, 5" : "",
           },
         };
+        if (relation.markerType) {
+          // @ts-ignore
+          newConnection.markerEnd = {
+            type: relation.markerType,
+            color: relation.color,
+            width: 10,
+            height: 10,
+          };
+        }
         return setEdges(eds => addEdge(newConnection, eds));
       }
     },
-    [setEdges, relation.color, relation.strokeDasharray],
+    [relation.markerType, relation.color, relation.strokeDasharray, setEdges],
   );
 
   const addNode = (type: NodeType) => {
@@ -86,11 +103,15 @@ export default function App() {
             `${buttonVariants.edge} border-green-400 text-green-400 hover:bg-green-400 `,
             {
               "bg-green-400 text-white border-transparent":
-                relation.color === "rgb(74 222 128)",
+                relation.color === "#4ade80",
             },
           )}
           onClick={() =>
-            setRelation({ color: "rgb(74 222 128)", strokeDasharray: false })
+            setRelation({
+              color: "#4ade80",
+              strokeDasharray: false,
+              markerType: MarkerType.ArrowClosed,
+            })
           }
         >
           Part of
@@ -100,11 +121,15 @@ export default function App() {
             `${buttonVariants.edge} border-blue-200 text-blue-200 hover:bg-blue-200 `,
             {
               "bg-blue-200 text-white border-transparent":
-                relation.color === "rgb(191 219 254)",
+                relation.color === "#bfdbfe",
             },
           )}
           onClick={() =>
-            setRelation({ color: "rgb(191 219 254)", strokeDasharray: false })
+            setRelation({
+              color: "#bfdbfe",
+              strokeDasharray: false,
+              markerType: null,
+            })
           }
         >
           Connected to
@@ -114,11 +139,15 @@ export default function App() {
             `${buttonVariants.edge} border-blue-400 text-blue-400 hover:bg-blue-400 `,
             {
               "bg-blue-400 text-white border-transparent":
-                relation.color === "rgb(96 165 250)",
+                relation.color === "#60a5fa",
             },
           )}
           onClick={() =>
-            setRelation({ color: "rgb(96 165 250)", strokeDasharray: false })
+            setRelation({
+              color: "#60a5fa",
+              strokeDasharray: false,
+              markerType: MarkerType.ArrowClosed,
+            })
           }
         >
           Transfer to
@@ -128,25 +157,33 @@ export default function App() {
             `${buttonVariants.edge} border-amber-300 text-amber-300 hover:bg-amber-300 `,
             {
               "bg-amber-300 text-white border-transparent":
-                relation.color === "rgb(252 211 77)",
+                relation.color === "#fcd34d",
             },
           )}
           onClick={() =>
-            setRelation({ color: "rgb(252 211 77)", strokeDasharray: false })
+            setRelation({
+              color: "#fcd34d",
+              strokeDasharray: false,
+              markerType: MarkerType.ArrowClosed,
+            })
           }
         >
           Specialisation of
         </button>
         <button
           className={cn(
-            `${buttonVariants.edge} border-amber-300 text-amber-300 hover:bg-amber-300 `,
+            `${buttonVariants.edge} border-amber-300 text-amber-300 hover:bg-amber-300 border-dotted`,
             {
               "bg-amber-300 text-white border-transparent":
-                relation.color === "rgb(252 211 76)",
+                relation.color === "#fcd34c",
             },
           )}
           onClick={() =>
-            setRelation({ color: "rgb(252 211 76)", strokeDasharray: false })
+            setRelation({
+              color: "#fcd34c",
+              strokeDasharray: true,
+              markerType: MarkerType.Arrow,
+            })
           }
         >
           Fulfilled by
@@ -156,11 +193,15 @@ export default function App() {
             `${buttonVariants.edge} border-gray-200 text-gray-200 hover:bg-gray-200 `,
             {
               "bg-gray-200 text-white border-transparent":
-                relation.color === "rgb(229 231 236)",
+                relation.color === "#e5e7ec",
             },
           )}
           onClick={() =>
-            setRelation({ color: "rgb(229 231 236)", strokeDasharray: true })
+            setRelation({
+              color: "#e5e7ec",
+              strokeDasharray: true,
+              markerType: MarkerType.ArrowClosed,
+            })
           }
         >
           Proxy
@@ -170,11 +211,15 @@ export default function App() {
             `${buttonVariants.edge} border-dotted border-gray-200 text-gray-200 hover:bg-gray-200`,
             {
               "bg-gray-200 text-white border-transparent":
-                relation.color === "rgb(229 231 235)",
+                relation.color === "#e5e7eb",
             },
           )}
           onClick={() =>
-            setRelation({ color: "rgb(229 231 235)", strokeDasharray: true })
+            setRelation({
+              color: "#e5e7eb",
+              strokeDasharray: true,
+              markerType: MarkerType.Arrow,
+            })
           }
         >
           Projection
