@@ -7,7 +7,9 @@ export enum NodeType {
 
 export type NodeData = {
   data: {
-    label: string;
+    type: NodeType;
+    id: string;
+    createdAt: Date;
   };
 };
 

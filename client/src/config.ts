@@ -1,8 +1,3 @@
-import { type ClassValue, clsx } from "clsx";
-import { twMerge } from "tailwind-merge";
-
-export const cn = (...inputs: ClassValue[]) => twMerge(clsx(inputs));
-
 const commonStyles =
   "border-2 bg-transparent uppercase font-bold cursor-pointer transition duration-300 ease-in-out outline-none m-5 hover:text-white hover:border-transparent";
 

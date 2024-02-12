@@ -8,13 +8,13 @@ import ReactFlow, {
   MarkerType,
 } from "reactflow";
 import type { Edge, Connection } from "reactflow";
-import { v4 as uuidv4 } from "uuid";
 
 import "reactflow/dist/style.css";
 import { Block, Connector, Terminal, TextBox } from "./components/Nodes";
 import { canConnect } from "./utils";
-import { buttonVariants, cn } from "./config";
+import { buttonVariants } from "./config";
 import { NodeType } from "./types";
+import { cn } from "./lib/utils";
 
 const nodeTypes = {
   block: Block,
@@ -75,15 +75,15 @@ export default function App() {
   );
 
   const addNode = (type: NodeType) => {
-    const id = uuidv4();
+    const id = nodeCount.toString();
     const newNode = {
-      id,
+      id: nodeCount.toString(),
       type,
       position: {
         x: window.innerWidth / 2,
         y: window.innerHeight / 2,
       },
-      data: { label: `${type} ${id}` },
+      data: { type, id, createdAt: Date.now() },
     };
 
     setNodes(nds => nds.concat(newNode));
