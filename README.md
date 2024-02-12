@@ -21,37 +21,48 @@ To get a local copy up and running, follow these simple steps from your terminal
    cd node-editor-react
    ```
 
-3. **Install client dependencies**
+3. **Install root & client dependencies**
 
    ```bash
-   cd client
    npm install
+   ```
+
+4. **Install server dependencies**
+
+   ```bash
+   npm run server:init
+   ```
+
+5. **Build server**
+
+   ```bash
+   npm run server:build
    ```
 
 ## Running the Project 🚀
 
 ### Development Mode 🔧
 
-1. **Start the client application**:
+1. **Start both the server and client**:
 
    ```bash
-   npm run dev
+   npm run start:dev
    ```
 
-The application will be accessible at [http://localhost:5173](http://localhost:5173).
+The server will be accessible at [http://localhost:5250](http://localhost:5250), and the client will be running on [http://localhost:5173](http://localhost:5173).
 
 ### Production Mode 🌐
 
 1. **Build the client**:
 
    ```bash
-   npm run build
+   npm run client:build
    ```
 
-2. **Start the client**:
+2. **Start both the server and client**:
 
    ```bash
    npm start
    ```
 
-The server will be accessible at [http://localhost:5173](http://localhost:5173).
+The server will be accessible at [http://localhost:5250](http://localhost:5250), and the client will be running on [http://localhost:5173](http://localhost:5173).
