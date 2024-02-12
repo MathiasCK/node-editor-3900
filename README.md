@@ -21,9 +21,10 @@ To get a local copy up and running, follow these simple steps from your terminal
    cd node-editor-react
    ```
 
-3. **Install dependencies**
+3. **Install client dependencies**
 
    ```bash
+   cd client
    npm install
    ```
 
@@ -31,7 +32,7 @@ To get a local copy up and running, follow these simple steps from your terminal
 
 ### Development Mode 🔧
 
-1. **Start the application**:
+1. **Start the client application**:
 
    ```bash
    npm run dev
@@ -41,13 +42,13 @@ The application will be accessible at [http://localhost:5173](http://localhost:5
 
 ### Production Mode 🌐
 
-1. **Build the application**:
+1. **Build the client**:
 
    ```bash
    npm run build
    ```
 
-2. **Start the application**:
+2. **Start the client**:
 
    ```bash
    npm start
