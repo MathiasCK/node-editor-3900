@@ -1,48 +1,37 @@
-import { Handle, Position } from "reactflow";
-import { NodeData } from "../../types";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import Handles from "./Handles";
+import { NodeProps } from "reactflow";
 
-const Connector = ({ data }: NodeData) => {
+const Connector = (props: NodeProps) => {
+  const displayName = `${props.data.type} ${props.data.id}`;
+  const nodeId = `${props.data.type}_${props.data.id}`;
   return (
     <>
-      <div className="h-8 w-8 rounded-3xl bg-connector">
-        <h1 style={{ display: "none" }}>{data.label}</h1>
-      </div>
-
-      <Handle type="target" position={Position.Top} id="connector_top_target" />
-      <Handle type="source" position={Position.Top} id="connector_top_source" />
-
-      <Handle
-        type="source"
-        position={Position.Bottom}
-        id="connector_bottom_source"
-      />
-      <Handle
-        type="target"
-        position={Position.Bottom}
-        id="connector_bottom_target"
-      />
-
-      <Handle
-        type="source"
-        position={Position.Right}
-        id="connector_right_source"
-      />
-      <Handle
-        type="target"
-        position={Position.Right}
-        id="connector_right_target"
-      />
-
-      <Handle
-        type="source"
-        position={Position.Left}
-        id="connector_left_source"
-      />
-      <Handle
-        type="target"
-        position={Position.Left}
-        id="connector_left_target"
-      />
+      <Sheet>
+        <SheetTrigger>
+          <div className="h-8 w-8 rounded-xl bg-connector">
+            <header className="flex items-center justify-center w-full h-full">
+              <p className="uppercase text-white">{props.data.id}</p>
+            </header>
+          </div>
+        </SheetTrigger>
+        <SheetContent>
+          <SheetHeader>
+            <SheetTitle className="uppercase">{displayName}</SheetTitle>
+            <SheetDescription>
+              Created at: {new Date(props.data.createdAt).toLocaleString()}
+            </SheetDescription>
+          </SheetHeader>
+        </SheetContent>
+      </Sheet>
+      <Handles nodeId={nodeId} />
     </>
   );
 };

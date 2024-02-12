@@ -1,47 +1,37 @@
-import { Handle, Position } from "reactflow";
-import { NodeData } from "../../types";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import Handles from "./Handles";
+import { NodeProps } from "reactflow";
 
-const Terminal = ({ data }: NodeData) => {
+const Terminal = (props: NodeProps) => {
+  const displayName = `${props.data.type} ${props.data.id}`;
+  const nodeId = `${props.data.type}_${props.data.id}`;
   return (
     <>
-      <div className="h-3 w-3 bg-terminal">
-        <h1 style={{ display: "none" }}>{data.label}</h1>
-      </div>
-      <Handle type="target" position={Position.Top} id="terminal_top_target" />
-      <Handle type="source" position={Position.Top} id="terminal_top_source" />
-
-      <Handle
-        type="source"
-        position={Position.Bottom}
-        id="terminal_bottom_source"
-      />
-      <Handle
-        type="target"
-        position={Position.Bottom}
-        id="terminal_bottom_target"
-      />
-
-      <Handle
-        type="source"
-        position={Position.Right}
-        id="terminal_right_source"
-      />
-      <Handle
-        type="target"
-        position={Position.Right}
-        id="terminal_right_target"
-      />
-
-      <Handle
-        type="source"
-        position={Position.Left}
-        id="terminal_left_source"
-      />
-      <Handle
-        type="target"
-        position={Position.Left}
-        id="terminal_left_target"
-      />
+      <Sheet>
+        <SheetTrigger>
+          <div className="h-4 w-4 bg-terminal">
+            <header className="flex items-center justify-center w-full h-full">
+              <p className="uppercase text-white">{props.data.id}</p>
+            </header>
+          </div>
+        </SheetTrigger>
+        <SheetContent>
+          <SheetHeader>
+            <SheetTitle className="uppercase">{displayName}</SheetTitle>
+            <SheetDescription>
+              Created at: {new Date(props.data.createdAt).toLocaleString()}
+            </SheetDescription>
+          </SheetHeader>
+        </SheetContent>
+      </Sheet>
+      <Handles nodeId={nodeId} />
     </>
   );
 };
