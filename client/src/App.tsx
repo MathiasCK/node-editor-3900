@@ -10,8 +10,8 @@ import type { Edge, Connection } from "reactflow";
 
 import "reactflow/dist/style.css";
 import { Block, Connector, Terminal, TextBox } from "./components/Nodes";
-import { buttonVariants } from "./config";
-import { NodeType } from "./types";
+import { buttonVariants } from "./lib/config";
+import { NodeType } from "./lib/types";
 import { canConnect, cn } from "./lib/utils";
 import { useSettings, useSheet, useTheme } from "./hooks";
 
