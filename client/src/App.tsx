@@ -16,6 +16,14 @@ import { canConnect } from "./utils";
 import { buttonVariants } from "./config";
 import { NodeType } from "./types";
 import { cn } from "./lib/utils";
+import { useSheet } from "./hooks";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "./components/ui/sheet";
 
 const nodeTypes = {
   block: Block,
@@ -36,6 +44,8 @@ export default function App() {
     strokeDasharray: false,
     markerType: null,
   });
+
+  const { sheet, closeSheet } = useSheet();
 
   const [nodes, setNodes, onNodesChange] = useNodesState(
     localStorage.getItem("nodes")
@@ -107,6 +117,15 @@ export default function App() {
         onConnect={onConnect}
         nodeTypes={nodeTypes}
       >
+        <Sheet open={sheet?.open} onOpenChange={() => closeSheet()}>
+          <SheetContent>
+            <SheetHeader>
+              <SheetTitle className="uppercase">{sheet.data?.title}</SheetTitle>
+              <SheetDescription>{sheet.data?.subtitle}</SheetDescription>
+            </SheetHeader>
+          </SheetContent>
+        </Sheet>
+
         <Panel position="top-center" className="w-full flex justify-center">
           <button
             className={buttonVariants.block}

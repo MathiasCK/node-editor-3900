@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
 type SheetData = {
+  type: "node" | "edge";
   title: string;
   subtitle: string;
 };
@@ -28,6 +29,7 @@ const useSheet = create<SheetState>()(
           sheet: {
             open: true,
             data: {
+              type: data.type,
               title: data.title,
               subtitle: data.subtitle,
             },
