@@ -6,6 +6,7 @@ import ReactFlow, {
   useEdgesState,
   addEdge,
   MarkerType,
+  Panel,
 } from "reactflow";
 import type { Edge, Connection } from "reactflow";
 
@@ -68,6 +69,7 @@ export default function App() {
             height: 10,
           };
         }
+
         return setEdges(eds => addEdge(newConnection, eds));
       }
     },
@@ -77,7 +79,7 @@ export default function App() {
   const addNode = (type: NodeType) => {
     const id = nodeCount.toString();
     const newNode = {
-      id: nodeCount.toString(),
+      id,
       type,
       position: {
         x: window.innerWidth / 2,
@@ -97,161 +99,6 @@ export default function App() {
 
   return (
     <main className="w-screen h-screen bg-black">
-      <div className="h-10 min-w-10 absolute right-0 bottom-50 flex flex-col z-20">
-        <button
-          className={cn(
-            `${buttonVariants.edge} border-green-400 text-green-400 hover:bg-green-400 `,
-            {
-              "bg-green-400 text-white border-transparent":
-                relation.color === "#4ade80",
-            },
-          )}
-          onClick={() =>
-            setRelation({
-              color: "#4ade80",
-              strokeDasharray: false,
-              markerType: MarkerType.ArrowClosed,
-            })
-          }
-        >
-          Part of
-        </button>
-        <button
-          className={cn(
-            `${buttonVariants.edge} border-blue-200 text-blue-200 hover:bg-blue-200 `,
-            {
-              "bg-blue-200 text-white border-transparent":
-                relation.color === "#bfdbfe",
-            },
-          )}
-          onClick={() =>
-            setRelation({
-              color: "#bfdbfe",
-              strokeDasharray: false,
-              markerType: null,
-            })
-          }
-        >
-          Connected to
-        </button>
-        <button
-          className={cn(
-            `${buttonVariants.edge} border-blue-400 text-blue-400 hover:bg-blue-400 `,
-            {
-              "bg-blue-400 text-white border-transparent":
-                relation.color === "#60a5fa",
-            },
-          )}
-          onClick={() =>
-            setRelation({
-              color: "#60a5fa",
-              strokeDasharray: false,
-              markerType: MarkerType.ArrowClosed,
-            })
-          }
-        >
-          Transfer to
-        </button>
-        <button
-          className={cn(
-            `${buttonVariants.edge} border-amber-300 text-amber-300 hover:bg-amber-300 `,
-            {
-              "bg-amber-300 text-white border-transparent":
-                relation.color === "#fcd34d",
-            },
-          )}
-          onClick={() =>
-            setRelation({
-              color: "#fcd34d",
-              strokeDasharray: false,
-              markerType: MarkerType.ArrowClosed,
-            })
-          }
-        >
-          Specialisation of
-        </button>
-        <button
-          className={cn(
-            `${buttonVariants.edge} border-amber-300 text-amber-300 hover:bg-amber-300 border-dotted`,
-            {
-              "bg-amber-300 text-white border-transparent":
-                relation.color === "#fcd34c",
-            },
-          )}
-          onClick={() =>
-            setRelation({
-              color: "#fcd34c",
-              strokeDasharray: true,
-              markerType: MarkerType.Arrow,
-            })
-          }
-        >
-          Fulfilled by
-        </button>
-        <button
-          className={cn(
-            `${buttonVariants.edge} border-gray-200 text-gray-200 hover:bg-gray-200 `,
-            {
-              "bg-gray-200 text-white border-transparent":
-                relation.color === "#e5e7ec",
-            },
-          )}
-          onClick={() =>
-            setRelation({
-              color: "#e5e7ec",
-              strokeDasharray: true,
-              markerType: MarkerType.ArrowClosed,
-            })
-          }
-        >
-          Proxy
-        </button>
-        <button
-          className={cn(
-            `${buttonVariants.edge} border-dotted border-gray-200 text-gray-200 hover:bg-gray-200`,
-            {
-              "bg-gray-200 text-white border-transparent":
-                relation.color === "#e5e7eb",
-            },
-          )}
-          onClick={() =>
-            setRelation({
-              color: "#e5e7eb",
-              strokeDasharray: true,
-              markerType: MarkerType.Arrow,
-            })
-          }
-        >
-          Projection
-        </button>
-      </div>
-
-      <div className="absolute z-10 flex justify-center w-full">
-        <button
-          className={buttonVariants.block}
-          onClick={() => addNode(NodeType.Block)}
-        >
-          Add block
-        </button>
-        <button
-          className={buttonVariants.connector}
-          onClick={() => addNode(NodeType.Connector)}
-        >
-          Add connector
-        </button>
-        <button
-          className={buttonVariants.terminal}
-          onClick={() => addNode(NodeType.Terminal)}
-        >
-          Add terminal
-        </button>
-        <button
-          className={buttonVariants.textbox}
-          onClick={() => addNode(NodeType.TextBox)}
-        >
-          Add TextBox
-        </button>
-      </div>
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -260,6 +107,163 @@ export default function App() {
         onConnect={onConnect}
         nodeTypes={nodeTypes}
       >
+        <Panel position="top-center" className="w-full flex justify-center">
+          <button
+            className={buttonVariants.block}
+            onClick={() => addNode(NodeType.Block)}
+          >
+            Add block
+          </button>
+          <button
+            className={buttonVariants.connector}
+            onClick={() => addNode(NodeType.Connector)}
+          >
+            Add connector
+          </button>
+          <button
+            className={buttonVariants.terminal}
+            onClick={() => addNode(NodeType.Terminal)}
+          >
+            Add terminal
+          </button>
+          <button
+            className={buttonVariants.textbox}
+            onClick={() => addNode(NodeType.TextBox)}
+          >
+            Add TextBox
+          </button>
+        </Panel>
+        <Panel
+          position="top-right"
+          className="w-100 flex justify-center flex-col"
+        >
+          <button
+            className={cn(
+              `${buttonVariants.edge} border-green-400 text-green-400 hover:bg-green-400 `,
+              {
+                "bg-green-400 text-white border-transparent":
+                  relation.color === "#4ade80",
+              },
+            )}
+            onClick={() =>
+              setRelation({
+                color: "#4ade80",
+                strokeDasharray: false,
+                markerType: MarkerType.ArrowClosed,
+              })
+            }
+          >
+            Part of
+          </button>
+          <button
+            className={cn(
+              `${buttonVariants.edge} border-blue-200 text-blue-200 hover:bg-blue-200 `,
+              {
+                "bg-blue-200 text-white border-transparent":
+                  relation.color === "#bfdbfe",
+              },
+            )}
+            onClick={() =>
+              setRelation({
+                color: "#bfdbfe",
+                strokeDasharray: false,
+                markerType: null,
+              })
+            }
+          >
+            Connected to
+          </button>
+          <button
+            className={cn(
+              `${buttonVariants.edge} border-blue-400 text-blue-400 hover:bg-blue-400 `,
+              {
+                "bg-blue-400 text-white border-transparent":
+                  relation.color === "#60a5fa",
+              },
+            )}
+            onClick={() =>
+              setRelation({
+                color: "#60a5fa",
+                strokeDasharray: false,
+                markerType: MarkerType.ArrowClosed,
+              })
+            }
+          >
+            Transfer to
+          </button>
+          <button
+            className={cn(
+              `${buttonVariants.edge} border-amber-300 text-amber-300 hover:bg-amber-300 `,
+              {
+                "bg-amber-300 text-white border-transparent":
+                  relation.color === "#fcd34d",
+              },
+            )}
+            onClick={() =>
+              setRelation({
+                color: "#fcd34d",
+                strokeDasharray: false,
+                markerType: MarkerType.ArrowClosed,
+              })
+            }
+          >
+            Specialisation of
+          </button>
+          <button
+            className={cn(
+              `${buttonVariants.edge} border-amber-300 text-amber-300 hover:bg-amber-300 border-dotted`,
+              {
+                "bg-amber-300 text-white border-transparent":
+                  relation.color === "#fcd34c",
+              },
+            )}
+            onClick={() =>
+              setRelation({
+                color: "#fcd34c",
+                strokeDasharray: true,
+                markerType: MarkerType.Arrow,
+              })
+            }
+          >
+            Fulfilled by
+          </button>
+          <button
+            className={cn(
+              `${buttonVariants.edge} border-gray-200 text-gray-200 hover:bg-gray-200 `,
+              {
+                "bg-gray-200 text-white border-transparent":
+                  relation.color === "#e5e7ec",
+              },
+            )}
+            onClick={() =>
+              setRelation({
+                color: "#e5e7ec",
+                strokeDasharray: true,
+                markerType: MarkerType.ArrowClosed,
+              })
+            }
+          >
+            Proxy
+          </button>
+          <button
+            className={cn(
+              `${buttonVariants.edge} border-dotted border-gray-200 text-gray-200 hover:bg-gray-200`,
+              {
+                "bg-gray-200 text-white border-transparent":
+                  relation.color === "#e5e7eb",
+              },
+            )}
+            onClick={() =>
+              setRelation({
+                color: "#e5e7eb",
+                strokeDasharray: true,
+                markerType: MarkerType.Arrow,
+              })
+            }
+          >
+            Projection
+          </button>
+        </Panel>
         <Controls />
         <Background gap={12} size={1} />
       </ReactFlow>
