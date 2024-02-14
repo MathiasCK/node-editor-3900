@@ -1,0 +1,50 @@
+import { create } from "zustand";
+import { createJSONStorage, persist } from "zustand/middleware";
+
+type SheetData = {
+  title: string;
+  subtitle: string;
+};
+
+type Sheet = {
+  open: boolean;
+  data?: SheetData;
+};
+
+type SheetState = {
+  sheet: Sheet;
+  openSheet: (data: SheetData) => void;
+  closeSheet: () => void;
+};
+
+const useSheet = create<SheetState>()(
+  persist(
+    set => ({
+      sheet: {
+        open: false,
+      },
+      openSheet: data =>
+        set({
+          sheet: {
+            open: true,
+            data: {
+              title: data.title,
+              subtitle: data.subtitle,
+            },
+          },
+        }),
+      closeSheet: () =>
+        set({
+          sheet: {
+            open: false,
+          },
+        }),
+    }),
+    {
+      name: "sheet-storage",
+      storage: createJSONStorage(() => localStorage),
+    },
+  ),
+);
+
+export default useSheet;
