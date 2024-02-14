@@ -1,8 +1,9 @@
-import { useSheet } from "@/hooks";
+import { useSheet, useTheme } from "@/hooks";
 import { EdgeProps } from "reactflow";
 
 const Specialisation = (props: EdgeProps) => {
   const { openSheet } = useSheet();
+  const { theme } = useTheme();
   return (
     <g
       onClick={() =>
@@ -28,7 +29,7 @@ const Specialisation = (props: EdgeProps) => {
           <svg width="20" height="10" xmlns="http://www.w3.org/2000/svg">
             <polygon
               points="0 0, 10 3.5, 0 7"
-              fill="black"
+              fill={theme === "dark" ? "#000" : "#fff"}
               stroke="#fcd34c"
               strokeWidth="1"
             />

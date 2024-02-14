@@ -1,8 +1,10 @@
 import { useSheet } from "@/hooks";
 import { EdgeProps } from "reactflow";
+import { useTheme } from "styled-components";
 
 const Fulfilled = (props: EdgeProps) => {
   const { openSheet } = useSheet();
+  const { theme } = useTheme();
   return (
     <g
       onClick={() =>
@@ -36,7 +38,7 @@ const Fulfilled = (props: EdgeProps) => {
             strokeWidth="1"
             strokeLinecap="square"
             strokeLinejoin="miter"
-            fill="black"
+            fill={theme === "dark" ? "#000" : "#fff"}
             color="#fcd34c"
           >
             {" "}
