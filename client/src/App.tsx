@@ -5,7 +5,6 @@ import ReactFlow, {
   useNodesState,
   useEdgesState,
   addEdge,
-  MarkerType,
   Panel,
 } from "reactflow";
 import type { Edge, Connection } from "reactflow";
@@ -24,6 +23,15 @@ import {
   SheetHeader,
   SheetTitle,
 } from "./components/ui/sheet";
+import {
+  Connected,
+  Fulfilled,
+  Part,
+  Projection,
+  Proxy,
+  Specialisation,
+  Transfer,
+} from "./components/Edges";
 
 const nodeTypes = {
   block: Block,
@@ -32,19 +40,18 @@ const nodeTypes = {
   textbox: TextBox,
 };
 
-interface AppState {
-  color: string;
-  strokeDasharray: boolean;
-  markerType: MarkerType | null;
-}
+const edgeTypes = {
+  part: Part,
+  connected: Connected,
+  fulfilled: Fulfilled,
+  projection: Projection,
+  proxy: Proxy,
+  specialisation: Specialisation,
+  transfer: Transfer,
+};
 
 export default function App() {
-  const [relation, setRelation] = useState<AppState>({
-    color: "#4ade80",
-    strokeDasharray: false,
-    markerType: null,
-  });
-
+  const [edgeType, setEdgeType] = useState<string>("part");
   const { sheet, closeSheet } = useSheet();
 
   const [nodes, setNodes, onNodesChange] = useNodesState(
@@ -58,32 +65,30 @@ export default function App() {
       : [],
   );
   const [nodeCount, setNodeCount] = useState(nodes.length);
+  const [edgeCount, setEdgeCount] = useState(edges.length);
+
+  useEffect(() => {
+    localStorage.setItem("nodes", JSON.stringify(nodes));
+    localStorage.setItem("edges", JSON.stringify(edges));
+  }, [nodes, edges]);
 
   const onConnect = useCallback(
     (params: Edge | Connection) => {
       if (canConnect(params)) {
         const newConnection = {
           ...params,
-          style: {
-            stroke: relation.color,
-            strokeWidth: 2,
-            strokeDasharray: relation.strokeDasharray ? "5, 5" : "",
+          type: edgeType,
+          data: {
+            label: `Edge ${edgeCount}`,
+            createdAt: Date.now(),
           },
         };
-        if (relation.markerType) {
-          // @ts-ignore
-          newConnection.markerEnd = {
-            type: relation.markerType,
-            color: relation.color,
-            width: 10,
-            height: 10,
-          };
-        }
 
+        setEdgeCount(edgeCount + 1);
         return setEdges(eds => addEdge(newConnection, eds));
       }
     },
-    [relation.markerType, relation.color, relation.strokeDasharray, setEdges],
+    [edgeCount, setEdges, edgeType],
   );
 
   const addNode = (type: NodeType) => {
@@ -102,11 +107,6 @@ export default function App() {
     setNodeCount(nodeCount + 1);
   };
 
-  useEffect(() => {
-    localStorage.setItem("nodes", JSON.stringify(nodes));
-    localStorage.setItem("edges", JSON.stringify(edges));
-  }, [nodes, edges]);
-
   return (
     <main className="w-screen h-screen bg-black">
       <ReactFlow
@@ -116,6 +116,7 @@ export default function App() {
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
         nodeTypes={nodeTypes}
+        edgeTypes={edgeTypes}
       >
         <Sheet open={sheet?.open} onOpenChange={() => closeSheet()}>
           <SheetContent>
@@ -161,16 +162,10 @@ export default function App() {
               `${buttonVariants.edge} border-green-400 text-green-400 hover:bg-green-400 `,
               {
                 "bg-green-400 text-white border-transparent":
-                  relation.color === "#4ade80",
+                  edgeType === "part",
               },
             )}
-            onClick={() =>
-              setRelation({
-                color: "#4ade80",
-                strokeDasharray: false,
-                markerType: MarkerType.ArrowClosed,
-              })
-            }
+            onClick={() => setEdgeType("part")}
           >
             Part of
           </button>
@@ -179,16 +174,10 @@ export default function App() {
               `${buttonVariants.edge} border-blue-200 text-blue-200 hover:bg-blue-200 `,
               {
                 "bg-blue-200 text-white border-transparent":
-                  relation.color === "#bfdbfe",
+                  edgeType === "connected",
               },
             )}
-            onClick={() =>
-              setRelation({
-                color: "#bfdbfe",
-                strokeDasharray: false,
-                markerType: null,
-              })
-            }
+            onClick={() => setEdgeType("connected")}
           >
             Connected to
           </button>
@@ -197,16 +186,10 @@ export default function App() {
               `${buttonVariants.edge} border-blue-400 text-blue-400 hover:bg-blue-400 `,
               {
                 "bg-blue-400 text-white border-transparent":
-                  relation.color === "#60a5fa",
+                  edgeType === "transfer",
               },
             )}
-            onClick={() =>
-              setRelation({
-                color: "#60a5fa",
-                strokeDasharray: false,
-                markerType: MarkerType.ArrowClosed,
-              })
-            }
+            onClick={() => setEdgeType("transfer")}
           >
             Transfer to
           </button>
@@ -215,16 +198,10 @@ export default function App() {
               `${buttonVariants.edge} border-amber-300 text-amber-300 hover:bg-amber-300 `,
               {
                 "bg-amber-300 text-white border-transparent":
-                  relation.color === "#fcd34d",
+                  edgeType === "specialisation",
               },
             )}
-            onClick={() =>
-              setRelation({
-                color: "#fcd34d",
-                strokeDasharray: false,
-                markerType: MarkerType.ArrowClosed,
-              })
-            }
+            onClick={() => setEdgeType("specialisation")}
           >
             Specialisation of
           </button>
@@ -233,16 +210,10 @@ export default function App() {
               `${buttonVariants.edge} border-amber-300 text-amber-300 hover:bg-amber-300 border-dotted`,
               {
                 "bg-amber-300 text-white border-transparent":
-                  relation.color === "#fcd34c",
+                  edgeType === "fulfilled",
               },
             )}
-            onClick={() =>
-              setRelation({
-                color: "#fcd34c",
-                strokeDasharray: true,
-                markerType: MarkerType.Arrow,
-              })
-            }
+            onClick={() => setEdgeType("fulfilled")}
           >
             Fulfilled by
           </button>
@@ -251,16 +222,10 @@ export default function App() {
               `${buttonVariants.edge} border-gray-200 text-gray-200 hover:bg-gray-200 `,
               {
                 "bg-gray-200 text-white border-transparent":
-                  relation.color === "#e5e7ec",
+                  edgeType === "proxy",
               },
             )}
-            onClick={() =>
-              setRelation({
-                color: "#e5e7ec",
-                strokeDasharray: true,
-                markerType: MarkerType.ArrowClosed,
-              })
-            }
+            onClick={() => setEdgeType("proxy")}
           >
             Proxy
           </button>
@@ -269,16 +234,10 @@ export default function App() {
               `${buttonVariants.edge} border-dotted border-gray-200 text-gray-200 hover:bg-gray-200`,
               {
                 "bg-gray-200 text-white border-transparent":
-                  relation.color === "#e5e7eb",
+                  edgeType === "projection",
               },
             )}
-            onClick={() =>
-              setRelation({
-                color: "#e5e7eb",
-                strokeDasharray: true,
-                markerType: MarkerType.Arrow,
-              })
-            }
+            onClick={() => setEdgeType("projection")}
           >
             Projection
           </button>
