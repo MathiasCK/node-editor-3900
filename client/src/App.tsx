@@ -69,7 +69,21 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem("nodes", JSON.stringify(nodes));
     localStorage.setItem("edges", JSON.stringify(edges));
-  }, [nodes, edges]);
+
+    const handleKeyPress = (e: KeyboardEvent) => {
+      if (e.key === "Backspace" || e.key === "Delete") {
+        if (sheet?.open) {
+          closeSheet();
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyPress);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyPress);
+    };
+  }, [nodes, edges, sheet?.open, closeSheet]);
 
   const onConnect = useCallback(
     (params: Edge | Connection) => {
