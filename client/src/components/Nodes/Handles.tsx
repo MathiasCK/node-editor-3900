@@ -1,4 +1,4 @@
-import { isBlock } from "@/utils";
+import { isBlock } from "@/lib/utils";
 import { FC } from "react";
 import { Handle, Position } from "reactflow";
 
