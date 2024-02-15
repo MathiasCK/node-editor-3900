@@ -139,9 +139,8 @@ export default function App() {
     setNodeCount(nodeCount + 1);
   };
 
-  const deleteNode = (): void => {
-    const id = sheet.currentNode?.id;
-    const currentNode = nodes.find(node => node.id === id);
+  const deleteSelectedNode = (selectedNodeId: string): void => {
+    const currentNode = nodes.find(node => node.id === selectedNodeId);
 
     if (!currentNode) {
       toast.error("No node selected");
@@ -151,22 +150,21 @@ export default function App() {
     const connectedEdges = getConnectedEdges([currentNode], edges);
     const updatedEdges = getSymmetricDifference(edges, connectedEdges);
 
-    const updatedNodes = nodes.filter(node => node.id !== id);
+    const updatedNodes = nodes.filter(node => node.id !== selectedNodeId);
 
     setNodes(updatedNodes);
     setEdges(updatedEdges);
   };
 
-  const deleteEdge = (): void => {
-    const id = sheet.currentEdge?.id;
-    const currentNode = edges.find(edge => edge.id === id);
+  const deleteSelectedEdge = (selectedEdgeId: string): void => {
+    const currentNode = edges.find(edge => edge.id === selectedEdgeId);
 
     if (!currentNode) {
       toast.error("No edge selected");
       return;
     }
 
-    const updatedEdges = edges.filter(edge => edge.id !== id);
+    const updatedEdges = edges.filter(edge => edge.id !== selectedEdgeId);
     setEdges(updatedEdges);
   };
 
@@ -182,7 +180,11 @@ export default function App() {
           nodeTypes={nodeTypes}
           edgeTypes={edgeTypes}
         >
-          <Info deleteEdge={deleteEdge} deleteNode={deleteNode} />
+          <Info
+            deleteSelectedEdge={deleteSelectedEdge}
+            deleteSelectedNode={deleteSelectedNode}
+            setEdges={setEdges}
+          />
 
           <Settings />
           <Panel position="top-left" className="z-10">
