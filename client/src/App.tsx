@@ -111,6 +111,7 @@ export default function App() {
           type: edgeType,
           data: {
             label: `Edge ${edgeCount}`,
+            type: edgeType,
             createdAt: Date.now(),
           },
         };

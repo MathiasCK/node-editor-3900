@@ -14,6 +14,9 @@ type SheetState = {
   closeSheet: () => void;
 };
 
+const isEdgeProps = (data: NodeProps | EdgeProps): data is EdgeProps =>
+  "sourceHandleId" in data && "targetHandleId" in data;
+
 const useSheet = create<SheetState>()(
   persist(
     set => ({
@@ -21,20 +24,18 @@ const useSheet = create<SheetState>()(
         open: false,
       },
       openSheet: data => {
-        if (data.data.type) {
+        if (isEdgeProps(data)) {
           set({
             sheet: {
               open: true,
-
-              currentNode: data as NodeProps,
+              currentEdge: data,
             },
           });
         } else {
           set({
             sheet: {
               open: true,
-
-              currentEdge: data as EdgeProps,
+              currentNode: data,
             },
           });
         }
