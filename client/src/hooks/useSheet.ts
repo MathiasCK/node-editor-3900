@@ -1,20 +1,16 @@
+import type { EdgeProps, NodeProps } from "reactflow";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
-type SheetData = {
-  type: "node" | "edge";
-  title: string;
-  subtitle: string;
-};
-
 type Sheet = {
   open: boolean;
-  data?: SheetData;
+  currentNode?: NodeProps;
+  currentEdge?: EdgeProps;
 };
 
 type SheetState = {
   sheet: Sheet;
-  openSheet: (data: SheetData) => void;
+  openSheet: (data: NodeProps | EdgeProps) => void;
   closeSheet: () => void;
 };
 
@@ -24,17 +20,25 @@ const useSheet = create<SheetState>()(
       sheet: {
         open: false,
       },
-      openSheet: data =>
-        set({
-          sheet: {
-            open: true,
-            data: {
-              type: data.type,
-              title: data.title,
-              subtitle: data.subtitle,
+      openSheet: data => {
+        if (data.data.type) {
+          set({
+            sheet: {
+              open: true,
+
+              currentNode: data as NodeProps,
             },
-          },
-        }),
+          });
+        } else {
+          set({
+            sheet: {
+              open: true,
+
+              currentEdge: data as EdgeProps,
+            },
+          });
+        }
+      },
       closeSheet: () =>
         set({
           sheet: {

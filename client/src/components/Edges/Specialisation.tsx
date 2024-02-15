@@ -1,21 +1,11 @@
 import { useSheet, useTheme } from "@/hooks";
-import { EdgeProps } from "reactflow";
+import type { EdgeProps } from "reactflow";
 
 const Specialisation = (props: EdgeProps) => {
   const { openSheet } = useSheet();
   const { theme } = useTheme();
   return (
-    <g
-      onClick={() =>
-        openSheet({
-          type: "edge",
-          title: props.data.label,
-          subtitle: `Created at: ${new Date(
-            props.data.createdAt,
-          ).toLocaleString()}`,
-        })
-      }
-    >
+    <g onClick={() => openSheet(props)}>
       <defs>
         <marker
           id="specialhead"
