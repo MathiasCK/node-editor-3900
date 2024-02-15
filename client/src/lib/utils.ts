@@ -27,3 +27,16 @@ export const isConnector = (id: string): boolean => id.includes("connector");
 export const isTerminal = (id: string): boolean => id.includes("terminal");
 
 export const isTextBox = (id: string): boolean => id.includes("textbox");
+
+export const getSymmetricDifference = (arr1: Edge[], arr2: Edge[]): Edge[] => {
+  const set1 = new Set(arr1);
+  const set2 = new Set(arr2);
+
+  const difference = new Set(
+    [...set1]
+      .filter(x => !set2.has(x))
+      .concat([...set2].filter(x => !set1.has(x))),
+  );
+
+  return Array.from(difference);
+};

@@ -1,18 +1,20 @@
 import { useCallback, useEffect, useState } from "react";
 import {
+  type Edge,
+  type Connection,
   Background,
   useNodesState,
   useEdgesState,
   addEdge,
   Panel,
+  getConnectedEdges,
 } from "reactflow";
-import type { Edge, Connection } from "reactflow";
 
 import "reactflow/dist/style.css";
 import { Block, Connector, Terminal, TextBox } from "./components/Nodes";
 import { buttonVariants } from "./lib/config";
 import { NodeType } from "./lib/types";
-import { canConnect, cn } from "./lib/utils";
+import { canConnect, cn, getSymmetricDifference } from "./lib/utils";
 import { useSettings, useSheet, useTheme } from "./hooks";
 
 import {
@@ -34,6 +36,7 @@ import {
 import { ThemeProvider } from "styled-components";
 import { AlignJustify } from "lucide-react";
 import { Info, Settings } from "./components/Sidebar";
+import toast from "react-hot-toast";
 
 const nodeTypes = {
   block: Block,
@@ -135,8 +138,39 @@ export default function App() {
     setNodeCount(nodeCount + 1);
   };
 
+  const deleteNode = (): void => {
+    const id = sheet.currentNode?.id;
+    const currentNode = nodes.find(node => node.id === id);
+
+    if (!currentNode) {
+      toast.error("No node selected");
+      return;
+    }
+
+    const connectedEdges = getConnectedEdges([currentNode], edges);
+    const updatedEdges = getSymmetricDifference(edges, connectedEdges);
+
+    const updatedNodes = nodes.filter(node => node.id !== id);
+
+    setNodes(updatedNodes);
+    setEdges(updatedEdges);
+  };
+
+  const deleteEdge = (): void => {
+    const id = sheet.currentEdge?.id;
+    const currentNode = edges.find(edge => edge.id === id);
+
+    if (!currentNode) {
+      toast.error("No edge selected");
+      return;
+    }
+
+    const updatedEdges = edges.filter(edge => edge.id !== id);
+    setEdges(updatedEdges);
+  };
+
   return (
-    <main className="w-screen h-screen ">
+    <main className="w-screen h-screen">
       <ThemeProvider theme={theme === "light" ? lightTheme : darkTheme}>
         <ReactFlowStyled
           nodes={nodes}
@@ -147,7 +181,8 @@ export default function App() {
           nodeTypes={nodeTypes}
           edgeTypes={edgeTypes}
         >
-          <Info />
+          <Info deleteEdge={deleteEdge} deleteNode={deleteNode} />
+
           <Settings />
           <Panel position="top-left" className="z-10">
             <AlignJustify

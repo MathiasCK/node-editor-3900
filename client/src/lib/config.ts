@@ -9,4 +9,6 @@ export const buttonVariants = {
   block: `${commonStyles} px-5 py-2.5 border-block text-block hover:bg-block`,
   connector: `${commonStyles} px-5 py-2.5 border-connector  text-connector hover:bg-connector`,
   terminal: `${commonStyles} px-5 py-2.5 border-terminal  text-terminal hover:bg-terminal`,
+  danger:
+    "bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline",
 };
