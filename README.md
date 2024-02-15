@@ -12,13 +12,13 @@ To get a local copy up and running, follow these simple steps from your terminal
 1. **Clone the repository**:
 
    ```bash
-   git clone https://github.com/MathiasCK/node-editor-react.git
+   git clone https://github.com/MathiasCK/node-editor.git
    ```
 
 2. **Navigate to the project folder**
 
    ```bash
-   cd node-editor-react
+   cd node-editor
    ```
 
 3. **Install root & client dependencies**

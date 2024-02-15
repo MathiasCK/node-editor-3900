@@ -1,9 +1,6 @@
 {
-  "name": "node-editor-react",
+  "name": "node-editor",
   "version": "1.0.0",
-  "workspaces": [
-    "client"
-  ],
   "scripts": {
     "start:dev": "npm-run-all --parallel server:dev client:dev",
     "start": "npm-run-all --parallel server client:serve",
