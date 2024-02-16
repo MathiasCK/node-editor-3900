@@ -36,7 +36,7 @@ const Info = ({
   deleteSelectedEdge,
   updateNodeName,
 }: InfoProps) => {
-  const { sheet, closeSheet } = useSheet();
+  const { sheet, handleEdit, closeSheet } = useSheet();
   const { edges, setEdges } = useStore(storeSelector, shallow);
 
   const displayName = capitalizeFirstLetter(
@@ -59,7 +59,6 @@ const Info = ({
       : sheet.currentEdge?.data?.updatedAt,
   ).toLocaleString();
 
-  const [edit, setEdit] = useState<boolean>(false);
   const [connectionType, setConnectionType] = useState<string>("");
   const [nodeName, setNodeName] = useState<string>("");
 
@@ -78,7 +77,7 @@ const Info = ({
       deleteSelectedEdge(sheet.currentEdge?.id as string);
     }
     closeSheet();
-    setEdit(false);
+    handleEdit(false);
   };
 
   const handleConnectionTypeChange = () => {
@@ -106,7 +105,7 @@ const Info = ({
 
   const handleNodeNameChange = () => {
     updateNodeName(sheet.currentNode?.id as string, nodeName);
-    setEdit(false);
+    handleEdit(false);
   };
 
   return (
@@ -114,15 +113,15 @@ const Info = ({
       open={sheet?.open}
       onOpenChange={() => {
         closeSheet();
-        setEdit(false);
+        handleEdit(false);
       }}
     >
       <SheetContent className="bg:background flex flex-col justify-between">
         <SheetHeader>
           <SheetTitle className="uppercase flex items-center dark:text-white">
-            {!edit ? (
+            {!sheet.edit ? (
               <Pencil
-                onClick={() => setEdit(true)}
+                onClick={() => handleEdit(true)}
                 size={15}
                 className={cn(
                   "text-md font-semibold text-foreground  hover:cursor-pointer",
@@ -134,7 +133,7 @@ const Info = ({
             ) : null}
 
             <Input
-              disabled={!edit}
+              disabled={!sheet.edit}
               value={nodeName}
               onChange={e => setNodeName(e.target.value)}
               className="border-none text-lg font-semibold text-foreground"

@@ -75,7 +75,7 @@ export default function App() {
 
     const handleKeyPress = (e: KeyboardEvent) => {
       if (e.key === "Backspace" || e.key === "Delete") {
-        if (sheet?.open) {
+        if (sheet?.open && !sheet?.edit) {
           closeSheet();
         }
       }
@@ -86,7 +86,7 @@ export default function App() {
     return () => {
       window.removeEventListener("keydown", handleKeyPress);
     };
-  }, [sheet?.open, closeSheet, theme]);
+  }, [sheet?.open, closeSheet, theme, sheet?.edit]);
 
   const onConnect = useCallback(
     (params: Edge | Connection) => {

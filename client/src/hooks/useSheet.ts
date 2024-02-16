@@ -4,6 +4,7 @@ import { createJSONStorage, persist } from "zustand/middleware";
 
 type Sheet = {
   open: boolean;
+  edit: boolean;
   currentNode?: CustomNodeProps;
   currentEdge?: CustomEdgeProps;
 };
@@ -12,6 +13,7 @@ type SheetState = {
   sheet: Sheet;
   openSheet: (data: CustomNodeProps | CustomEdgeProps) => void;
   closeSheet: () => void;
+  handleEdit: (edit: boolean) => void;
 };
 
 const isEdgeProps = (
@@ -19,16 +21,18 @@ const isEdgeProps = (
 ): data is CustomEdgeProps =>
   "sourceHandleId" in data && "targetHandleId" in data;
 
-const useSheet = create<SheetState>()(
+const useSidebar = create<SheetState>()(
   persist(
     set => ({
       sheet: {
         open: false,
+        edit: false,
       },
       openSheet: data => {
         if (isEdgeProps(data)) {
           set({
             sheet: {
+              edit: false,
               open: true,
               currentEdge: data,
             },
@@ -36,16 +40,26 @@ const useSheet = create<SheetState>()(
         } else {
           set({
             sheet: {
+              edit: false,
               open: true,
               currentNode: data,
             },
           });
         }
       },
+      handleEdit: (edit: boolean) => {
+        set(state => ({
+          sheet: {
+            ...state.sheet, // spread the existing sheet properties
+            edit: edit, // set the new edit value
+          },
+        }));
+      },
       closeSheet: () =>
         set({
           sheet: {
             open: false,
+            edit: false,
           },
         }),
     }),
@@ -56,4 +70,4 @@ const useSheet = create<SheetState>()(
   ),
 );
 
-export default useSheet;
+export default useSidebar;
