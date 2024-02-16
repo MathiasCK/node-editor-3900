@@ -244,16 +244,6 @@ export default function App() {
             >
               Add terminal
             </button>
-            <button
-              className={
-                theme === "light"
-                  ? buttonVariants.button
-                  : buttonVariants.textbox
-              }
-              onClick={() => addNode(NodeType.TextBox)}
-            >
-              Add TextBox
-            </button>
           </Panel>
           <Panel
             position="top-right"
@@ -342,6 +332,16 @@ export default function App() {
               onClick={() => setEdgeType(EdgeType.Projection)}
             >
               Projection
+            </button>
+            <button
+              className={
+                theme === "light"
+                  ? buttonVariants.button
+                  : buttonVariants.textbox
+              }
+              onClick={() => addNode(NodeType.TextBox)}
+            >
+              Add TextBox
             </button>
           </Panel>
           <ControlsStyled />
