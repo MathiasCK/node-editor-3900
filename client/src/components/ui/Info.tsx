@@ -7,7 +7,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "./sheet";
-import { useSheet } from "@/hooks";
+import { storeSelector, useSheet, useStore } from "@/hooks";
 import { buttonVariants } from "@/lib/config";
 import { Edge, addEdge } from "reactflow";
 import { useEffect, useState } from "react";
@@ -23,22 +23,21 @@ import { EdgeType } from "@/lib/types";
 import { Pencil } from "lucide-react";
 import { capitalizeFirstLetter, cn } from "@/lib/utils";
 import { Input } from "./input";
+import { shallow } from "zustand/shallow";
 
 interface InfoProps {
   deleteSelectedNode: (selectedNodeId: string) => void;
   deleteSelectedEdge: (selectedEdgeId: string, displayToast?: boolean) => void;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  setEdges: (value: React.SetStateAction<Edge<any>[]>) => void;
   updateNodeName: (nodeId: string, newValue: string) => void;
 }
 
 const Info = ({
   deleteSelectedNode,
   deleteSelectedEdge,
-  setEdges,
   updateNodeName,
 }: InfoProps) => {
   const { sheet, closeSheet } = useSheet();
+  const { edges, setEdges } = useStore(storeSelector, shallow);
 
   const displayName = capitalizeFirstLetter(
     sheet.currentNode
@@ -96,8 +95,11 @@ const Info = ({
       targetHandle: sheet.currentEdge?.targetHandleId,
       type: connectionType,
     };
-    deleteSelectedEdge(sheet.currentEdge?.id as string, false);
-    setEdges(eds => addEdge(clonedConnection as Edge, eds));
+
+    const filteredEdges = edges.filter(e => e.id !== sheet.currentEdge?.id);
+
+    const newEdges = addEdge(clonedConnection as Edge, filteredEdges);
+    setEdges(newEdges);
     closeSheet();
     toast.success(`${displayName} connection updated`);
   };

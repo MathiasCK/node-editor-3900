@@ -11,8 +11,9 @@ import {
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
 import { AlignJustify } from "lucide-react";
-import { useSettings, useTheme } from "@/hooks";
+import { storeSelector, useSettings, useStore, useTheme } from "@/hooks";
 import { NavItem } from "@/lib/types";
+import { shallow } from "zustand/shallow";
 
 const navItems: NavItem[] = [
   {
@@ -83,6 +84,9 @@ const navItems: NavItem[] = [
 const Navbar = () => {
   const { theme } = useTheme();
   const { openSettings } = useSettings();
+
+  const {} = useStore(storeSelector, shallow);
+
   return (
     <NavigationMenu className="fixed backdrop-blur-md">
       <NavigationMenuList>

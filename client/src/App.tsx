@@ -3,20 +3,19 @@ import {
   type Edge,
   type Connection,
   Background,
-  useNodesState,
-  useEdgesState,
   addEdge,
   Panel,
   getConnectedEdges,
   EdgeTypes,
 } from "reactflow";
+import { shallow } from "zustand/shallow";
 
 import "reactflow/dist/style.css";
 import { Block, Connector, Terminal, TextBox } from "./components/Nodes";
 import { buttonVariants } from "./lib/config";
 import { EdgeType, NodeType } from "./lib/types";
 import { canConnect, cn, getSymmetricDifference } from "./lib/utils";
-import { useSheet, useTheme } from "./hooks";
+import { storeSelector, useSheet, useStore, useTheme } from "./hooks";
 
 import {
   Connected,
@@ -61,23 +60,10 @@ export default function App() {
   const { sheet, closeSheet } = useSheet();
   const { theme } = useTheme();
 
-  const [nodes, setNodes, onNodesChange] = useNodesState(
-    localStorage.getItem("nodes")
-      ? JSON.parse(localStorage.getItem("nodes")!)
-      : [],
-  );
-  const [edges, setEdges, onEdgesChange] = useEdgesState(
-    localStorage.getItem("edges")
-      ? JSON.parse(localStorage.getItem("edges")!)
-      : [],
-  );
-  const [nodeCount, setNodeCount] = useState(nodes.length);
-  const [edgeCount, setEdgeCount] = useState(edges.length);
+  const { nodes, setNodes, onNodesChange, edges, setEdges, onEdgesChange } =
+    useStore(storeSelector, shallow);
 
   useEffect(() => {
-    localStorage.setItem("nodes", JSON.stringify(nodes));
-    localStorage.setItem("edges", JSON.stringify(edges));
-
     if (
       theme === "dark" &&
       window.matchMedia("(prefers-color-scheme: dark)").matches
@@ -100,33 +86,34 @@ export default function App() {
     return () => {
       window.removeEventListener("keydown", handleKeyPress);
     };
-  }, [nodes, edges, sheet?.open, closeSheet, theme]);
+  }, [sheet?.open, closeSheet, theme]);
 
   const onConnect = useCallback(
     (params: Edge | Connection) => {
       if (canConnect(params)) {
         const currentDate = Date.now();
+        const id = edges.length.toString();
         const newConnection = {
           ...params,
           type: edgeType,
           data: {
-            id: edgeCount.toString(),
-            label: `Edge ${edgeCount}`,
+            id,
+            label: `Edge ${id}`,
             type: edgeType,
             createdAt: currentDate,
             updatedAt: currentDate,
           },
         };
 
-        setEdgeCount(edgeCount + 1);
-        return setEdges(eds => addEdge(newConnection, eds));
+        const newEdges = addEdge(newConnection, edges);
+        return setEdges(newEdges);
       }
     },
-    [edgeCount, setEdges, edgeType],
+    [edges, edgeType, setEdges],
   );
 
   const addNode = (type: NodeType) => {
-    const id = nodeCount.toString();
+    const id = nodes.length.toString();
     const currentDate = Date.now();
     const newNode = {
       id,
@@ -144,8 +131,7 @@ export default function App() {
       },
     };
 
-    setNodes(nds => nds.concat(newNode));
-    setNodeCount(nodeCount + 1);
+    setNodes([...nodes, newNode]);
   };
 
   const deleteSelectedNode = (selectedNodeId: string): void => {
@@ -171,14 +157,15 @@ export default function App() {
     selectedEdgeId: string,
     displayToast = true,
   ): void => {
-    const currentNode = edges.find(edge => edge.id === selectedEdgeId);
+    const currentEdge = edges.find(edge => edge.id === selectedEdgeId);
 
-    if (!currentNode) {
+    if (!currentEdge) {
       toast.error("Could not delete -> no edge selected");
       return;
     }
 
     const updatedEdges = edges.filter(edge => edge.id !== selectedEdgeId);
+
     setEdges(updatedEdges);
 
     if (displayToast) {
@@ -219,7 +206,6 @@ export default function App() {
           <Info
             deleteSelectedEdge={deleteSelectedEdge}
             deleteSelectedNode={deleteSelectedNode}
-            setEdges={setEdges}
             updateNodeName={updateNodeName}
           />
 
