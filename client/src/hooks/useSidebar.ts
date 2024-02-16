@@ -2,17 +2,17 @@ import type { CustomNodeProps, CustomEdgeProps } from "@/lib/types";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
-type Sheet = {
+type Sidebar = {
   open: boolean;
   edit: boolean;
   currentNode?: CustomNodeProps;
   currentEdge?: CustomEdgeProps;
 };
 
-type SheetState = {
-  sheet: Sheet;
-  openSheet: (data: CustomNodeProps | CustomEdgeProps) => void;
-  closeSheet: () => void;
+type SidebarState = {
+  sidebar: Sidebar;
+  openSidebar: (data: CustomNodeProps | CustomEdgeProps) => void;
+  closeSidebar: () => void;
   handleEdit: (edit: boolean) => void;
 };
 
@@ -21,17 +21,17 @@ const isEdgeProps = (
 ): data is CustomEdgeProps =>
   "sourceHandleId" in data && "targetHandleId" in data;
 
-const useSidebar = create<SheetState>()(
+const useSidebar = create<SidebarState>()(
   persist(
     set => ({
-      sheet: {
+      sidebar: {
         open: false,
         edit: false,
       },
-      openSheet: data => {
+      openSidebar: data => {
         if (isEdgeProps(data)) {
           set({
-            sheet: {
+            sidebar: {
               edit: false,
               open: true,
               currentEdge: data,
@@ -39,7 +39,7 @@ const useSidebar = create<SheetState>()(
           });
         } else {
           set({
-            sheet: {
+            sidebar: {
               edit: false,
               open: true,
               currentNode: data,
@@ -49,22 +49,22 @@ const useSidebar = create<SheetState>()(
       },
       handleEdit: (edit: boolean) => {
         set(state => ({
-          sheet: {
-            ...state.sheet, // spread the existing sheet properties
-            edit: edit, // set the new edit value
+          sidebar: {
+            ...state.sidebar,
+            edit: edit,
           },
         }));
       },
-      closeSheet: () =>
+      closeSidebar: () =>
         set({
-          sheet: {
+          sidebar: {
             open: false,
             edit: false,
           },
         }),
     }),
     {
-      name: "sheet-storage",
+      name: "sidebar-storage",
       storage: createJSONStorage(() => localStorage),
     },
   ),

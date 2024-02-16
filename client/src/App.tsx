@@ -15,7 +15,7 @@ import { Block, Connector, Terminal, TextBox } from "./components/Nodes";
 import { buttonVariants } from "./lib/config";
 import { EdgeType, NodeType } from "./lib/types";
 import { addNode, canConnect, cn, getSymmetricDifference } from "./lib/utils";
-import { storeSelector, useSheet, useStore, useTheme } from "./hooks";
+import { storeSelector, useSidebar, useStore, useTheme } from "./hooks";
 
 import {
   Connected,
@@ -34,7 +34,7 @@ import {
   lightTheme,
 } from "./components/ui/styled";
 import { ThemeProvider } from "styled-components";
-import { Info, Settings } from "./components/ui";
+import { Sidebar, Settings } from "./components/ui";
 import toast from "react-hot-toast";
 
 const nodeTypes = {
@@ -57,7 +57,7 @@ const edgeTypes = {
 export default function App() {
   const [edgeType, setEdgeType] = useState<EdgeType>(EdgeType.Part);
 
-  const { sheet, closeSheet } = useSheet();
+  const { sidebar, closeSidebar } = useSidebar();
   const { theme } = useTheme();
 
   const { nodes, setNodes, onNodesChange, edges, setEdges, onEdgesChange } =
@@ -75,8 +75,8 @@ export default function App() {
 
     const handleKeyPress = (e: KeyboardEvent) => {
       if (e.key === "Backspace" || e.key === "Delete") {
-        if (sheet?.open && !sheet?.edit) {
-          closeSheet();
+        if (sidebar?.open && !sidebar?.edit) {
+          closeSidebar();
         }
       }
     };
@@ -86,7 +86,7 @@ export default function App() {
     return () => {
       window.removeEventListener("keydown", handleKeyPress);
     };
-  }, [sheet?.open, closeSheet, theme, sheet?.edit]);
+  }, [sidebar?.open, closeSidebar, theme, sidebar?.edit]);
 
   const onConnect = useCallback(
     (params: Edge | Connection) => {
@@ -181,7 +181,7 @@ export default function App() {
           nodeTypes={nodeTypes}
           edgeTypes={edgeTypes as EdgeTypes}
         >
-          <Info
+          <Sidebar
             deleteSelectedEdge={deleteSelectedEdge}
             deleteSelectedNode={deleteSelectedNode}
             updateNodeName={updateNodeName}

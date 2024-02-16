@@ -1,14 +1,14 @@
 import Handles from "./Handles";
-import { useSheet } from "@/hooks";
+import { useSidebar } from "@/hooks";
 import type { CustomNodeProps } from "@/lib/types";
 
 const Block = (props: CustomNodeProps) => {
-  const { openSheet } = useSheet();
+  const { openSidebar } = useSidebar();
 
   return (
     <figure id={props.data.label}>
       <div
-        onClick={() => openSheet(props)}
+        onClick={() => openSidebar(props)}
         className="h-12 w-24 rounded-xl bg-block"
       >
         <header className="flex items-center justify-center w-full h-full">

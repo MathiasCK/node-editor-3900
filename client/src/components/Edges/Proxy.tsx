@@ -1,10 +1,10 @@
-import { useSheet } from "@/hooks";
+import { useSidebar } from "@/hooks";
 import type { CustomEdgeProps } from "@/lib/types";
 
 const Proxy = (props: CustomEdgeProps) => {
-  const { openSheet } = useSheet();
+  const { openSidebar } = useSidebar();
   return (
-    <g onClick={() => openSheet(props)}>
+    <g onClick={() => openSidebar(props)}>
       <path
         fill="transparent"
         stroke="#e5e7eb"

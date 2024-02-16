@@ -1,11 +1,11 @@
-import { useSheet, useTheme } from "@/hooks";
+import { useSidebar, useTheme } from "@/hooks";
 import type { CustomEdgeProps } from "@/lib/types";
 
 const Specialisation = (props: CustomEdgeProps) => {
-  const { openSheet } = useSheet();
+  const { openSidebar } = useSidebar();
   const { theme } = useTheme();
   return (
-    <g onClick={() => openSheet(props)}>
+    <g onClick={() => openSidebar(props)}>
       <defs>
         <marker
           id="specialhead"

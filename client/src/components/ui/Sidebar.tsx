@@ -7,7 +7,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "./sheet";
-import { storeSelector, useSheet, useStore } from "@/hooks";
+import { storeSelector, useSidebar, useStore } from "@/hooks";
 import { buttonVariants } from "@/lib/config";
 import { Edge, addEdge } from "reactflow";
 import { useEffect, useState } from "react";
@@ -25,115 +25,115 @@ import { capitalizeFirstLetter, cn } from "@/lib/utils";
 import { Input } from "./input";
 import { shallow } from "zustand/shallow";
 
-interface InfoProps {
+interface SidebarProps {
   deleteSelectedNode: (selectedNodeId: string) => void;
   deleteSelectedEdge: (selectedEdgeId: string, displayToast?: boolean) => void;
   updateNodeName: (nodeId: string, newValue: string) => void;
 }
 
-const Info = ({
+const Sidebar = ({
   deleteSelectedNode,
   deleteSelectedEdge,
   updateNodeName,
-}: InfoProps) => {
-  const { sheet, handleEdit, closeSheet } = useSheet();
+}: SidebarProps) => {
+  const { sidebar, handleEdit, closeSidebar } = useSidebar();
   const { edges, setEdges } = useStore(storeSelector, shallow);
 
   const displayName = capitalizeFirstLetter(
-    sheet.currentNode
-      ? sheet.currentNode?.data?.customName
-        ? sheet.currentNode?.data?.customName
-        : `${sheet.currentNode.type} ${sheet.currentNode.id}`
-      : `Edge ${sheet.currentEdge?.source} -> ${sheet.currentEdge?.target}`,
+    sidebar.currentNode
+      ? sidebar.currentNode?.data?.customName
+        ? sidebar.currentNode?.data?.customName
+        : `${sidebar.currentNode.type} ${sidebar.currentNode.id}`
+      : `Edge ${sidebar.currentEdge?.source} -> ${sidebar.currentEdge?.target}`,
   );
 
   const createdAt = new Date(
-    sheet.currentNode
-      ? sheet.currentNode?.data?.createdAt
-      : sheet.currentEdge?.data?.createdAt,
+    sidebar.currentNode
+      ? sidebar.currentNode?.data?.createdAt
+      : sidebar.currentEdge?.data?.createdAt,
   ).toLocaleString();
 
   const updatedAt = new Date(
-    sheet.currentNode
-      ? sheet.currentNode?.data?.updatedAt
-      : sheet.currentEdge?.data?.updatedAt,
+    sidebar.currentNode
+      ? sidebar.currentNode?.data?.updatedAt
+      : sidebar.currentEdge?.data?.updatedAt,
   ).toLocaleString();
 
   const [connectionType, setConnectionType] = useState<string>("");
   const [nodeName, setNodeName] = useState<string>("");
 
   useEffect(() => {
-    setConnectionType(sheet.currentEdge?.data?.type);
-  }, [sheet.currentEdge]);
+    setConnectionType(sidebar.currentEdge?.data?.type);
+  }, [sidebar.currentEdge]);
 
   useEffect(() => {
     setNodeName(displayName);
-  }, [displayName, sheet.currentNode]);
+  }, [displayName, sidebar.currentNode]);
 
   const handleDelete = () => {
-    if (sheet.currentNode) {
-      deleteSelectedNode(sheet.currentNode.id as string);
+    if (sidebar.currentNode) {
+      deleteSelectedNode(sidebar.currentNode.id as string);
     } else {
-      deleteSelectedEdge(sheet.currentEdge?.id as string);
+      deleteSelectedEdge(sidebar.currentEdge?.id as string);
     }
-    closeSheet();
+    closeSidebar();
     handleEdit(false);
   };
 
   const handleConnectionTypeChange = () => {
     const clonedConnection = {
       data: {
-        label: `Edge ${sheet.currentEdge?.source} -> ${sheet.currentEdge?.target}`,
+        label: `Edge ${sidebar.currentEdge?.source} -> ${sidebar.currentEdge?.target}`,
         type: connectionType,
-        createdAt: sheet.currentEdge?.data?.createdAt,
+        createdAt: sidebar.currentEdge?.data?.createdAt,
         updatedAt: Date.now(),
       },
-      source: sheet.currentEdge?.source,
-      sourceHandle: sheet.currentEdge?.sourceHandleId,
-      target: sheet.currentEdge?.target,
-      targetHandle: sheet.currentEdge?.targetHandleId,
+      source: sidebar.currentEdge?.source,
+      sourceHandle: sidebar.currentEdge?.sourceHandleId,
+      target: sidebar.currentEdge?.target,
+      targetHandle: sidebar.currentEdge?.targetHandleId,
       type: connectionType,
     };
 
-    const filteredEdges = edges.filter(e => e.id !== sheet.currentEdge?.id);
+    const filteredEdges = edges.filter(e => e.id !== sidebar.currentEdge?.id);
 
     const newEdges = addEdge(clonedConnection as Edge, filteredEdges);
     setEdges(newEdges);
-    closeSheet();
+    closeSidebar();
     toast.success(`${displayName} connection updated`);
   };
 
   const handleNodeNameChange = () => {
-    updateNodeName(sheet.currentNode?.id as string, nodeName);
+    updateNodeName(sidebar.currentNode?.id as string, nodeName);
     handleEdit(false);
   };
 
   return (
     <Sheet
-      open={sheet?.open}
+      open={sidebar?.open}
       onOpenChange={() => {
-        closeSheet();
+        closeSidebar();
         handleEdit(false);
       }}
     >
       <SheetContent className="bg:background flex flex-col justify-between">
         <SheetHeader>
           <SheetTitle className="uppercase flex items-center dark:text-white">
-            {!sheet.edit ? (
+            {!sidebar.edit ? (
               <Pencil
                 onClick={() => handleEdit(true)}
                 size={15}
                 className={cn(
                   "text-md font-semibold text-foreground  hover:cursor-pointer",
                   {
-                    hidden: sheet.currentEdge,
+                    hidden: sidebar.currentEdge,
                   },
                 )}
               />
             ) : null}
 
             <Input
-              disabled={!sheet.edit}
+              disabled={!sidebar.edit}
               value={nodeName}
               onChange={e => setNodeName(e.target.value)}
               className="border-none text-lg font-semibold text-foreground"
@@ -142,7 +142,7 @@ const Info = ({
           <SheetDescription>Created: {createdAt}</SheetDescription>
           <SheetDescription>Updated: {updatedAt}</SheetDescription>
         </SheetHeader>
-        {sheet.currentEdge && (
+        {sidebar.currentEdge && (
           <div>
             <p className="text-sm text-muted-foreground mb-2">
               Connection type
@@ -177,12 +177,12 @@ const Info = ({
           </div>
         )}
         <SheetFooter>
-          {(connectionType !== sheet.currentEdge?.data?.type ||
+          {(connectionType !== sidebar.currentEdge?.data?.type ||
             nodeName !== displayName) && (
             <button
               className={buttonVariants.verbose}
               onClick={() => {
-                if (sheet.currentEdge) {
+                if (sidebar.currentEdge) {
                   return handleConnectionTypeChange();
                 }
                 handleNodeNameChange();
@@ -200,4 +200,4 @@ const Info = ({
   );
 };
 
-export default Info;
+export default Sidebar;
