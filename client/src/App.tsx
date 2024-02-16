@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   type Edge,
   type Connection,
@@ -35,24 +35,30 @@ import {
 import { ThemeProvider } from "styled-components";
 import { Sidebar, Settings } from "./components/ui";
 
-const nodeTypes = {
-  block: Block,
-  connector: Connector,
-  terminal: Terminal,
-  textbox: TextBox,
-};
-
-const edgeTypes = {
-  part: Part,
-  connected: Connected,
-  fulfilled: Fulfilled,
-  projection: Projection,
-  proxy: Proxy,
-  specialisation: Specialisation,
-  transfer: Transfer,
-};
-
 export default function App() {
+  const nodeTypes = useMemo(
+    () => ({
+      block: Block,
+      connector: Connector,
+      terminal: Terminal,
+      textbox: TextBox,
+    }),
+    [],
+  );
+
+  const edgeTypes = useMemo(
+    () => ({
+      part: Part,
+      connected: Connected,
+      fulfilled: Fulfilled,
+      projection: Projection,
+      proxy: Proxy,
+      specialisation: Specialisation,
+      transfer: Transfer,
+    }),
+    [],
+  );
+
   const [edgeType, setEdgeType] = useState<EdgeType>(EdgeType.Part);
 
   const { sidebar, closeSidebar } = useSidebar();
