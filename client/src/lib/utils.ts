@@ -1,7 +1,8 @@
 import toast from "react-hot-toast";
-import type { Connection, Edge } from "reactflow";
+import type { Connection, Edge, Node } from "reactflow";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { NodeType } from "./types";
 
 export const cn = (...inputs: ClassValue[]) => twMerge(clsx(inputs));
 
@@ -43,3 +44,29 @@ export const getSymmetricDifference = (arr1: Edge[], arr2: Edge[]): Edge[] => {
 
 export const capitalizeFirstLetter = (string: string) =>
   string.charAt(0).toUpperCase() + string.slice(1);
+
+export const addNode = (
+  type: NodeType,
+  nodes: Node[],
+  setNodes: (nodes: Node[]) => void,
+) => {
+  const id = nodes.length.toString();
+  const currentDate = Date.now();
+  const newNode = {
+    id,
+    type,
+    position: {
+      x: window.innerWidth / 2,
+      y: window.innerHeight / 2,
+    },
+    data: {
+      label: `${type}_${id}`,
+      type,
+      id,
+      createdAt: currentDate,
+      updatedAt: currentDate,
+    },
+  };
+
+  setNodes([...nodes, newNode]);
+};

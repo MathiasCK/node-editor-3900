@@ -14,7 +14,7 @@ import "reactflow/dist/style.css";
 import { Block, Connector, Terminal, TextBox } from "./components/Nodes";
 import { buttonVariants } from "./lib/config";
 import { EdgeType, NodeType } from "./lib/types";
-import { canConnect, cn, getSymmetricDifference } from "./lib/utils";
+import { addNode, canConnect, cn, getSymmetricDifference } from "./lib/utils";
 import { storeSelector, useSheet, useStore, useTheme } from "./hooks";
 
 import {
@@ -112,28 +112,6 @@ export default function App() {
     [edges, edgeType, setEdges],
   );
 
-  const addNode = (type: NodeType) => {
-    const id = nodes.length.toString();
-    const currentDate = Date.now();
-    const newNode = {
-      id,
-      type,
-      position: {
-        x: window.innerWidth / 2,
-        y: window.innerHeight / 2,
-      },
-      data: {
-        label: `${type}_${id}`,
-        type,
-        id,
-        createdAt: currentDate,
-        updatedAt: currentDate,
-      },
-    };
-
-    setNodes([...nodes, newNode]);
-  };
-
   const deleteSelectedNode = (selectedNodeId: string): void => {
     const currentNode = nodes.find(node => node.id === selectedNodeId);
 
@@ -211,29 +189,9 @@ export default function App() {
 
           <Settings />
 
-          <Panel position="top-center" className="w-full flex justify-center">
-            <button
-              className={buttonVariants.block}
-              onClick={() => addNode(NodeType.Block)}
-            >
-              Add block
-            </button>
-            <button
-              className={buttonVariants.connector}
-              onClick={() => addNode(NodeType.Connector)}
-            >
-              Add connector
-            </button>
-            <button
-              className={buttonVariants.terminal}
-              onClick={() => addNode(NodeType.Terminal)}
-            >
-              Add terminal
-            </button>
-          </Panel>
           <Panel
             position="top-right"
-            className="w-100 flex justify-center flex-col"
+            className="h-full w-100 flex justify-center flex-col"
           >
             <button
               className={cn(
@@ -325,7 +283,7 @@ export default function App() {
                   ? buttonVariants.button
                   : buttonVariants.textbox
               }
-              onClick={() => addNode(NodeType.TextBox)}
+              onClick={() => addNode(NodeType.TextBox, nodes, setNodes)}
             >
               Add TextBox
             </button>

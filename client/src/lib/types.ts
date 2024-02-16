@@ -38,5 +38,6 @@ export type NavItem = {
   children: {
     title: string;
     description: string;
+    nodeType: NodeType;
   }[];
 };

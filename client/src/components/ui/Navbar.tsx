@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { cn } from "@/lib/utils";
+import { addNode, cn } from "@/lib/utils";
 
 import {
   NavigationMenu,
@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/navigation-menu";
 import { AlignJustify } from "lucide-react";
 import { storeSelector, useSettings, useStore, useTheme } from "@/hooks";
-import { NavItem } from "@/lib/types";
+import { NavItem, NodeType } from "@/lib/types";
 import { shallow } from "zustand/shallow";
 
 const navItems: NavItem[] = [
@@ -24,16 +24,19 @@ const navItems: NavItem[] = [
         title: "Block",
         description:
           "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quibusdam, laboriosam!",
+        nodeType: NodeType.Block,
       },
       {
         title: "Connector",
         description:
           "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quibusdam, laboriosam!",
+        nodeType: NodeType.Connector,
       },
       {
         title: "Terminal",
         description:
           "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quibusdam, laboriosam!",
+        nodeType: NodeType.Terminal,
       },
     ],
   },
@@ -45,16 +48,19 @@ const navItems: NavItem[] = [
         title: "Block",
         description:
           "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quibusdam, laboriosam!",
+        nodeType: NodeType.Block,
       },
       {
         title: "Connector",
         description:
           "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quibusdam, laboriosam!",
+        nodeType: NodeType.Connector,
       },
       {
         title: "Terminal",
         description:
           "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quibusdam, laboriosam!",
+        nodeType: NodeType.Terminal,
       },
     ],
   },
@@ -66,16 +72,19 @@ const navItems: NavItem[] = [
         title: "Block",
         description:
           "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quibusdam, laboriosam!",
+        nodeType: NodeType.Block,
       },
       {
         title: "Connector",
         description:
           "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quibusdam, laboriosam!",
+        nodeType: NodeType.Connector,
       },
       {
         title: "Terminal",
         description:
           "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quibusdam, laboriosam!",
+        nodeType: NodeType.Terminal,
       },
     ],
   },
@@ -85,7 +94,7 @@ const Navbar = () => {
   const { theme } = useTheme();
   const { openSettings } = useSettings();
 
-  const {} = useStore(storeSelector, shallow);
+  const { nodes, setNodes } = useStore(storeSelector, shallow);
 
   return (
     <NavigationMenu className="fixed backdrop-blur-md">
@@ -106,7 +115,11 @@ const Navbar = () => {
               <h1 className="text-muted-foreground p-4">{node.subtitle}</h1>
               <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
                 {node.children.map(component => (
-                  <ListItem key={component.title} title={component.title}>
+                  <ListItem
+                    key={component.title}
+                    title={component.title}
+                    onClick={() => addNode(component.nodeType, nodes, setNodes)}
+                  >
                     {component.description}
                   </ListItem>
                 ))}
