@@ -1,13 +1,12 @@
 import Handles from "./Handles";
-import type { NodeProps } from "reactflow";
 import { useSheet } from "@/hooks";
+import type { CustomNodeProps } from "@/lib/types";
 
-const Block = (props: NodeProps) => {
+const Block = (props: CustomNodeProps) => {
   const { openSheet } = useSheet();
-  const nodeId = `${props.data.type}_${props.data.id}`;
 
   return (
-    <figure id={nodeId}>
+    <figure id={props.data.label}>
       <div
         onClick={() => openSheet(props)}
         className="h-12 w-24 rounded-xl bg-block"
@@ -16,7 +15,7 @@ const Block = (props: NodeProps) => {
           <p className="uppercase text-white">{props.data.id}</p>
         </header>
       </div>
-      <Handles nodeId={nodeId} />
+      <Handles nodeId={props.data.label} />
     </figure>
   );
 };

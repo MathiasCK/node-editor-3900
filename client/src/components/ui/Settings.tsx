@@ -4,10 +4,10 @@ import {
   SheetDescription,
   SheetHeader,
   SheetTitle,
-} from "../ui/sheet";
+} from "./sheet";
 import { useSettings, useTheme } from "@/hooks";
-import { Switch } from "../ui/switch";
-import { Label } from "../ui/label";
+import { Switch } from "./switch";
+import { Label } from "./label";
 
 const SidebarSettings = () => {
   const { isOpen, closeSettings } = useSettings();

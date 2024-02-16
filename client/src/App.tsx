@@ -8,12 +8,13 @@ import {
   addEdge,
   Panel,
   getConnectedEdges,
+  EdgeTypes,
 } from "reactflow";
 
 import "reactflow/dist/style.css";
 import { Block, Connector, Terminal, TextBox } from "./components/Nodes";
 import { buttonVariants } from "./lib/config";
-import { NodeType } from "./lib/types";
+import { EdgeType, NodeType } from "./lib/types";
 import { canConnect, cn, getSymmetricDifference } from "./lib/utils";
 import { useSettings, useSheet, useTheme } from "./hooks";
 
@@ -35,7 +36,7 @@ import {
 } from "./components/ui/styled";
 import { ThemeProvider } from "styled-components";
 import { AlignJustify } from "lucide-react";
-import { Info, Settings } from "./components/Sidebar";
+import { Info, Settings } from "./components/ui";
 import toast from "react-hot-toast";
 
 const nodeTypes = {
@@ -56,7 +57,7 @@ const edgeTypes = {
 };
 
 export default function App() {
-  const [edgeType, setEdgeType] = useState<string>("part");
+  const [edgeType, setEdgeType] = useState<EdgeType>(EdgeType.Part);
 
   const { openSettings } = useSettings();
   const { sheet, closeSheet } = useSheet();
@@ -110,6 +111,7 @@ export default function App() {
           ...params,
           type: edgeType,
           data: {
+            id: edgeCount.toString(),
             label: `Edge ${edgeCount}`,
             type: edgeType,
             createdAt: Date.now(),
@@ -132,7 +134,12 @@ export default function App() {
         x: window.innerWidth / 2,
         y: window.innerHeight / 2,
       },
-      data: { type, id, createdAt: Date.now() },
+      data: {
+        label: `${type}_${id}`,
+        type,
+        id,
+        createdAt: Date.now(),
+      },
     };
 
     setNodes(nds => nds.concat(newNode));
@@ -178,7 +185,7 @@ export default function App() {
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}
           nodeTypes={nodeTypes}
-          edgeTypes={edgeTypes}
+          edgeTypes={edgeTypes as EdgeTypes}
         >
           <Info
             deleteSelectedEdge={deleteSelectedEdge}
@@ -235,10 +242,10 @@ export default function App() {
                 `${buttonVariants.edge} border-green-400 text-green-400 hover:bg-green-400 `,
                 {
                   "bg-green-400 text-white border-transparent":
-                    edgeType === "part",
+                    edgeType === EdgeType.Part,
                 },
               )}
-              onClick={() => setEdgeType("part")}
+              onClick={() => setEdgeType(EdgeType.Part)}
             >
               Part of
             </button>
@@ -247,10 +254,10 @@ export default function App() {
                 `${buttonVariants.edge} border-blue-200 text-blue-200 hover:bg-blue-200 `,
                 {
                   "bg-blue-200 text-white border-transparent":
-                    edgeType === "connected",
+                    edgeType === EdgeType.Connected,
                 },
               )}
-              onClick={() => setEdgeType("connected")}
+              onClick={() => setEdgeType(EdgeType.Connected)}
             >
               Connected to
             </button>
@@ -259,10 +266,10 @@ export default function App() {
                 `${buttonVariants.edge} border-blue-400 text-blue-400 hover:bg-blue-400 `,
                 {
                   "bg-blue-400 text-white border-transparent":
-                    edgeType === "transfer",
+                    edgeType === EdgeType.Transfer,
                 },
               )}
-              onClick={() => setEdgeType("transfer")}
+              onClick={() => setEdgeType(EdgeType.Transfer)}
             >
               Transfer to
             </button>
@@ -271,10 +278,10 @@ export default function App() {
                 `${buttonVariants.edge} border-amber-300 text-amber-300 hover:bg-amber-300 `,
                 {
                   "bg-amber-300 text-white border-transparent":
-                    edgeType === "specialisation",
+                    edgeType === EdgeType.Specialisation,
                 },
               )}
-              onClick={() => setEdgeType("specialisation")}
+              onClick={() => setEdgeType(EdgeType.Specialisation)}
             >
               Specialisation of
             </button>
@@ -283,10 +290,10 @@ export default function App() {
                 `${buttonVariants.edge} border-amber-300 text-amber-300 hover:bg-amber-300 border-dotted`,
                 {
                   "bg-amber-300 text-white border-transparent":
-                    edgeType === "fulfilled",
+                    edgeType === EdgeType.Fulfilled,
                 },
               )}
-              onClick={() => setEdgeType("fulfilled")}
+              onClick={() => setEdgeType(EdgeType.Fulfilled)}
             >
               Fulfilled by
             </button>
@@ -295,10 +302,10 @@ export default function App() {
                 `${buttonVariants.edge} border-gray-200 text-gray-200 hover:bg-gray-200 `,
                 {
                   "bg-gray-200 text-white border-transparent":
-                    edgeType === "proxy",
+                    edgeType === EdgeType.Proxy,
                 },
               )}
-              onClick={() => setEdgeType("proxy")}
+              onClick={() => setEdgeType(EdgeType.Proxy)}
             >
               Proxy
             </button>
@@ -307,10 +314,10 @@ export default function App() {
                 `${buttonVariants.edge} border-dotted border-gray-200 text-gray-200 hover:bg-gray-200`,
                 {
                   "bg-gray-200 text-white border-transparent":
-                    edgeType === "projection",
+                    edgeType === EdgeType.Projection,
                 },
               )}
-              onClick={() => setEdgeType("projection")}
+              onClick={() => setEdgeType(EdgeType.Projection)}
             >
               Projection
             </button>

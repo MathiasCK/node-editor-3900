@@ -6,7 +6,7 @@ import {
   SheetFooter,
   SheetHeader,
   SheetTitle,
-} from "../ui/sheet";
+} from "./sheet";
 import { useSheet } from "@/hooks";
 import { buttonVariants } from "@/lib/config";
 import { Edge, addEdge } from "reactflow";
@@ -18,7 +18,8 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../ui/select";
+} from "./select";
+import { EdgeType } from "@/lib/types";
 
 interface InfoProps {
   deleteSelectedNode: (selectedNodeId: string) => void;
@@ -102,15 +103,21 @@ const Info = ({
               </SelectTrigger>
               <SelectContent>
                 <SelectGroup>
-                  <SelectItem value="part">Part of</SelectItem>
-                  <SelectItem value="connected">Connected to</SelectItem>
-                  <SelectItem value="transfer">Transfer to</SelectItem>
-                  <SelectItem value="specialisation">
+                  <SelectItem value={EdgeType.Part}>Part of</SelectItem>
+                  <SelectItem value={EdgeType.Connected}>
+                    Connected to
+                  </SelectItem>
+                  <SelectItem value={EdgeType.Transfer}>Transfer to</SelectItem>
+                  <SelectItem value={EdgeType.Specialisation}>
                     Specialisation of
                   </SelectItem>
-                  <SelectItem value="fulfilled">Fulfilled by</SelectItem>
-                  <SelectItem value="projection">Projection</SelectItem>
-                  <SelectItem value="proxy">Proxy</SelectItem>
+                  <SelectItem value={EdgeType.Fulfilled}>
+                    Fulfilled by
+                  </SelectItem>
+                  <SelectItem value={EdgeType.Projection}>
+                    Projection
+                  </SelectItem>
+                  <SelectItem value={EdgeType.Proxy}>Proxy</SelectItem>
                 </SelectGroup>
               </SelectContent>
             </Select>

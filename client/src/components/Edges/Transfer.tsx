@@ -1,7 +1,7 @@
 import { useSheet } from "@/hooks";
-import type { EdgeProps } from "reactflow";
+import type { CustomEdgeProps } from "@/lib/types";
 
-const Transfer = (props: EdgeProps) => {
+const Transfer = (props: CustomEdgeProps) => {
   const { openSheet } = useSheet();
   return (
     <g onClick={() => openSheet(props)}>

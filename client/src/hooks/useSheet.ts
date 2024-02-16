@@ -1,20 +1,22 @@
-import type { EdgeProps, NodeProps } from "reactflow";
+import type { CustomNodeProps, CustomEdgeProps } from "@/lib/types";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
 type Sheet = {
   open: boolean;
-  currentNode?: NodeProps;
-  currentEdge?: EdgeProps;
+  currentNode?: CustomNodeProps;
+  currentEdge?: CustomEdgeProps;
 };
 
 type SheetState = {
   sheet: Sheet;
-  openSheet: (data: NodeProps | EdgeProps) => void;
+  openSheet: (data: CustomNodeProps | CustomEdgeProps) => void;
   closeSheet: () => void;
 };
 
-const isEdgeProps = (data: NodeProps | EdgeProps): data is EdgeProps =>
+const isEdgeProps = (
+  data: CustomNodeProps | CustomEdgeProps,
+): data is CustomEdgeProps =>
   "sourceHandleId" in data && "targetHandleId" in data;
 
 const useSheet = create<SheetState>()(

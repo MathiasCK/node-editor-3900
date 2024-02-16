@@ -1,7 +1,7 @@
 import { useSheet, useTheme } from "@/hooks";
-import type { EdgeProps } from "reactflow";
+import type { CustomEdgeProps } from "@/lib/types";
 
-const Specialisation = (props: EdgeProps) => {
+const Specialisation = (props: CustomEdgeProps) => {
   const { openSheet } = useSheet();
   const { theme } = useTheme();
   return (

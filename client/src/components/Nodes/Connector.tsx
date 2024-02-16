@@ -1,13 +1,12 @@
 import Handles from "./Handles";
-import type { NodeProps } from "reactflow";
 import { useSheet } from "@/hooks";
+import type { CustomNodeProps } from "@/lib/types";
 
-const Connector = (props: NodeProps) => {
+const Connector = (props: CustomNodeProps) => {
   const { openSheet } = useSheet();
-  const nodeId = `${props.data.type}_${props.data.id}`;
 
   return (
-    <figure id={nodeId}>
+    <figure id={props.data.label}>
       <div
         onClick={() => openSheet(props)}
         className="h-8 w-8 rounded-xl bg-connector"
@@ -17,7 +16,7 @@ const Connector = (props: NodeProps) => {
         </header>
       </div>
 
-      <Handles nodeId={nodeId} />
+      <Handles nodeId={props.data.label} />
     </figure>
   );
 };
