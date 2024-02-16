@@ -5,7 +5,6 @@ import {
   Background,
   addEdge,
   Panel,
-  getConnectedEdges,
   EdgeTypes,
 } from "reactflow";
 import { shallow } from "zustand/shallow";
@@ -14,7 +13,7 @@ import "reactflow/dist/style.css";
 import { Block, Connector, Terminal, TextBox } from "./components/Nodes";
 import { buttonVariants } from "./lib/config";
 import { EdgeType, NodeType } from "./lib/types";
-import { addNode, canConnect, cn, getSymmetricDifference } from "./lib/utils";
+import { addNode, canConnect, cn } from "./lib/utils";
 import { storeSelector, useSidebar, useStore, useTheme } from "./hooks";
 
 import {
@@ -35,7 +34,6 @@ import {
 } from "./components/ui/styled";
 import { ThemeProvider } from "styled-components";
 import { Sidebar, Settings } from "./components/ui";
-import toast from "react-hot-toast";
 
 const nodeTypes = {
   block: Block,
@@ -112,63 +110,6 @@ export default function App() {
     [edges, edgeType, setEdges],
   );
 
-  const deleteSelectedNode = (selectedNodeId: string): void => {
-    const currentNode = nodes.find(node => node.id === selectedNodeId);
-
-    if (!currentNode) {
-      toast.error("Could not delete -> no node selected");
-      return;
-    }
-
-    const connectedEdges = getConnectedEdges([currentNode], edges);
-    const updatedEdges = getSymmetricDifference(edges, connectedEdges);
-
-    const updatedNodes = nodes.filter(node => node.id !== selectedNodeId);
-
-    setNodes(updatedNodes);
-    setEdges(updatedEdges);
-
-    toast.success(`Node ${selectedNodeId} deleted`);
-  };
-
-  const deleteSelectedEdge = (
-    selectedEdgeId: string,
-    displayToast = true,
-  ): void => {
-    const currentEdge = edges.find(edge => edge.id === selectedEdgeId);
-
-    if (!currentEdge) {
-      toast.error("Could not delete -> no edge selected");
-      return;
-    }
-
-    const updatedEdges = edges.filter(edge => edge.id !== selectedEdgeId);
-
-    setEdges(updatedEdges);
-
-    if (displayToast) {
-      toast.success(`Edge ${selectedEdgeId} deleted`);
-    }
-  };
-
-  const updateNodeName = (nodeId: string, newName: string) => {
-    const nodeToUpdate = nodes.find(node => node.id === nodeId);
-    const index = nodes.findIndex(node => node.id === nodeId);
-
-    if (!nodeToUpdate || index === -1) {
-      toast.error("Could not update name -> no node selected");
-      return;
-    }
-
-    nodeToUpdate.data.customName = newName;
-
-    const newNodes = [...nodes];
-    newNodes[index] = nodeToUpdate;
-
-    setNodes(newNodes);
-    toast.success("Name updated");
-  };
-
   return (
     <main className="w-screen h-screen">
       <ThemeProvider theme={theme === "light" ? lightTheme : darkTheme}>
@@ -181,12 +122,7 @@ export default function App() {
           nodeTypes={nodeTypes}
           edgeTypes={edgeTypes as EdgeTypes}
         >
-          <Sidebar
-            deleteSelectedEdge={deleteSelectedEdge}
-            deleteSelectedNode={deleteSelectedNode}
-            updateNodeName={updateNodeName}
-          />
-
+          <Sidebar />
           <Settings />
 
           <Panel

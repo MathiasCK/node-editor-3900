@@ -1,5 +1,10 @@
 import toast from "react-hot-toast";
-import type { Connection, Edge, Node } from "reactflow";
+import {
+  getConnectedEdges,
+  type Connection,
+  type Edge,
+  type Node,
+} from "reactflow";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { NodeType } from "./types";
@@ -69,4 +74,71 @@ export const addNode = (
   };
 
   setNodes([...nodes, newNode]);
+};
+
+export const updateNodeName = (
+  nodeId: string,
+  newName: string,
+  nodes: Node[],
+  setNodes: (nodes: Node[]) => void,
+) => {
+  const nodeToUpdate = nodes.find(node => node.id === nodeId);
+  const index = nodes.findIndex(node => node.id === nodeId);
+
+  if (!nodeToUpdate || index === -1) {
+    toast.error("Could not update name -> no node selected");
+    return;
+  }
+
+  nodeToUpdate.data.customName = newName;
+
+  const newNodes = [...nodes];
+  newNodes[index] = nodeToUpdate;
+
+  setNodes(newNodes);
+  toast.success("Name updated");
+};
+
+export const deleteSelectedNode = (
+  selectedNodeId: string,
+  edges: Edge[],
+  setEdges: (edges: Edge[]) => void,
+  nodes: Node[],
+  setNodes: (nodes: Node[]) => void,
+): void => {
+  const currentNode = nodes.find(node => node.id === selectedNodeId);
+
+  if (!currentNode) {
+    toast.error("Could not delete -> no node selected");
+    return;
+  }
+
+  const connectedEdges = getConnectedEdges([currentNode], edges);
+  const updatedEdges = getSymmetricDifference(edges, connectedEdges);
+
+  const updatedNodes = nodes.filter(node => node.id !== selectedNodeId);
+
+  setNodes(updatedNodes);
+  setEdges(updatedEdges);
+
+  toast.success(`Node ${selectedNodeId} deleted`);
+};
+
+export const deleteSelectedEdge = (
+  selectedEdgeId: string,
+  edges: Edge[],
+  setEdges: (edges: Edge[]) => void,
+): void => {
+  const currentEdge = edges.find(edge => edge.id === selectedEdgeId);
+
+  if (!currentEdge) {
+    toast.error("Could not delete -> no edge selected");
+    return;
+  }
+
+  const updatedEdges = edges.filter(edge => edge.id !== selectedEdgeId);
+
+  setEdges(updatedEdges);
+
+  toast.success(`Edge ${selectedEdgeId} deleted`);
 };

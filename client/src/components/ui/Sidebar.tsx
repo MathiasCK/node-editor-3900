@@ -21,23 +21,19 @@ import {
 } from "./select";
 import { EdgeType } from "@/lib/types";
 import { Pencil } from "lucide-react";
-import { capitalizeFirstLetter, cn } from "@/lib/utils";
+import {
+  capitalizeFirstLetter,
+  cn,
+  deleteSelectedEdge,
+  deleteSelectedNode,
+  updateNodeName,
+} from "@/lib/utils";
 import { Input } from "./input";
 import { shallow } from "zustand/shallow";
 
-interface SidebarProps {
-  deleteSelectedNode: (selectedNodeId: string) => void;
-  deleteSelectedEdge: (selectedEdgeId: string, displayToast?: boolean) => void;
-  updateNodeName: (nodeId: string, newValue: string) => void;
-}
-
-const Sidebar = ({
-  deleteSelectedNode,
-  deleteSelectedEdge,
-  updateNodeName,
-}: SidebarProps) => {
+const Sidebar = () => {
   const { sidebar, handleEdit, closeSidebar } = useSidebar();
-  const { edges, setEdges } = useStore(storeSelector, shallow);
+  const { edges, setEdges, nodes, setNodes } = useStore(storeSelector, shallow);
 
   const displayName = capitalizeFirstLetter(
     sidebar.currentNode
@@ -72,9 +68,15 @@ const Sidebar = ({
 
   const handleDelete = () => {
     if (sidebar.currentNode) {
-      deleteSelectedNode(sidebar.currentNode.id as string);
+      deleteSelectedNode(
+        sidebar.currentNode.id as string,
+        edges,
+        setEdges,
+        nodes,
+        setNodes,
+      );
     } else {
-      deleteSelectedEdge(sidebar.currentEdge?.id as string);
+      deleteSelectedEdge(sidebar.currentEdge?.id as string, edges, setEdges);
     }
     closeSidebar();
     handleEdit(false);
@@ -104,7 +106,12 @@ const Sidebar = ({
   };
 
   const handleNodeNameChange = () => {
-    updateNodeName(sidebar.currentNode?.id as string, nodeName);
+    updateNodeName(
+      sidebar.currentNode?.id as string,
+      nodeName,
+      nodes,
+      setNodes,
+    );
     handleEdit(false);
   };
 
