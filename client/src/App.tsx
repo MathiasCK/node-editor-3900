@@ -107,6 +107,7 @@ export default function App() {
   const onConnect = useCallback(
     (params: Edge | Connection) => {
       if (canConnect(params)) {
+        const currentDate = Date.now();
         const newConnection = {
           ...params,
           type: edgeType,
@@ -114,7 +115,8 @@ export default function App() {
             id: edgeCount.toString(),
             label: `Edge ${edgeCount}`,
             type: edgeType,
-            createdAt: Date.now(),
+            createdAt: currentDate,
+            updatedAt: currentDate,
           },
         };
 
@@ -127,6 +129,7 @@ export default function App() {
 
   const addNode = (type: NodeType) => {
     const id = nodeCount.toString();
+    const currentDate = Date.now();
     const newNode = {
       id,
       type,
@@ -138,7 +141,8 @@ export default function App() {
         label: `${type}_${id}`,
         type,
         id,
-        createdAt: Date.now(),
+        createdAt: currentDate,
+        updatedAt: currentDate,
       },
     };
 
@@ -150,7 +154,7 @@ export default function App() {
     const currentNode = nodes.find(node => node.id === selectedNodeId);
 
     if (!currentNode) {
-      toast.error("No node selected");
+      toast.error("Could not delete -> no node selected");
       return;
     }
 
@@ -161,18 +165,45 @@ export default function App() {
 
     setNodes(updatedNodes);
     setEdges(updatedEdges);
+
+    toast.success(`Node ${selectedNodeId} deleted`);
   };
 
-  const deleteSelectedEdge = (selectedEdgeId: string): void => {
+  const deleteSelectedEdge = (
+    selectedEdgeId: string,
+    displayToast = true,
+  ): void => {
     const currentNode = edges.find(edge => edge.id === selectedEdgeId);
 
     if (!currentNode) {
-      toast.error("No edge selected");
+      toast.error("Could not delete -> no edge selected");
       return;
     }
 
     const updatedEdges = edges.filter(edge => edge.id !== selectedEdgeId);
     setEdges(updatedEdges);
+
+    if (displayToast) {
+      toast.success(`Edge ${selectedEdgeId} deleted`);
+    }
+  };
+
+  const updateNodeName = (nodeId: string, newName: string) => {
+    const nodeToUpdate = nodes.find(node => node.id === nodeId);
+    const index = nodes.findIndex(node => node.id === nodeId);
+
+    if (!nodeToUpdate || index === -1) {
+      toast.error("Could not update name -> no node selected");
+      return;
+    }
+
+    nodeToUpdate.data.customName = newName;
+
+    const newNodes = [...nodes];
+    newNodes[index] = nodeToUpdate;
+
+    setNodes(newNodes);
+    toast.success("Name updated");
   };
 
   return (
@@ -191,6 +222,7 @@ export default function App() {
             deleteSelectedEdge={deleteSelectedEdge}
             deleteSelectedNode={deleteSelectedNode}
             setEdges={setEdges}
+            updateNodeName={updateNodeName}
           />
 
           <Settings />

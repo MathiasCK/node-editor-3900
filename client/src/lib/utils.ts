@@ -40,3 +40,6 @@ export const getSymmetricDifference = (arr1: Edge[], arr2: Edge[]): Edge[] => {
 
   return Array.from(difference);
 };
+
+export const capitalizeFirstLetter = (string: string) =>
+  string.charAt(0).toUpperCase() + string.slice(1);

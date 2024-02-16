@@ -20,36 +20,57 @@ import {
   SelectValue,
 } from "./select";
 import { EdgeType } from "@/lib/types";
+import { Pencil } from "lucide-react";
+import { capitalizeFirstLetter, cn } from "@/lib/utils";
+import { Input } from "./input";
 
 interface InfoProps {
   deleteSelectedNode: (selectedNodeId: string) => void;
-  deleteSelectedEdge: (selectedEdgeId: string) => void;
+  deleteSelectedEdge: (selectedEdgeId: string, displayToast?: boolean) => void;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   setEdges: (value: React.SetStateAction<Edge<any>[]>) => void;
+  updateNodeName: (nodeId: string, newValue: string) => void;
 }
 
 const Info = ({
   deleteSelectedNode,
   deleteSelectedEdge,
   setEdges,
+  updateNodeName,
 }: InfoProps) => {
   const { sheet, closeSheet } = useSheet();
 
+  const displayName = capitalizeFirstLetter(
+    sheet.currentNode
+      ? sheet.currentNode?.data?.customName
+        ? sheet.currentNode?.data?.customName
+        : `${sheet.currentNode.type} ${sheet.currentNode.id}`
+      : `Edge ${sheet.currentEdge?.source} -> ${sheet.currentEdge?.target}`,
+  );
+
+  const createdAt = new Date(
+    sheet.currentNode
+      ? sheet.currentNode?.data?.createdAt
+      : sheet.currentEdge?.data?.createdAt,
+  ).toLocaleString();
+
+  const updatedAt = new Date(
+    sheet.currentNode
+      ? sheet.currentNode?.data?.updatedAt
+      : sheet.currentEdge?.data?.updatedAt,
+  ).toLocaleString();
+
+  const [edit, setEdit] = useState<boolean>(false);
   const [connectionType, setConnectionType] = useState<string>("");
+  const [nodeName, setNodeName] = useState<string>("");
 
   useEffect(() => {
     setConnectionType(sheet.currentEdge?.data?.type);
   }, [sheet.currentEdge]);
 
-  const displayName = sheet.currentNode
-    ? `${sheet.currentNode.type} ${sheet.currentNode.id}`
-    : `Edge ${sheet.currentEdge?.source} -> ${sheet.currentEdge?.target}`;
-
-  const createdAt = new Date().toLocaleString(
-    sheet.currentNode
-      ? sheet.currentNode?.data?.createdAt
-      : sheet.currentEdge?.data?.createdAt,
-  );
+  useEffect(() => {
+    setNodeName(displayName);
+  }, [displayName, sheet.currentNode]);
 
   const handleDelete = () => {
     if (sheet.currentNode) {
@@ -58,7 +79,7 @@ const Info = ({
       deleteSelectedEdge(sheet.currentEdge?.id as string);
     }
     closeSheet();
-    toast.success(`${displayName} deleted`);
+    setEdit(false);
   };
 
   const handleConnectionTypeChange = () => {
@@ -67,6 +88,7 @@ const Info = ({
         label: `Edge ${sheet.currentEdge?.source} -> ${sheet.currentEdge?.target}`,
         type: connectionType,
         createdAt: sheet.currentEdge?.data?.createdAt,
+        updatedAt: Date.now(),
       },
       source: sheet.currentEdge?.source,
       sourceHandle: sheet.currentEdge?.sourceHandleId,
@@ -74,20 +96,50 @@ const Info = ({
       targetHandle: sheet.currentEdge?.targetHandleId,
       type: connectionType,
     };
-    deleteSelectedEdge(sheet.currentEdge?.id as string);
+    deleteSelectedEdge(sheet.currentEdge?.id as string, false);
     setEdges(eds => addEdge(clonedConnection as Edge, eds));
     closeSheet();
-    toast.success(`${displayName} updated`);
+    toast.success(`${displayName} connection updated`);
+  };
+
+  const handleNodeNameChange = () => {
+    updateNodeName(sheet.currentNode?.id as string, nodeName);
+    setEdit(false);
   };
 
   return (
-    <Sheet open={sheet?.open} onOpenChange={() => closeSheet()}>
+    <Sheet
+      open={sheet?.open}
+      onOpenChange={() => {
+        closeSheet();
+        setEdit(false);
+      }}
+    >
       <SheetContent className="dark:bg-black flex flex-col justify-between">
         <SheetHeader>
-          <SheetTitle className="uppercase dark:text-white">
-            {displayName}
+          <SheetTitle className="uppercase flex items-center dark:text-white">
+            {!edit ? (
+              <Pencil
+                onClick={() => setEdit(true)}
+                size={15}
+                className={cn(
+                  "text-md font-semibold text-foreground  hover:cursor-pointer",
+                  {
+                    hidden: sheet.currentEdge,
+                  },
+                )}
+              />
+            ) : null}
+
+            <Input
+              disabled={!edit}
+              value={nodeName}
+              onChange={e => setNodeName(e.target.value)}
+              className="border-none text-lg font-semibold text-foreground"
+            />
           </SheetTitle>
           <SheetDescription>Created: {createdAt}</SheetDescription>
+          <SheetDescription>Updated: {updatedAt}</SheetDescription>
         </SheetHeader>
         {sheet.currentEdge && (
           <div>
@@ -124,15 +176,20 @@ const Info = ({
           </div>
         )}
         <SheetFooter>
-          {sheet.currentEdge &&
-            connectionType !== sheet.currentEdge?.data?.type && (
-              <button
-                className={buttonVariants.verbose}
-                onClick={handleConnectionTypeChange}
-              >
-                Update
-              </button>
-            )}
+          {(connectionType !== sheet.currentEdge?.data?.type ||
+            nodeName !== displayName) && (
+            <button
+              className={buttonVariants.verbose}
+              onClick={() => {
+                if (sheet.currentEdge) {
+                  return handleConnectionTypeChange();
+                }
+                handleNodeNameChange();
+              }}
+            >
+              Update
+            </button>
+          )}
           <button className={buttonVariants.danger} onClick={handleDelete}>
             Delete
           </button>
