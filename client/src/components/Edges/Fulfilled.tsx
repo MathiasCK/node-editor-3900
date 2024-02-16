@@ -1,6 +1,5 @@
-import { useSheet } from "@/hooks";
+import { useSheet, useTheme } from "@/hooks";
 import type { CustomEdgeProps } from "@/lib/types";
-import { useTheme } from "styled-components";
 
 const Fulfilled = (props: CustomEdgeProps) => {
   const { openSheet } = useSheet();
