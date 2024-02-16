@@ -93,7 +93,6 @@ const navItems: NavItem[] = [
 const Navbar = () => {
   const { theme } = useTheme();
   const { openSettings } = useSettings();
-
   const { nodes, setNodes } = useStore(storeSelector, shallow);
 
   return (
@@ -102,7 +101,7 @@ const Navbar = () => {
         <NavigationMenuItem className="p-5">
           <AlignJustify
             onClick={openSettings}
-            className={cn("w-10 h-10", {
+            className={cn("w-10 h-10 cursor-pointer", {
               "text-white": theme === "dark",
               "text-black": theme === "light",
             })}
