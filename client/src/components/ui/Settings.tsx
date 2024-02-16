@@ -14,7 +14,7 @@ const SidebarSettings = () => {
   const { theme, toggleTheme } = useTheme();
   return (
     <Sheet open={isOpen} onOpenChange={() => closeSettings()}>
-      <SheetContent side="left" className="dark:bg-black">
+      <SheetContent side="left" className="bg:background">
         <SheetHeader>
           <SheetTitle className="uppercase dark:text-white">
             Settings

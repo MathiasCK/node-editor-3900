@@ -115,7 +115,7 @@ const Info = ({
         setEdit(false);
       }}
     >
-      <SheetContent className="dark:bg-black flex flex-col justify-between">
+      <SheetContent className="bg:background flex flex-col justify-between">
         <SheetHeader>
           <SheetTitle className="uppercase flex items-center dark:text-white">
             {!edit ? (

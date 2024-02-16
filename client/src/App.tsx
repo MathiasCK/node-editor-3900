@@ -16,7 +16,7 @@ import { Block, Connector, Terminal, TextBox } from "./components/Nodes";
 import { buttonVariants } from "./lib/config";
 import { EdgeType, NodeType } from "./lib/types";
 import { canConnect, cn, getSymmetricDifference } from "./lib/utils";
-import { useSettings, useSheet, useTheme } from "./hooks";
+import { useSheet, useTheme } from "./hooks";
 
 import {
   Connected,
@@ -35,7 +35,6 @@ import {
   lightTheme,
 } from "./components/ui/styled";
 import { ThemeProvider } from "styled-components";
-import { AlignJustify } from "lucide-react";
 import { Info, Settings } from "./components/ui";
 import toast from "react-hot-toast";
 
@@ -59,7 +58,6 @@ const edgeTypes = {
 export default function App() {
   const [edgeType, setEdgeType] = useState<EdgeType>(EdgeType.Part);
 
-  const { openSettings } = useSettings();
   const { sheet, closeSheet } = useSheet();
   const { theme } = useTheme();
 
@@ -226,15 +224,7 @@ export default function App() {
           />
 
           <Settings />
-          <Panel position="top-left" className="z-10">
-            <AlignJustify
-              onClick={openSettings}
-              className={cn("w-10 h-10", {
-                "text-white": theme === "dark",
-                "text-black": theme === "light",
-              })}
-            />
-          </Panel>
+
           <Panel position="top-center" className="w-full flex justify-center">
             <button
               className={buttonVariants.block}

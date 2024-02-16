@@ -31,3 +31,12 @@ export type Data = {
 export type CustomNodeProps = NodeProps & Data;
 
 export type CustomEdgeProps = EdgeProps & Data;
+
+export type NavItem = {
+  title: string;
+  subtitle: string;
+  children: {
+    title: string;
+    description: string;
+  }[];
+};
