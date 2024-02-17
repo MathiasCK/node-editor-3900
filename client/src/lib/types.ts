@@ -17,20 +17,42 @@ export enum EdgeType {
   Transfer = "transfer",
 }
 
-export type Data = {
-  data: {
-    id: string;
-    label: string;
-    type: string;
-    createdAt: number;
-    updatedAt: number;
-    customName?: string;
-  };
+export type NodeData = {
+  hasTerminal?: boolean;
+  id: string;
+  label: string;
+  type: string;
+  createdAt: number;
+  updatedAt: number;
+  customName?: string;
 };
 
-export type CustomNodeProps = NodeProps & Data;
+export type EdgeData = {
+  id: string;
+  label: string;
+  type: string;
+  lockConnection: boolean;
+  createdAt: number;
+  updatedAt: number;
+  customName?: string;
+};
 
-export type CustomEdgeProps = EdgeProps & Data;
+export type CustomEdgeProps = Omit<EdgeProps, "data"> &
+  EdgeData & {
+    data: EdgeData;
+  };
+
+export type CustomNodeProps = Omit<NodeProps, "data"> &
+  NodeData & {
+    data: NodeData;
+  };
+
+export type NodeRelation = {
+  nodeId: string;
+  connection: {
+    [key: string]: boolean;
+  };
+};
 
 export type NavItem = {
   title: string;

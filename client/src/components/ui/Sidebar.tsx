@@ -45,21 +45,21 @@ const Sidebar = () => {
 
   const createdAt = new Date(
     sidebar.currentNode
-      ? sidebar.currentNode?.data?.createdAt
-      : sidebar.currentEdge?.data?.createdAt,
+      ? (sidebar.currentNode?.data?.createdAt as number)
+      : (sidebar.currentEdge?.data?.createdAt as number),
   ).toLocaleString();
 
   const updatedAt = new Date(
     sidebar.currentNode
-      ? sidebar.currentNode?.data?.updatedAt
-      : sidebar.currentEdge?.data?.updatedAt,
+      ? (sidebar.currentNode?.data?.updatedAt as number)
+      : (sidebar.currentEdge?.data?.updatedAt as number),
   ).toLocaleString();
 
   const [connectionType, setConnectionType] = useState<string>("");
   const [nodeName, setNodeName] = useState<string>("");
 
   useEffect(() => {
-    setConnectionType(sidebar.currentEdge?.data?.type);
+    setConnectionType(sidebar.currentEdge?.data?.type as string);
   }, [sidebar.currentEdge]);
 
   useEffect(() => {
