@@ -122,27 +122,27 @@ const Sidebar = () => {
     handleEdit(false);
   };
 
-  const displayTerminal = (terminalId: string) => {
-    const terminalNode = nodes.find(n => n.id === terminalId);
+  const displayNewNode = (newNodeId: string) => {
+    const node = nodes.find(n => n.id === newNodeId);
 
-    if (!terminalNode) {
+    if (!node) {
       toast.error(
-        `Could not display terminal ${terminalId}. Refresh page & try again`,
+        `Could not display node ${newNodeId}. Refresh page & try again`,
       );
       return;
     }
     // @ts-ignore
     openSidebar({
-      data: terminalNode.data,
-      dragging: terminalNode.dragging as boolean,
-      id: terminalNode.id,
+      data: node.data,
+      dragging: node.dragging as boolean,
+      id: node.id,
       isConnectable: true,
       selected: true,
-      type: terminalNode.type as string,
+      type: node.type as string,
       sourcePosition: Position.Bottom,
       targetPosition: Position.Top,
-      xPos: terminalNode.position.x,
-      yPos: terminalNode.position.y,
+      xPos: node.position.x,
+      yPos: node.position.y,
       zIndex: 0,
     });
   };
@@ -224,10 +224,26 @@ const Sidebar = () => {
             {sidebar.currentNode?.data?.terminals!.map((t: string) => (
               <Button
                 key={`terminal_${t}_${sidebar.currentNode!.id!}_link_button`}
-                onClick={() => displayTerminal(t)}
+                onClick={() => displayNewNode(t)}
                 variant="ghost"
               >
                 {t}
+              </Button>
+            ))}
+          </div>
+        )}
+        {sidebar.currentNode?.data?.hasConnector && (
+          <div>
+            <p className="text-sm text-muted-foreground mb-2">
+              Connected Connectors
+            </p>
+            {sidebar.currentNode?.data?.connectors!.map((c: string) => (
+              <Button
+                key={`connector_${c}_${sidebar.currentNode!.id!}_link_button`}
+                onClick={() => displayNewNode(c)}
+                variant="ghost"
+              >
+                {c}
               </Button>
             ))}
           </div>
