@@ -115,9 +115,12 @@ export const addNode = (
       id,
       createdAt: currentDate,
       updatedAt: currentDate,
-      hasTerminal: false,
     },
   };
+
+  if (isBlock(type)) {
+    newNode.data.hasTerminal = false;
+  }
 
   setNodes([...nodes, newNode]);
 };
