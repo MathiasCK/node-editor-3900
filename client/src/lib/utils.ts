@@ -7,23 +7,68 @@ import {
 } from "reactflow";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { NodeType } from "./types";
+import { EdgeType, NodeRelation, NodeType } from "./types";
 
 export const cn = (...inputs: ClassValue[]) => twMerge(clsx(inputs));
 
-export const canConnect = (params: Edge | Connection): boolean => {
+export const checkConnection = (
+  params: Edge | Connection,
+  edgeType: EdgeType,
+): {
+  canConnect: boolean;
+  connectionType: EdgeType;
+  lockConnection: boolean;
+  newNodeRelations: NodeRelation[];
+} => {
+  const newNodeRelations: NodeRelation[] = [];
+  let canConnect = true;
+  let connectionType = edgeType;
+  let lockConnection = false;
+
   if (params.source === params.target) {
     toast.error("Cannot connect node to itself");
-    return false;
+    canConnect = false;
   }
   if (
     isBlock(params.sourceHandle as string) &&
     isBlock(params.targetHandle as string)
   ) {
     toast.error("Cannot connect block to block");
-    return false;
+    canConnect = false;
   }
-  return true;
+
+  if (
+    isBlock(params.sourceHandle as string) &&
+    isTerminal(params.targetHandle as string)
+  ) {
+    lockConnection = true;
+    connectionType = EdgeType.Connected;
+
+    newNodeRelations.push({
+      nodeId: params.source as string,
+      connection: { hasTerminal: true },
+    });
+  }
+  return { canConnect, connectionType, lockConnection, newNodeRelations };
+};
+
+export const handleNewNodeRelations = (
+  newNodeRelations: NodeRelation[],
+  nodes: Node[],
+  setNodes: (nodes: Node[]) => void,
+) => {
+  for (const relation of newNodeRelations) {
+    const nodeToUpdate = nodes.find(node => node.id === relation.nodeId);
+    const index = nodes.findIndex(node => node.id === relation.nodeId);
+
+    if (!nodeToUpdate || index === -1) return;
+
+    const keyToUpdate = Object.keys(relation.connection)[0];
+
+    nodeToUpdate.data[keyToUpdate] = relation.connection[keyToUpdate];
+
+    updateNodeData(index, nodeToUpdate, nodes, setNodes);
+  }
 };
 
 export const isBlock = (id: string): boolean => id.includes("block");
@@ -57,7 +102,7 @@ export const addNode = (
 ) => {
   const id = nodes.length.toString();
   const currentDate = Date.now();
-  const newNode = {
+  const newNode: Node = {
     id,
     type,
     position: {
@@ -70,6 +115,7 @@ export const addNode = (
       id,
       createdAt: currentDate,
       updatedAt: currentDate,
+      hasTerminal: false,
     },
   };
 
@@ -92,10 +138,8 @@ export const updateNodeName = (
 
   nodeToUpdate.data.customName = newName;
 
-  const newNodes = [...nodes];
-  newNodes[index] = nodeToUpdate;
+  updateNodeData(index, nodeToUpdate, nodes, setNodes);
 
-  setNodes(newNodes);
   toast.success("Name updated");
 };
 
@@ -124,18 +168,45 @@ export const deleteSelectedNode = (
   toast.success(`Node ${selectedNodeId} deleted`);
 };
 
+export const updateNodeRelations = (
+  currentEdge: Edge,
+  nodes: Node[],
+  setNodes: (nodes: Node[]) => void,
+) => {
+  if (
+    currentEdge.data.lockConnection &&
+    isBlock(currentEdge.sourceHandle!) &&
+    isTerminal(currentEdge.targetHandle!)
+  ) {
+    // Deleting a connection where block has hasTerminal set to true
+    const nodeToUpdate = nodes.find(node => node.id === currentEdge.source);
+    const index = nodes.findIndex(node => node.id === currentEdge.source);
+
+    if (!nodeToUpdate || index === -1) return;
+
+    nodeToUpdate.data.hasTerminal = false;
+
+    updateNodeData(index, nodeToUpdate, nodes, setNodes);
+  }
+};
+
+export const updateNodeData = (
+  index: number,
+  nodeToUpdate: Node,
+  nodes: Node[],
+  setNodes: (nodes: Node[]) => void,
+) => {
+  const newNodes = [...nodes];
+  newNodes[index] = nodeToUpdate;
+
+  setNodes(newNodes);
+};
+
 export const deleteSelectedEdge = (
   selectedEdgeId: string,
   edges: Edge[],
   setEdges: (edges: Edge[]) => void,
 ): void => {
-  const currentEdge = edges.find(edge => edge.id === selectedEdgeId);
-
-  if (!currentEdge) {
-    toast.error("Could not delete -> no edge selected");
-    return;
-  }
-
   const updatedEdges = edges.filter(edge => edge.id !== selectedEdgeId);
 
   setEdges(updatedEdges);

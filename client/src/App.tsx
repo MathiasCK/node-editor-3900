@@ -6,6 +6,7 @@ import {
   addEdge,
   Panel,
   EdgeTypes,
+  NodeTypes,
 } from "reactflow";
 import { shallow } from "zustand/shallow";
 
@@ -13,7 +14,12 @@ import "reactflow/dist/style.css";
 import { Block, Connector, Terminal, TextBox } from "./components/Nodes";
 import { buttonVariants } from "./lib/config";
 import { EdgeType, NodeType } from "./lib/types";
-import { addNode, canConnect, cn } from "./lib/utils";
+import {
+  addNode,
+  checkConnection,
+  cn,
+  handleNewNodeRelations,
+} from "./lib/utils";
 import { storeSelector, useSidebar, useStore, useTheme } from "./hooks";
 
 import {
@@ -94,26 +100,33 @@ export default function App() {
 
   const onConnect = useCallback(
     (params: Edge | Connection) => {
-      if (canConnect(params)) {
+      const { canConnect, connectionType, lockConnection, newNodeRelations } =
+        checkConnection(params, edgeType);
+      if (canConnect) {
         const currentDate = Date.now();
         const id = edges.length.toString();
         const newConnection = {
           ...params,
-          type: edgeType,
+          type: connectionType,
           data: {
             id,
             label: `Edge ${id}`,
-            type: edgeType,
+            type: connectionType,
+            lockConnection,
             createdAt: currentDate,
             updatedAt: currentDate,
           },
         };
 
+        if (newNodeRelations.length > 0) {
+          handleNewNodeRelations(newNodeRelations, nodes, setNodes);
+        }
+
         const newEdges = addEdge(newConnection, edges);
         return setEdges(newEdges);
       }
     },
-    [edges, edgeType, setEdges],
+    [edges, edgeType, setEdges, nodes, setNodes],
   );
 
   return (
@@ -125,8 +138,8 @@ export default function App() {
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}
-          nodeTypes={nodeTypes}
-          edgeTypes={edgeTypes as EdgeTypes}
+          nodeTypes={nodeTypes as unknown as NodeTypes}
+          edgeTypes={edgeTypes as unknown as EdgeTypes}
         >
           <Sidebar />
           <Settings />

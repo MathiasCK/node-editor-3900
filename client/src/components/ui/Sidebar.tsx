@@ -27,6 +27,7 @@ import {
   deleteSelectedEdge,
   deleteSelectedNode,
   updateNodeName,
+  updateNodeRelations,
 } from "@/lib/utils";
 import { Input } from "./input";
 import { shallow } from "zustand/shallow";
@@ -76,7 +77,17 @@ const Sidebar = () => {
         setNodes,
       );
     } else {
-      deleteSelectedEdge(sidebar.currentEdge?.id as string, edges, setEdges);
+      const currentEdge = edges.find(
+        edge => edge.id === (sidebar.currentEdge?.id as string),
+      );
+
+      if (!currentEdge) {
+        toast.error("Could not delete -> no edge selected");
+        return;
+      }
+
+      deleteSelectedEdge(currentEdge.id, edges, setEdges);
+      updateNodeRelations(currentEdge, nodes, setNodes);
     }
     closeSidebar();
     handleEdit(false);
@@ -155,6 +166,7 @@ const Sidebar = () => {
               Connection type
             </p>
             <Select
+              disabled={sidebar.currentEdge.data.lockConnection}
               value={connectionType}
               onValueChange={e => setConnectionType(e)}
             >
