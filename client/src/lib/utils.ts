@@ -173,6 +173,11 @@ export const deleteSelectedNode = (
   }
 
   const connectedEdges = getConnectedEdges([currentNode], edges);
+
+  for (const edge of connectedEdges) {
+    updateNodeRelations(edge, nodes, setNodes);
+  }
+
   const updatedEdges = getSymmetricDifference(edges, connectedEdges);
 
   const updatedNodes = nodes.filter(node => node.id !== selectedNodeId);
@@ -200,6 +205,7 @@ export const deleteEdgeWithRelations = (
   }
 
   deleteSelectedEdge(currentEdge.id, edges, setEdges);
+
   updateNodeRelations(currentEdge, nodes, setNodes);
 };
 
