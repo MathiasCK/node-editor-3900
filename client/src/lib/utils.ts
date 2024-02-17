@@ -180,7 +180,9 @@ export const deleteSelectedNode = (
   setNodes(updatedNodes);
   setEdges(updatedEdges);
 
-  toast.success(`Node ${selectedNodeId} deleted`);
+  toast.success(
+    `${capitalizeFirstLetter(currentNode.data.type)} ${selectedNodeId} deleted`,
+  );
 };
 
 export const deleteEdgeWithRelations = (
