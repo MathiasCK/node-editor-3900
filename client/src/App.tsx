@@ -18,6 +18,7 @@ import {
   addNode,
   checkConnection,
   cn,
+  deleteEdgeWithRelations,
   handleNewNodeRelations,
 } from "./lib/utils";
 import { storeSelector, useSidebar, useStore, useTheme } from "./hooks";
@@ -67,7 +68,7 @@ export default function App() {
 
   const [edgeType, setEdgeType] = useState<EdgeType>(EdgeType.Part);
 
-  const { sidebar, closeSidebar } = useSidebar();
+  const { sidebar, closeSidebar, handleEdit } = useSidebar();
   const { theme } = useTheme();
 
   const { nodes, setNodes, onNodesChange, edges, setEdges, onEdgesChange } =
@@ -84,10 +85,23 @@ export default function App() {
     }
 
     const handleKeyPress = (e: KeyboardEvent) => {
-      if (e.key === "Backspace" || e.key === "Delete") {
-        if (sidebar?.open && !sidebar?.edit) {
-          closeSidebar();
+      if (
+        (e.key === "Backspace" || e.key === "Delete") &&
+        sidebar?.open &&
+        !sidebar?.edit
+      ) {
+        if (sidebar.currentEdge) {
+          deleteEdgeWithRelations(
+            sidebar.currentEdge?.id as string,
+            edges,
+            setEdges,
+            nodes,
+            setNodes,
+          );
         }
+
+        closeSidebar();
+        handleEdit(false);
       }
     };
 
@@ -96,7 +110,18 @@ export default function App() {
     return () => {
       window.removeEventListener("keydown", handleKeyPress);
     };
-  }, [sidebar?.open, closeSidebar, theme, sidebar?.edit]);
+  }, [
+    sidebar?.open,
+    closeSidebar,
+    theme,
+    sidebar?.edit,
+    sidebar.currentEdge,
+    handleEdit,
+    edges,
+    setEdges,
+    nodes,
+    setNodes,
+  ]);
 
   const onConnect = useCallback(
     (params: Edge | Connection) => {
