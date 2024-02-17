@@ -24,10 +24,9 @@ import { Pencil } from "lucide-react";
 import {
   capitalizeFirstLetter,
   cn,
-  deleteSelectedEdge,
+  deleteEdgeWithRelations,
   deleteSelectedNode,
   updateNodeName,
-  updateNodeRelations,
 } from "@/lib/utils";
 import { Input } from "./input";
 import { shallow } from "zustand/shallow";
@@ -77,20 +76,17 @@ const Sidebar = () => {
         setNodes,
       );
     } else {
-      const currentEdge = edges.find(
-        edge => edge.id === (sidebar.currentEdge?.id as string),
+      deleteEdgeWithRelations(
+        sidebar.currentEdge?.id as string,
+        edges,
+        setEdges,
+        nodes,
+        setNodes,
       );
 
-      if (!currentEdge) {
-        toast.error("Could not delete -> no edge selected");
-        return;
-      }
-
-      deleteSelectedEdge(currentEdge.id, edges, setEdges);
-      updateNodeRelations(currentEdge, nodes, setNodes);
+      closeSidebar();
+      handleEdit(false);
     }
-    closeSidebar();
-    handleEdit(false);
   };
 
   const handleConnectionTypeChange = () => {

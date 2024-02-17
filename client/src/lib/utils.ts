@@ -46,7 +46,12 @@ export const checkConnection = (
 
     newNodeRelations.push({
       nodeId: params.source as string,
-      connection: { hasTerminal: true },
+      value: {
+        hasTerminal: true,
+      },
+      array: {
+        terminals: params.target as string,
+      },
     });
   }
   return { canConnect, connectionType, lockConnection, newNodeRelations };
@@ -63,9 +68,16 @@ export const handleNewNodeRelations = (
 
     if (!nodeToUpdate || index === -1) return;
 
-    const keyToUpdate = Object.keys(relation.connection)[0];
+    const keyToUpdate = Object.keys(relation.value)[0];
 
-    nodeToUpdate.data[keyToUpdate] = relation.connection[keyToUpdate];
+    const arrayToUpdate = Object.keys(relation.array)[0];
+
+    nodeToUpdate.data[keyToUpdate] = relation.value[keyToUpdate];
+
+    nodeToUpdate.data[arrayToUpdate] = [
+      ...(nodeToUpdate.data[arrayToUpdate] ?? []),
+      relation.array[arrayToUpdate],
+    ];
 
     updateNodeData(index, nodeToUpdate, nodes, setNodes);
   }
@@ -171,6 +183,24 @@ export const deleteSelectedNode = (
   toast.success(`Node ${selectedNodeId} deleted`);
 };
 
+export const deleteEdgeWithRelations = (
+  currentEdgeId: string,
+  edges: Edge[],
+  setEdges: (nodes: Edge[]) => void,
+  nodes: Node[],
+  setNodes: (nodes: Node[]) => void,
+) => {
+  const currentEdge = edges.find(edge => edge.id === (currentEdgeId as string));
+
+  if (!currentEdge) {
+    toast.error("Could not delete -> no edge selected");
+    return;
+  }
+
+  deleteSelectedEdge(currentEdge.id, edges, setEdges);
+  updateNodeRelations(currentEdge, nodes, setNodes);
+};
+
 export const updateNodeRelations = (
   currentEdge: Edge,
   nodes: Node[],
@@ -187,7 +217,16 @@ export const updateNodeRelations = (
 
     if (!nodeToUpdate || index === -1) return;
 
-    nodeToUpdate.data.hasTerminal = false;
+    const updatedTerminals = nodeToUpdate.data.terminals.filter(
+      (terminal: string) => terminal !== currentEdge.target,
+    );
+
+    nodeToUpdate.data.terminals = updatedTerminals;
+
+    if (updatedTerminals.length === 0) {
+      delete nodeToUpdate.data.terminals;
+      nodeToUpdate.data.hasTerminal = false;
+    }
 
     updateNodeData(index, nodeToUpdate, nodes, setNodes);
   }
