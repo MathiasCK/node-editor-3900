@@ -1,7 +1,7 @@
 import { useSidebar } from "@/hooks";
 import type { CustomEdgeProps } from "@/lib/types";
 
-const Part = (props: CustomEdgeProps) => {
+const Connected = (props: CustomEdgeProps) => {
   const { openSidebar } = useSidebar();
   return (
     <g onClick={() => openSidebar(props)}>
@@ -15,4 +15,4 @@ const Part = (props: CustomEdgeProps) => {
   );
 };
 
-export default Part;
+export default Connected;
