@@ -251,8 +251,9 @@ const Sidebar = () => {
         <SheetFooter>
           {(connectionType !== sidebar.currentEdge?.data?.type ||
             nodeName !== displayName) && (
-            <button
+            <Button
               className={buttonVariants.verbose}
+              variant="outline"
               onClick={() => {
                 if (sidebar.currentEdge) {
                   return handleConnectionTypeChange();
@@ -261,11 +262,15 @@ const Sidebar = () => {
               }}
             >
               Update
-            </button>
+            </Button>
           )}
-          <button className={buttonVariants.danger} onClick={handleDelete}>
+          <Button
+            className={buttonVariants.danger}
+            variant="outline"
+            onClick={handleDelete}
+          >
             Delete
-          </button>
+          </Button>
         </SheetFooter>
       </SheetContent>
     </Sheet>
