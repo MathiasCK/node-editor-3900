@@ -20,6 +20,8 @@ export enum EdgeType {
 export type NodeData = {
   hasTerminal?: boolean;
   terminals?: string[];
+  hasConnector?: boolean;
+  connectors?: string[];
   id: string;
   label: string;
   type: string;

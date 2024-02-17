@@ -54,6 +54,26 @@ export const checkConnection = (
       },
     });
   }
+
+  if (
+    (isBlock(params.sourceHandle as string) ||
+      isTerminal(params.sourceHandle as string)) &&
+    isConnector(params.targetHandle as string)
+  ) {
+    lockConnection = true;
+    connectionType = EdgeType.Connected;
+
+    newNodeRelations.push({
+      nodeId: params.source as string,
+      value: {
+        hasConnector: true,
+      },
+      array: {
+        connectors: params.target as string,
+      },
+    });
+  }
+
   return { canConnect, connectionType, lockConnection, newNodeRelations };
 };
 
@@ -132,6 +152,11 @@ export const addNode = (
 
   if (isBlock(type)) {
     newNode.data.hasTerminal = false;
+    newNode.data.hasConnector = false;
+  }
+
+  if (isTerminal(type)) {
+    newNode.data.hasConnector = false;
   }
 
   setNodes([...nodes, newNode]);
@@ -234,6 +259,32 @@ export const updateNodeRelations = (
     if (updatedTerminals.length === 0) {
       delete nodeToUpdate.data.terminals;
       nodeToUpdate.data.hasTerminal = false;
+    }
+
+    updateNodeData(index, nodeToUpdate, nodes, setNodes);
+  }
+
+  if (
+    currentEdge.data.lockConnection &&
+    (isBlock(currentEdge.sourceHandle!) ||
+      isTerminal(currentEdge.sourceHandle!)) &&
+    isConnector(currentEdge.targetHandle!)
+  ) {
+    // Deleting a connection where block or terminal has hasConnector set to true
+    const nodeToUpdate = nodes.find(node => node.id === currentEdge.source);
+    const index = nodes.findIndex(node => node.id === currentEdge.source);
+
+    if (!nodeToUpdate || index === -1) return;
+
+    const updatedConnectors = nodeToUpdate.data.connectors.filter(
+      (terminal: string) => terminal !== currentEdge.target,
+    );
+
+    nodeToUpdate.data.connectors = updatedConnectors;
+
+    if (updatedConnectors.length === 0) {
+      delete nodeToUpdate.data.connectors;
+      nodeToUpdate.data.hasConnector = false;
     }
 
     updateNodeData(index, nodeToUpdate, nodes, setNodes);
