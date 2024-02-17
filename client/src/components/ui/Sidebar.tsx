@@ -9,7 +9,7 @@ import {
 } from "./sheet";
 import { storeSelector, useSidebar, useStore } from "@/hooks";
 import { buttonVariants } from "@/lib/config";
-import { Edge, addEdge } from "reactflow";
+import { Edge, Position, addEdge } from "reactflow";
 import { useEffect, useState } from "react";
 import {
   Select,
@@ -30,9 +30,10 @@ import {
 } from "@/lib/utils";
 import { Input } from "./input";
 import { shallow } from "zustand/shallow";
+import { Button } from "./button";
 
 const Sidebar = () => {
-  const { sidebar, handleEdit, closeSidebar } = useSidebar();
+  const { sidebar, handleEdit, closeSidebar, openSidebar } = useSidebar();
   const { edges, setEdges, nodes, setNodes } = useStore(storeSelector, shallow);
 
   const displayName = capitalizeFirstLetter(
@@ -83,10 +84,9 @@ const Sidebar = () => {
         nodes,
         setNodes,
       );
-
-      closeSidebar();
-      handleEdit(false);
     }
+    closeSidebar();
+    handleEdit(false);
   };
 
   const handleConnectionTypeChange = () => {
@@ -120,6 +120,31 @@ const Sidebar = () => {
       setNodes,
     );
     handleEdit(false);
+  };
+
+  const displayTerminal = (terminalId: string) => {
+    const terminalNode = nodes.find(n => n.id === terminalId);
+
+    if (!terminalNode) {
+      toast.error(
+        `Could not display terminal ${terminalId}. Refresh page & try again`,
+      );
+      return;
+    }
+    // @ts-ignore
+    openSidebar({
+      data: terminalNode.data,
+      dragging: terminalNode.dragging as boolean,
+      id: terminalNode.id,
+      isConnectable: true,
+      selected: true,
+      type: terminalNode.type as string,
+      sourcePosition: Position.Bottom,
+      targetPosition: Position.Top,
+      xPos: terminalNode.position.x,
+      yPos: terminalNode.position.y,
+      zIndex: 0,
+    });
   };
 
   return (
@@ -189,6 +214,22 @@ const Sidebar = () => {
                 </SelectGroup>
               </SelectContent>
             </Select>
+          </div>
+        )}
+        {sidebar.currentNode?.data?.hasTerminal && (
+          <div>
+            <p className="text-sm text-muted-foreground mb-2">
+              Connected Terminals
+            </p>
+            {sidebar.currentNode?.data?.terminals!.map((t: string) => (
+              <Button
+                key={`terminal_${t}_${sidebar.currentNode!.id!}_link_button`}
+                onClick={() => displayTerminal(t)}
+                variant="ghost"
+              >
+                {t}
+              </Button>
+            ))}
           </div>
         )}
         <SheetFooter>
