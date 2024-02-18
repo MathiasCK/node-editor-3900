@@ -13,14 +13,9 @@ import { shallow } from "zustand/shallow";
 import "reactflow/dist/style.css";
 import { Block, Connector, Terminal, TextBox } from "./components/Nodes";
 import { buttonVariants } from "./lib/config";
-import { AspectType, EdgeType, NodeType } from "./lib/types";
-import {
-  addNode,
-  checkConnection,
-  cn,
-  handleNewNodeRelations,
-} from "./lib/utils";
-import { storeSelector, useStore, useTheme } from "./hooks";
+import { AspectType, NodeType } from "./lib/types";
+import { addNode, checkConnection, handleNewNodeRelations } from "./lib/utils";
+import { storeSelector, useConnection, useStore, useTheme } from "./hooks";
 
 import {
   Connected,
@@ -39,7 +34,7 @@ import {
   lightTheme,
 } from "./components/ui/styled";
 import { ThemeProvider } from "styled-components";
-import { Sidebar, Settings } from "./components/ui";
+import { Sidebar, Settings, SelectConnection } from "./components/ui";
 
 export default function App() {
   const nodeTypes = useMemo(
@@ -65,9 +60,9 @@ export default function App() {
     [],
   );
 
-  const [edgeType, setEdgeType] = useState<EdgeType>(EdgeType.Part);
-
   const { theme } = useTheme();
+  const { edgeType, openDialog } = useConnection();
+  const [params, setParams] = useState<Edge | Connection | null>();
 
   const { nodes, setNodes, onNodesChange, edges, setEdges, onEdgesChange } =
     useStore(storeSelector, shallow);
@@ -95,35 +90,42 @@ export default function App() {
     };
   }, [theme]);
 
+  const createNewConnection = () => {
+    if (!params) return;
+
+    const { canConnect, connectionType, lockConnection, newNodeRelations } =
+      checkConnection(params, edgeType);
+    if (canConnect) {
+      const currentDate = Date.now();
+      const id = edges.length.toString();
+      const newConnection = {
+        ...params,
+        type: connectionType,
+        data: {
+          id,
+          label: `Edge ${id}`,
+          type: connectionType,
+          lockConnection,
+          createdAt: currentDate,
+          updatedAt: currentDate,
+        },
+      };
+
+      if (newNodeRelations.length > 0) {
+        handleNewNodeRelations(newNodeRelations, nodes, setNodes);
+      }
+
+      const newEdges = addEdge(newConnection, edges);
+      return setEdges(newEdges);
+    }
+  };
+
   const onConnect = useCallback(
     (params: Edge | Connection) => {
-      const { canConnect, connectionType, lockConnection, newNodeRelations } =
-        checkConnection(params, edgeType);
-      if (canConnect) {
-        const currentDate = Date.now();
-        const id = edges.length.toString();
-        const newConnection = {
-          ...params,
-          type: connectionType,
-          data: {
-            id,
-            label: `Edge ${id}`,
-            type: connectionType,
-            lockConnection,
-            createdAt: currentDate,
-            updatedAt: currentDate,
-          },
-        };
-
-        if (newNodeRelations.length > 0) {
-          handleNewNodeRelations(newNodeRelations, nodes, setNodes);
-        }
-
-        const newEdges = addEdge(newConnection, edges);
-        return setEdges(newEdges);
-      }
+      openDialog();
+      setParams(params);
     },
-    [edges, edgeType, setEdges, nodes, setNodes],
+    [openDialog],
   );
 
   return (
@@ -140,95 +142,11 @@ export default function App() {
         >
           <Sidebar />
           <Settings />
-
+          <SelectConnection createNewConnection={createNewConnection} />
           <Panel
             position="top-right"
             className="h-full w-100 flex justify-center flex-col"
           >
-            <button
-              className={cn(
-                `${buttonVariants.edge} border-green-400 text-green-400 hover:bg-green-400 `,
-                {
-                  "bg-green-400 text-white border-transparent":
-                    edgeType === EdgeType.Part,
-                },
-              )}
-              onClick={() => setEdgeType(EdgeType.Part)}
-            >
-              Part of
-            </button>
-            <button
-              className={cn(
-                `${buttonVariants.edge} border-blue-200 text-blue-200 hover:bg-blue-200 `,
-                {
-                  "bg-blue-200 text-white border-transparent":
-                    edgeType === EdgeType.Connected,
-                },
-              )}
-              onClick={() => setEdgeType(EdgeType.Connected)}
-            >
-              Connected to
-            </button>
-            <button
-              className={cn(
-                `${buttonVariants.edge} border-blue-400 text-blue-400 hover:bg-blue-400 `,
-                {
-                  "bg-blue-400 text-white border-transparent":
-                    edgeType === EdgeType.Transfer,
-                },
-              )}
-              onClick={() => setEdgeType(EdgeType.Transfer)}
-            >
-              Transfer to
-            </button>
-            <button
-              className={cn(
-                `${buttonVariants.edge} border-amber-300 text-amber-300 hover:bg-amber-300 `,
-                {
-                  "bg-amber-300 text-white border-transparent":
-                    edgeType === EdgeType.Specialisation,
-                },
-              )}
-              onClick={() => setEdgeType(EdgeType.Specialisation)}
-            >
-              Specialisation of
-            </button>
-            <button
-              className={cn(
-                `${buttonVariants.edge} border-amber-300 text-amber-300 hover:bg-amber-300 border-dotted`,
-                {
-                  "bg-amber-300 text-white border-transparent":
-                    edgeType === EdgeType.Fulfilled,
-                },
-              )}
-              onClick={() => setEdgeType(EdgeType.Fulfilled)}
-            >
-              Fulfilled by
-            </button>
-            <button
-              className={cn(
-                `${buttonVariants.edge} border-gray-200 text-gray-200 hover:bg-gray-200 `,
-                {
-                  "bg-gray-200 text-white border-transparent":
-                    edgeType === EdgeType.Proxy,
-                },
-              )}
-              onClick={() => setEdgeType(EdgeType.Proxy)}
-            >
-              Proxy
-            </button>
-            <button
-              className={cn(
-                `${buttonVariants.edge} border-dotted border-gray-200 text-gray-200 hover:bg-gray-200`,
-                {
-                  "bg-gray-200 text-white border-transparent":
-                    edgeType === EdgeType.Projection,
-                },
-              )}
-              onClick={() => setEdgeType(EdgeType.Projection)}
-            >
-              Projection
-            </button>
             <button
               className={
                 theme === "light"
