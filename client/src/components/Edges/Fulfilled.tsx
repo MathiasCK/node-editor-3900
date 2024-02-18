@@ -1,9 +1,9 @@
-import { useSidebar, useTheme } from "@/hooks";
+import { useSidebar } from "@/hooks";
 import type { CustomEdgeProps } from "@/lib/types";
 
 const Fulfilled = (props: CustomEdgeProps) => {
   const { openSidebar } = useSidebar();
-  const { theme } = useTheme();
+
   return (
     <g onClick={() => openSidebar(props)}>
       <defs>
@@ -17,18 +17,15 @@ const Fulfilled = (props: CustomEdgeProps) => {
           markerUnits="strokeWidth"
         >
           <svg
+            className="stroke-fulfilled fill-white dark:fill-black"
             width="5px"
             height="5px"
             viewBox="0 0 5 5"
             role="img"
             xmlns="http://www.w3.org/2000/svg"
             aria-labelledby="rectangleIconTitle"
-            stroke="#fcd34c"
-            strokeWidth="1"
             strokeLinecap="square"
             strokeLinejoin="miter"
-            fill={theme === "dark" ? "#000" : "#fff"}
-            color="#fcd34c"
           >
             {" "}
             <title id="rectangleIconTitle">Rectangle</title>{" "}
@@ -37,9 +34,7 @@ const Fulfilled = (props: CustomEdgeProps) => {
         </marker>
       </defs>
       <path
-        fill="transparent"
-        stroke="#fcd34c"
-        strokeWidth={2}
+        className="stroke-fulfilled stroke-2"
         d={`M${props.sourceX},${props.sourceY}L${props.targetX},${props.targetY}`}
         markerEnd="url(#fulfilledhead)"
       />

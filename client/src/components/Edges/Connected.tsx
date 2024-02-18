@@ -6,9 +6,7 @@ const Connected = (props: CustomEdgeProps) => {
   return (
     <g onClick={() => openSidebar(props)}>
       <path
-        fill="transparent"
-        stroke="#bfdbfe"
-        strokeWidth={2}
+        className="stroke-connected stroke-2"
         d={`M${props.sourceX},${props.sourceY}L${props.targetX},${props.targetY}`}
       />
     </g>

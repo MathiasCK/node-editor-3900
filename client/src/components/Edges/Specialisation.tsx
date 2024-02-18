@@ -1,9 +1,9 @@
-import { useSidebar, useTheme } from "@/hooks";
+import { useSidebar } from "@/hooks";
 import type { CustomEdgeProps } from "@/lib/types";
 
 const Specialisation = (props: CustomEdgeProps) => {
   const { openSidebar } = useSidebar();
-  const { theme } = useTheme();
+
   return (
     <g onClick={() => openSidebar(props)}>
       <defs>
@@ -18,18 +18,14 @@ const Specialisation = (props: CustomEdgeProps) => {
         >
           <svg width="20" height="10" xmlns="http://www.w3.org/2000/svg">
             <polygon
+              className="stroke-specialisation fill-white dark:fill-black"
               points="0 0, 10 3.5, 0 7"
-              fill={theme === "dark" ? "#000" : "#fff"}
-              stroke="#fcd34c"
-              strokeWidth="1"
             />
           </svg>
         </marker>
       </defs>
       <path
-        fill="transparent"
-        stroke="#fcd34c"
-        strokeWidth={2}
+        className="stroke-specialisation stroke-2"
         d={`M${props.sourceX},${props.sourceY}L${props.targetX},${props.targetY}`}
         markerEnd="url(#specialhead)"
       />

@@ -7,8 +7,7 @@ const Proxy = (props: CustomEdgeProps) => {
     <g onClick={() => openSidebar(props)}>
       <path
         fill="transparent"
-        stroke="#e5e7eb"
-        strokeWidth={2}
+        className="stroke-proxy stroke-2"
         strokeDasharray="5 5"
         d={`M${props.sourceX},${props.sourceY}L${props.targetX},${props.targetY}`}
       />

@@ -15,13 +15,11 @@ const Projection = (props: CustomEdgeProps) => {
           orient="auto"
           markerUnits="strokeWidth"
         >
-          <polygon points="0 0, 7 3.5, 0 7" fill="#e5e7eb" />
+          <polygon points="0 0, 7 3.5, 0 7" className="fill-projection" />
         </marker>
       </defs>
       <path
-        fill="transparent"
-        stroke="#e5e7eb"
-        strokeWidth={2}
+        className="stroke-projection stroke-2"
         strokeDasharray="5 5"
         d={`M${props.sourceX},${props.sourceY}L${props.targetX},${props.targetY}`}
         markerEnd="url(#projectionhead)"
