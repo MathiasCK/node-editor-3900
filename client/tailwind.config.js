@@ -7,6 +7,9 @@ module.exports = {
     "./app/**/*.{ts,tsx}",
     "./src/**/*.{ts,tsx}",
   ],
+  purge: {
+    safelist: ["bg-function", "bg-product", "bg-location"],
+  },
   prefix: "",
   theme: {
     container: {
