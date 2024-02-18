@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/navigation-menu";
 import { AlignJustify } from "lucide-react";
 import { storeSelector, useSettings, useStore, useTheme } from "@/hooks";
-import { NavItem, NodeType } from "@/lib/types";
+import { AspectType, NavItem, NodeType } from "@/lib/types";
 import { shallow } from "zustand/shallow";
 
 const navItems: NavItem[] = [
@@ -117,7 +117,14 @@ const Navbar = () => {
                   <ListItem
                     key={component.title}
                     title={component.title}
-                    onClick={() => addNode(component.nodeType, nodes, setNodes)}
+                    onClick={() =>
+                      addNode(
+                        node.title.toLowerCase() as AspectType,
+                        component.nodeType,
+                        nodes,
+                        setNodes,
+                      )
+                    }
                   >
                     {component.description}
                   </ListItem>

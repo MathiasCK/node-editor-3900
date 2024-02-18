@@ -1,5 +1,11 @@
 import { EdgeProps, NodeProps } from "reactflow";
 
+export enum AspectType {
+  Function = "function",
+  Product = "product",
+  Location = "location",
+}
+
 export enum NodeType {
   Block = "block",
   Connector = "connector",
@@ -18,6 +24,7 @@ export enum EdgeType {
 }
 
 export type NodeData = {
+  aspect: AspectType;
   hasTerminal?: boolean;
   hasConnector?: boolean;
   id: string;

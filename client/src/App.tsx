@@ -13,7 +13,7 @@ import { shallow } from "zustand/shallow";
 import "reactflow/dist/style.css";
 import { Block, Connector, Terminal, TextBox } from "./components/Nodes";
 import { buttonVariants } from "./lib/config";
-import { EdgeType, NodeType } from "./lib/types";
+import { AspectType, EdgeType, NodeType } from "./lib/types";
 import {
   addNode,
   checkConnection,
@@ -235,7 +235,14 @@ export default function App() {
                   ? buttonVariants.button
                   : buttonVariants.textbox
               }
-              onClick={() => addNode(NodeType.TextBox, nodes, setNodes)}
+              onClick={() =>
+                addNode(
+                  "white" as AspectType,
+                  NodeType.TextBox,
+                  nodes,
+                  setNodes,
+                )
+              }
             >
               Add TextBox
             </button>

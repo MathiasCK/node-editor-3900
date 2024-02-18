@@ -8,6 +8,7 @@ import {
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import {
+  AspectType,
   ConnectionWithChildren,
   ConnectionWithTarget,
   EdgeType,
@@ -122,6 +123,7 @@ export const capitalizeFirstLetter = (string: string) =>
   string.charAt(0).toUpperCase() + string.slice(1);
 
 export const addNode = (
+  aspect: AspectType,
   type: NodeType,
   nodes: Node[],
   setNodes: (nodes: Node[]) => void,
@@ -136,6 +138,7 @@ export const addNode = (
       y: window.innerHeight / 2,
     },
     data: {
+      aspect,
       label: `${type}_${id}`,
       type,
       id,

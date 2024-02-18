@@ -7,9 +7,12 @@ const Terminal = (props: CustomNodeProps) => {
 
   return (
     <figure id={props.data.label}>
-      <div onClick={() => openSidebar(props)} className="h-4 w-4 bg-terminal">
+      <div
+        onClick={() => openSidebar(props)}
+        className={`h-4 w-4 bg-${props.data.aspect}`}
+      >
         <header className="flex items-center justify-center w-full h-full">
-          <p className="uppercase text-white">{props.data.id}</p>
+          <p className="uppercase text-black">{props.data.id}</p>
         </header>
       </div>
 
