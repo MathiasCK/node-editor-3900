@@ -181,7 +181,13 @@ export const updateNode = (
 
   updateNodeData(index, nodeToUpdate, nodes, setNodes);
 
-  toast.success("Name updated");
+  if (newNodeData.aspect) {
+    toast.success("Aspect type updated");
+  }
+
+  if (newNodeData.customName) {
+    toast.success("Name updated");
+  }
 };
 
 export const deleteSelectedNode = (
