@@ -303,9 +303,11 @@ export const getRelatedNodesWithRelations = (
   const data = currentNodeRelations.map((r, i) => ({
     type: r.data.type,
     target: relatedNodes?.[i]?.id,
-    displayName: `${capitalizeFirstLetter(relatedNodes?.[i]?.type as string)} ${
-      relatedNodes?.[i]?.id
-    }`,
+    displayName:
+      relatedNodes?.[i]?.data?.customName ??
+      `${capitalizeFirstLetter(relatedNodes?.[i]?.type as string)} ${
+        relatedNodes?.[i]?.id
+      }`,
   })) as ConnectionWithTarget[];
 
   const result = data.reduce(
