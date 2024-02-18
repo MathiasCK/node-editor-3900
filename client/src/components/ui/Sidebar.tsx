@@ -19,7 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./select";
-import { EdgeType } from "@/lib/types";
+import { AspectType, EdgeType, UpdateNode } from "@/lib/types";
 import { Pencil } from "lucide-react";
 import {
   capitalizeFirstLetter,
@@ -28,7 +28,7 @@ import {
   deleteSelectedNode,
   getReadableEdgeType,
   getRelatedNodesWithRelations,
-  updateNodeName,
+  updateNode,
 } from "@/lib/utils";
 import { Input } from "./input";
 import { shallow } from "zustand/shallow";
@@ -59,11 +59,16 @@ const Sidebar = () => {
   ).toLocaleString();
 
   const [connectionType, setConnectionType] = useState<string>("");
+  const [aspectType, setAspectType] = useState<string>("");
   const [nodeName, setNodeName] = useState<string>("");
 
   useEffect(() => {
     setConnectionType(sidebar.currentEdge?.data?.type as string);
   }, [sidebar.currentEdge]);
+
+  useEffect(() => {
+    setAspectType(sidebar.currentNode?.data?.aspect as string);
+  }, [sidebar.currentNode]);
 
   useEffect(() => {
     setNodeName(displayName);
@@ -118,13 +123,18 @@ const Sidebar = () => {
     toast.success(`${displayName} connection updated`);
   };
 
-  const handleNodeNameChange = () => {
-    updateNodeName(
-      sidebar.currentNode?.id as string,
-      nodeName,
-      nodes,
-      setNodes,
-    );
+  const updateNodeData = () => {
+    const newNodeData: UpdateNode = {};
+
+    if (nodeName !== displayName) {
+      newNodeData["customName"] = nodeName;
+    }
+
+    if (aspectType !== sidebar.currentNode?.data?.aspect) {
+      newNodeData["aspect"] = aspectType as AspectType;
+    }
+
+    updateNode(sidebar.currentNode?.id as string, newNodeData, nodes, setNodes);
     handleEdit(false);
   };
 
@@ -190,6 +200,23 @@ const Sidebar = () => {
           <SheetDescription>Created: {createdAt}</SheetDescription>
           <SheetDescription>Updated: {updatedAt}</SheetDescription>
         </SheetHeader>
+        {sidebar.currentNode && (
+          <div>
+            <p className="text-sm text-muted-foreground mb-2">Aspect type</p>
+            <Select value={aspectType} onValueChange={e => setAspectType(e)}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder={aspectType} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectItem value={AspectType.Function}>Function</SelectItem>
+                  <SelectItem value={AspectType.Product}>Product</SelectItem>
+                  <SelectItem value={AspectType.Location}>Location</SelectItem>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </div>
+        )}
         {sidebar.currentNode && nodesWithRelations.length > 0 && (
           <>
             {nodesWithRelations.map(nodeRelation => (
@@ -248,7 +275,8 @@ const Sidebar = () => {
         )}
         <SheetFooter>
           {(connectionType !== sidebar.currentEdge?.data?.type ||
-            nodeName !== displayName) && (
+            nodeName !== displayName ||
+            aspectType !== sidebar.currentNode?.data?.aspect) && (
             <Button
               className={buttonVariants.verbose}
               variant="outline"
@@ -256,7 +284,7 @@ const Sidebar = () => {
                 if (sidebar.currentEdge) {
                   return handleConnectionTypeChange();
                 }
-                handleNodeNameChange();
+                updateNodeData();
               }}
             >
               Update

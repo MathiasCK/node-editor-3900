@@ -14,6 +14,7 @@ import {
   EdgeType,
   NodeRelation,
   NodeType,
+  UpdateNode,
 } from "./types";
 import { Sidebar } from "@/hooks/useSidebar";
 
@@ -159,9 +160,9 @@ export const addNode = (
   setNodes([...nodes, newNode]);
 };
 
-export const updateNodeName = (
+export const updateNode = (
   nodeId: string,
-  newName: string,
+  newNodeData: UpdateNode,
   nodes: Node[],
   setNodes: (nodes: Node[]) => void,
 ) => {
@@ -173,7 +174,10 @@ export const updateNodeName = (
     return;
   }
 
-  nodeToUpdate.data.customName = newName;
+  Object.keys(newNodeData).forEach(key => {
+    // @ts-ignore
+    nodeToUpdate.data[key] = newNodeData[key];
+  });
 
   updateNodeData(index, nodeToUpdate, nodes, setNodes);
 

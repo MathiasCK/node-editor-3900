@@ -23,6 +23,8 @@ export enum EdgeType {
   Transfer = "transfer",
 }
 
+export type UpdateNode = { customName?: string; aspect?: AspectType };
+
 export type NodeData = {
   aspect: AspectType;
   hasTerminal?: boolean;
