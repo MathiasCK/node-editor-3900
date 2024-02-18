@@ -63,6 +63,7 @@ export default function App() {
   const { theme } = useTheme();
   const { edgeType, openDialog } = useConnection();
   const [params, setParams] = useState<Edge | Connection | null>();
+  const [displayDialog, setDisplayDialog] = useState<boolean>(true);
 
   const { nodes, setNodes, onNodesChange, edges, setEdges, onEdgesChange } =
     useStore(storeSelector, shallow);
@@ -93,39 +94,46 @@ export default function App() {
   const createNewConnection = () => {
     if (!params) return;
 
-    const { canConnect, connectionType, lockConnection, newNodeRelations } =
+    const { connectionType, lockConnection, newNodeRelations } =
       checkConnection(params, edgeType);
-    if (canConnect) {
-      const currentDate = Date.now();
-      const id = edges.length.toString();
-      const newConnection = {
-        ...params,
+
+    const currentDate = Date.now();
+    const id = edges.length.toString();
+    const newConnection = {
+      ...params,
+      type: connectionType,
+      data: {
+        id,
+        label: `Edge ${id}`,
         type: connectionType,
-        data: {
-          id,
-          label: `Edge ${id}`,
-          type: connectionType,
-          lockConnection,
-          createdAt: currentDate,
-          updatedAt: currentDate,
-        },
-      };
+        lockConnection,
+        createdAt: currentDate,
+        updatedAt: currentDate,
+      },
+    };
 
-      if (newNodeRelations.length > 0) {
-        handleNewNodeRelations(newNodeRelations, nodes, setNodes);
-      }
-
-      const newEdges = addEdge(newConnection, edges);
-      return setEdges(newEdges);
+    if (newNodeRelations.length > 0) {
+      handleNewNodeRelations(newNodeRelations, nodes, setNodes);
     }
+
+    const newEdges = addEdge(newConnection, edges);
+    return setEdges(newEdges);
   };
 
   const onConnect = useCallback(
     (params: Edge | Connection) => {
+      const { canConnect, lockConnection } = checkConnection(params, edgeType);
+      if (!canConnect) return;
+
+      if (lockConnection) {
+        setDisplayDialog(false);
+      } else {
+        setDisplayDialog(true);
+      }
       openDialog();
       setParams(params);
     },
-    [openDialog],
+    [edgeType, openDialog],
   );
 
   return (
@@ -142,7 +150,10 @@ export default function App() {
         >
           <Sidebar />
           <Settings />
-          <SelectConnection createNewConnection={createNewConnection} />
+          <SelectConnection
+            displayDialog={displayDialog}
+            createNewConnection={createNewConnection}
+          />
           <Panel
             position="top-right"
             className="h-full w-100 flex justify-center flex-col"

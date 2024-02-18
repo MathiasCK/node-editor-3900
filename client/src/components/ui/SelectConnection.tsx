@@ -8,12 +8,22 @@ import { buttonVariants } from "@/lib/config";
 import { Button } from "./button";
 
 interface Props {
+  displayDialog: boolean;
   createNewConnection: () => void;
 }
 
-const SelectConnection: FC<Props> = ({ createNewConnection }) => {
+const SelectConnection: FC<Props> = ({
+  createNewConnection,
+  displayDialog,
+}) => {
   const { dialogOpen, edgeType, setEdgeType, closeDialog } = useConnection();
   if (!dialogOpen) return null;
+
+  if (!displayDialog) {
+    createNewConnection();
+    closeDialog();
+    return;
+  }
 
   return (
     <Dialog open={dialogOpen}>
