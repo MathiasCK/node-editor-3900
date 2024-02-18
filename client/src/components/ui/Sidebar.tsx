@@ -199,11 +199,11 @@ const Sidebar = () => {
                 </p>
                 {nodeRelation.children.map(c => (
                   <Button
-                    key={`${nodeRelation}_${c}_link_button`}
+                    key={`${nodeRelation}_${c.displayName}_link_button`}
                     variant="ghost"
-                    onClick={() => displayNewNode(c as string)}
+                    onClick={() => displayNewNode(c.id as string)}
                   >
-                    {c}
+                    {c.displayName}
                   </Button>
                 ))}
               </div>
@@ -251,13 +251,13 @@ const Sidebar = () => {
             <p className="text-sm text-muted-foreground mb-2">
               Connected Terminals
             </p>
-            {sidebar.currentNode?.data?.terminals!.map((t: string) => (
+            {sidebar.currentNode?.data?.terminals!.map(t => (
               <Button
-                key={`terminal_${t}_${sidebar.currentNode!.id!}_link_button`}
-                onClick={() => displayNewNode(t)}
+                key={`terminal_${t.id}_${sidebar.currentNode!.id!}_link_button`}
+                onClick={() => displayNewNode(t.id)}
                 variant="ghost"
               >
-                {t}
+                {t.displayName}
               </Button>
             ))}
           </div>
@@ -267,13 +267,14 @@ const Sidebar = () => {
             <p className="text-sm text-muted-foreground mb-2">
               Connected Connectors
             </p>
-            {sidebar.currentNode?.data?.connectors!.map((c: string) => (
+            {sidebar.currentNode?.data?.connectors!.map(c => (
               <Button
-                key={`connector_${c}_${sidebar.currentNode!.id!}_link_button`}
-                onClick={() => displayNewNode(c)}
+                key={`connector_${c.id}_${sidebar.currentNode!
+                  .id!}_link_button`}
+                onClick={() => displayNewNode(c.id)}
                 variant="ghost"
               >
-                {c}
+                {c.displayName}
               </Button>
             ))}
           </div>

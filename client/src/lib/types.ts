@@ -19,9 +19,15 @@ export enum EdgeType {
 
 export type NodeData = {
   hasTerminal?: boolean;
-  terminals?: string[];
+  terminals?: {
+    id: string;
+    displayName: string;
+  }[];
   hasConnector?: boolean;
-  connectors?: string[];
+  connectors?: {
+    id: string;
+    displayName: string;
+  }[];
   id: string;
   label: string;
   type: string;
@@ -56,7 +62,10 @@ export type NodeRelation = {
     [key: string]: boolean;
   };
   array: {
-    [key: string]: string;
+    [key: string]: {
+      id: string;
+      displayName: string;
+    };
   };
 };
 
@@ -72,10 +81,14 @@ export type NavItem = {
 
 export type ConnectionWithChildren = {
   type: string;
-  children: string[];
+  children: {
+    id: string;
+    displayName: string;
+  }[];
 };
 
 export type ConnectionWithTarget = {
   type: string;
   target: string;
+  displayName: string;
 };

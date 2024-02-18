@@ -57,7 +57,10 @@ export const checkConnection = (
         hasTerminal: true,
       },
       array: {
-        terminals: params.target as string,
+        terminals: {
+          id: params.target as string,
+          displayName: `Terminal ${params.target}`,
+        },
       },
     });
   }
@@ -76,7 +79,10 @@ export const checkConnection = (
         hasConnector: true,
       },
       array: {
-        connectors: params.target as string,
+        connectors: {
+          id: params.target as string,
+          displayName: `Connector ${params.target}`,
+        },
       },
     });
   }
@@ -338,6 +344,9 @@ export const getRelatedNodesWithRelations = (
   const data = currentNodeRelations.map((r, i) => ({
     type: r.data.type,
     target: relatedNodes?.[i]?.id,
+    displayName: `${capitalizeFirstLetter(relatedNodes?.[i]?.type as string)} ${
+      relatedNodes?.[i]?.id
+    }`,
   })) as ConnectionWithTarget[];
 
   const result = data.reduce(
@@ -346,11 +355,19 @@ export const getRelatedNodesWithRelations = (
         entry => entry.type === currentValue.type,
       );
       if (existingEntry) {
-        existingEntry.children.push(currentValue.target);
+        existingEntry.children.push({
+          id: currentValue.target,
+          displayName: currentValue.displayName,
+        });
       } else {
         accumulator.push({
           type: currentValue.type,
-          children: [currentValue.target],
+          children: [
+            {
+              id: currentValue.target,
+              displayName: currentValue.displayName,
+            },
+          ],
         });
       }
       return accumulator;
