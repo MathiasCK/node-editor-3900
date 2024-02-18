@@ -56,12 +56,6 @@ export const checkConnection = (
       value: {
         hasTerminal: true,
       },
-      array: {
-        terminals: {
-          id: params.target as string,
-          displayName: `Terminal ${params.target}`,
-        },
-      },
     });
   }
 
@@ -77,12 +71,6 @@ export const checkConnection = (
       nodeId: params.source as string,
       value: {
         hasConnector: true,
-      },
-      array: {
-        connectors: {
-          id: params.target as string,
-          displayName: `Connector ${params.target}`,
-        },
       },
     });
   }
@@ -103,14 +91,7 @@ export const handleNewNodeRelations = (
 
     const keyToUpdate = Object.keys(relation.value)[0];
 
-    const arrayToUpdate = Object.keys(relation.array)[0];
-
     nodeToUpdate.data[keyToUpdate] = relation.value[keyToUpdate];
-
-    nodeToUpdate.data[arrayToUpdate] = [
-      ...(nodeToUpdate.data[arrayToUpdate] ?? []),
-      relation.array[arrayToUpdate],
-    ];
 
     updateNodeData(index, nodeToUpdate, nodes, setNodes);
   }
@@ -263,17 +244,6 @@ export const updateNodeRelations = (
 
     if (!nodeToUpdate || index === -1) return;
 
-    const updatedTerminals = nodeToUpdate.data.terminals.filter(
-      (terminal: string) => terminal !== currentEdge.target,
-    );
-
-    nodeToUpdate.data.terminals = updatedTerminals;
-
-    if (updatedTerminals.length === 0) {
-      delete nodeToUpdate.data.terminals;
-      nodeToUpdate.data.hasTerminal = false;
-    }
-
     updateNodeData(index, nodeToUpdate, nodes, setNodes);
   }
 
@@ -288,17 +258,6 @@ export const updateNodeRelations = (
     const index = nodes.findIndex(node => node.id === currentEdge.source);
 
     if (!nodeToUpdate || index === -1) return;
-
-    const updatedConnectors = nodeToUpdate.data.connectors.filter(
-      (terminal: string) => terminal !== currentEdge.target,
-    );
-
-    nodeToUpdate.data.connectors = updatedConnectors;
-
-    if (updatedConnectors.length === 0) {
-      delete nodeToUpdate.data.connectors;
-      nodeToUpdate.data.hasConnector = false;
-    }
 
     updateNodeData(index, nodeToUpdate, nodes, setNodes);
   }

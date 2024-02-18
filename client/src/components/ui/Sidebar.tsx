@@ -246,39 +246,6 @@ const Sidebar = () => {
             </Select>
           </div>
         )}
-        {sidebar.currentNode?.data?.hasTerminal && (
-          <div>
-            <p className="text-sm text-muted-foreground mb-2">
-              Connected Terminals
-            </p>
-            {sidebar.currentNode?.data?.terminals!.map(t => (
-              <Button
-                key={`terminal_${t.id}_${sidebar.currentNode!.id!}_link_button`}
-                onClick={() => displayNewNode(t.id)}
-                variant="ghost"
-              >
-                {t.displayName}
-              </Button>
-            ))}
-          </div>
-        )}
-        {sidebar.currentNode?.data?.hasConnector && (
-          <div>
-            <p className="text-sm text-muted-foreground mb-2">
-              Connected Connectors
-            </p>
-            {sidebar.currentNode?.data?.connectors!.map(c => (
-              <Button
-                key={`connector_${c.id}_${sidebar.currentNode!
-                  .id!}_link_button`}
-                onClick={() => displayNewNode(c.id)}
-                variant="ghost"
-              >
-                {c.displayName}
-              </Button>
-            ))}
-          </div>
-        )}
         <SheetFooter>
           {(connectionType !== sidebar.currentEdge?.data?.type ||
             nodeName !== displayName) && (

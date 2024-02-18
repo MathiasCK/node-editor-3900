@@ -19,15 +19,7 @@ export enum EdgeType {
 
 export type NodeData = {
   hasTerminal?: boolean;
-  terminals?: {
-    id: string;
-    displayName: string;
-  }[];
   hasConnector?: boolean;
-  connectors?: {
-    id: string;
-    displayName: string;
-  }[];
   id: string;
   label: string;
   type: string;
@@ -60,12 +52,6 @@ export type NodeRelation = {
   nodeId: string;
   value: {
     [key: string]: boolean;
-  };
-  array: {
-    [key: string]: {
-      id: string;
-      displayName: string;
-    };
   };
 };
 
