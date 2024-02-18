@@ -7,7 +7,14 @@ import {
 } from "reactflow";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { EdgeType, NodeRelation, NodeType } from "./types";
+import {
+  ConnectionWithChildren,
+  ConnectionWithTarget,
+  EdgeType,
+  NodeRelation,
+  NodeType,
+} from "./types";
+import { Sidebar } from "@/hooks/useSidebar";
 
 export const cn = (...inputs: ClassValue[]) => twMerge(clsx(inputs));
 
@@ -313,4 +320,64 @@ export const deleteSelectedEdge = (
   setEdges(updatedEdges);
 
   toast.success(`Edge ${selectedEdgeId} deleted`);
+};
+
+export const getRelatedNodesWithRelations = (
+  sidebar: Sidebar,
+  edges: Edge[],
+  nodes: Node[],
+): ConnectionWithChildren[] => {
+  const currentNodeRelations = edges.filter(
+    edge => edge.source === sidebar.currentNode?.id,
+  );
+
+  const relatedNodes = currentNodeRelations?.map(r =>
+    nodes.find(node => node.id === r?.target),
+  );
+
+  const data = currentNodeRelations.map((r, i) => ({
+    type: r.data.type,
+    target: relatedNodes?.[i]?.id,
+  })) as ConnectionWithTarget[];
+
+  const result = data.reduce(
+    (accumulator: ConnectionWithChildren[], currentValue) => {
+      const existingEntry = accumulator.find(
+        entry => entry.type === currentValue.type,
+      );
+      if (existingEntry) {
+        existingEntry.children.push(currentValue.target);
+      } else {
+        accumulator.push({
+          type: currentValue.type,
+          children: [currentValue.target],
+        });
+      }
+      return accumulator;
+    },
+    [],
+  );
+
+  return result;
+};
+
+export const getReadableEdgeType = (type: EdgeType) => {
+  switch (type) {
+    case EdgeType.Connected:
+      return "Connected to";
+    case EdgeType.Fulfilled:
+      return "Fulfilled by";
+    case EdgeType.Part:
+      return "Part of";
+    case EdgeType.Projection:
+      return "Projected by";
+    case EdgeType.Proxy:
+      return "Proxy for";
+    case EdgeType.Specialisation:
+      return "Specialised by";
+    case EdgeType.Transfer:
+      return "Transfer to";
+    default:
+      return null;
+  }
 };

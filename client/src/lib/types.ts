@@ -69,3 +69,13 @@ export type NavItem = {
     nodeType: NodeType;
   }[];
 };
+
+export type ConnectionWithChildren = {
+  type: string;
+  children: string[];
+};
+
+export type ConnectionWithTarget = {
+  type: string;
+  target: string;
+};

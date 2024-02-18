@@ -2,7 +2,7 @@ import type { CustomNodeProps, CustomEdgeProps } from "@/lib/types";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
-type Sidebar = {
+export type Sidebar = {
   open: boolean;
   edit: boolean;
   currentNode?: CustomNodeProps;

@@ -26,6 +26,8 @@ import {
   cn,
   deleteEdgeWithRelations,
   deleteSelectedNode,
+  getReadableEdgeType,
+  getRelatedNodesWithRelations,
   updateNodeName,
 } from "@/lib/utils";
 import { Input } from "./input";
@@ -89,6 +91,10 @@ const Sidebar = () => {
     handleEdit(false);
   };
 
+  const nodesWithRelations = sidebar.currentNode
+    ? getRelatedNodesWithRelations(sidebar, edges, nodes)
+    : [];
+
   const handleConnectionTypeChange = () => {
     const clonedConnection = {
       data: {
@@ -131,20 +137,23 @@ const Sidebar = () => {
       );
       return;
     }
-    // @ts-ignore
-    openSidebar({
-      data: node.data,
-      dragging: node.dragging as boolean,
-      id: node.id,
-      isConnectable: true,
-      selected: true,
-      type: node.type as string,
-      sourcePosition: Position.Bottom,
-      targetPosition: Position.Top,
-      xPos: node.position.x,
-      yPos: node.position.y,
-      zIndex: 0,
-    });
+    closeSidebar();
+    setTimeout(() => {
+      // @ts-ignore
+      openSidebar({
+        data: node.data,
+        dragging: node.dragging as boolean,
+        id: node.id,
+        isConnectable: true,
+        selected: true,
+        type: node.type as string,
+        sourcePosition: Position.Bottom,
+        targetPosition: Position.Top,
+        xPos: node.position.x,
+        yPos: node.position.y,
+        zIndex: 0,
+      });
+    }, 100);
   };
 
   return (
@@ -181,6 +190,27 @@ const Sidebar = () => {
           <SheetDescription>Created: {createdAt}</SheetDescription>
           <SheetDescription>Updated: {updatedAt}</SheetDescription>
         </SheetHeader>
+        {sidebar.currentNode && nodesWithRelations.length > 0 && (
+          <>
+            {nodesWithRelations.map(nodeRelation => (
+              <div key={nodeRelation.type}>
+                <p className="text-sm text-muted-foreground mb-2">
+                  {getReadableEdgeType(nodeRelation.type as EdgeType)}
+                </p>
+                {nodeRelation.children.map(c => (
+                  <Button
+                    key={`${nodeRelation}_${c}_link_button`}
+                    variant="ghost"
+                    onClick={() => displayNewNode(c as string)}
+                  >
+                    {c}
+                  </Button>
+                ))}
+              </div>
+            ))}
+          </>
+        )}
+
         {sidebar.currentEdge && (
           <div>
             <p className="text-sm text-muted-foreground mb-2">
