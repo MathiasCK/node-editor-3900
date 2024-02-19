@@ -96,7 +96,7 @@ const Navbar = () => {
   const { nodes, setNodes } = useStore(storeSelector, shallow);
 
   return (
-    <NavigationMenu className="fixed bg-white  dark:bg-background">
+    <NavigationMenu className="bg-white  dark:bg-background">
       <NavigationMenuList>
         <NavigationMenuItem className="p-5">
           <AlignJustify

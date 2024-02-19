@@ -137,50 +137,41 @@ export default function App() {
   );
 
   return (
-    <main className="w-screen h-screen">
-      <ThemeProvider theme={theme === "light" ? lightTheme : darkTheme}>
-        <ReactFlowStyled
-          nodes={nodes}
-          edges={edges}
-          onNodesChange={onNodesChange}
-          onEdgesChange={onEdgesChange}
-          onConnect={onConnect}
-          nodeTypes={nodeTypes as unknown as NodeTypes}
-          edgeTypes={edgeTypes as unknown as EdgeTypes}
+    <ThemeProvider theme={theme === "light" ? lightTheme : darkTheme}>
+      <ReactFlowStyled
+        nodes={nodes}
+        edges={edges}
+        onNodesChange={onNodesChange}
+        onEdgesChange={onEdgesChange}
+        onConnect={onConnect}
+        nodeTypes={nodeTypes as unknown as NodeTypes}
+        edgeTypes={edgeTypes as unknown as EdgeTypes}
+      >
+        <Sidebar />
+        <Settings />
+        <SelectConnection
+          displayDialog={displayDialog}
+          createNewConnection={createNewConnection}
+        />
+        <Panel
+          position="top-right"
+          className="h-full w-100 flex justify-center flex-col"
         >
-          <Sidebar />
-          <Settings />
-          <SelectConnection
-            displayDialog={displayDialog}
-            createNewConnection={createNewConnection}
-          />
-          <Panel
-            position="top-right"
-            className="h-full w-100 flex justify-center flex-col"
+          <button
+            className={
+              theme === "light" ? buttonVariants.button : buttonVariants.textbox
+            }
+            onClick={() =>
+              addNode("white" as AspectType, NodeType.TextBox, nodes, setNodes)
+            }
           >
-            <button
-              className={
-                theme === "light"
-                  ? buttonVariants.button
-                  : buttonVariants.textbox
-              }
-              onClick={() =>
-                addNode(
-                  "white" as AspectType,
-                  NodeType.TextBox,
-                  nodes,
-                  setNodes,
-                )
-              }
-            >
-              Add TextBox
-            </button>
-          </Panel>
-          <ControlsStyled />
-          <MiniMapStyled />
-          <Background gap={12} size={1} />
-        </ReactFlowStyled>
-      </ThemeProvider>
-    </main>
+            Add TextBox
+          </button>
+        </Panel>
+        <ControlsStyled />
+        <MiniMapStyled />
+        <Background gap={12} size={1} />
+      </ReactFlowStyled>
+    </ThemeProvider>
   );
 }
