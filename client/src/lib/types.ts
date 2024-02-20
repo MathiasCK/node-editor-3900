@@ -28,7 +28,13 @@ export type UpdateNode = { customName?: string; aspect?: AspectType };
 export type NodeData = {
   aspect: AspectType;
   hasTerminal?: boolean;
+  terminals?: {
+    id: string;
+  }[];
   hasConnector?: boolean;
+  connectors?: {
+    id: string;
+  }[];
   id: string;
   label: string;
   type: string;
@@ -61,6 +67,11 @@ export type NodeRelation = {
   nodeId: string;
   value: {
     [key: string]: boolean;
+  };
+  array: {
+    [key: string]: {
+      id: string;
+    };
   };
 };
 

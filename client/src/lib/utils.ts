@@ -58,6 +58,11 @@ export const checkConnection = (
       value: {
         hasTerminal: true,
       },
+      array: {
+        terminals: {
+          id: params.target as string,
+        },
+      },
     });
   }
 
@@ -73,6 +78,11 @@ export const checkConnection = (
       nodeId: params.source as string,
       value: {
         hasConnector: true,
+      },
+      array: {
+        connectors: {
+          id: params.target as string,
+        },
       },
     });
   }
@@ -92,8 +102,14 @@ export const handleNewNodeRelations = (
     if (!nodeToUpdate || index === -1) return;
 
     const keyToUpdate = Object.keys(relation.value)[0];
+    const arrayToUpdate = Object.keys(relation.array)[0];
 
     nodeToUpdate.data[keyToUpdate] = relation.value[keyToUpdate];
+
+    nodeToUpdate.data[arrayToUpdate] = [
+      ...(nodeToUpdate.data[arrayToUpdate] ?? []),
+      relation.array[arrayToUpdate],
+    ];
 
     updateNodeData(index, nodeToUpdate, nodes, setNodes);
   }
@@ -207,7 +223,7 @@ export const deleteSelectedNode = (
   const connectedEdges = getConnectedEdges([currentNode], edges);
 
   for (const edge of connectedEdges) {
-    updateNodeRelations(edge, nodes, setNodes, edges);
+    updateNodeRelations(edge, nodes, setNodes);
   }
 
   const updatedEdges = getSymmetricDifference(edges, connectedEdges);
@@ -238,14 +254,13 @@ export const deleteEdgeWithRelations = (
 
   deleteSelectedEdge(currentEdge.id, edges, setEdges);
 
-  updateNodeRelations(currentEdge, nodes, setNodes, edges);
+  updateNodeRelations(currentEdge, nodes, setNodes);
 };
 
 export const updateNodeRelations = (
   currentEdge: Edge,
   nodes: Node[],
   setNodes: (nodes: Node[]) => void,
-  edges: Edge[],
 ) => {
   if (
     currentEdge.data.lockConnection &&
@@ -258,13 +273,16 @@ export const updateNodeRelations = (
 
     if (!nodeToUpdate || index === -1) return;
 
-    const connected = getConnectedEdges([nodeToUpdate!], edges);
+    const updatedTerminals = nodeToUpdate.data.terminals.filter(
+      (terminal: { id: string }) => terminal.id !== currentEdge.target,
+    );
 
-    const hasMoreTerminals = connected
-      .filter(edge => edge.id !== currentEdge.id)
-      .some(edge => isTerminal(edge.targetHandle!));
+    nodeToUpdate.data.terminals = updatedTerminals;
 
-    nodeToUpdate.data.hasTerminal = hasMoreTerminals;
+    if (updatedTerminals.length === 0) {
+      delete nodeToUpdate.data.terminals;
+      nodeToUpdate.data.hasTerminal = false;
+    }
 
     updateNodeData(index, nodeToUpdate, nodes, setNodes);
   }
@@ -281,13 +299,16 @@ export const updateNodeRelations = (
 
     if (!nodeToUpdate || index === -1) return;
 
-    const connected = getConnectedEdges([nodeToUpdate!], edges);
+    const updatedConnectors = nodeToUpdate.data.connectors.filter(
+      (connector: { id: string }) => connector.id !== currentEdge.target,
+    );
 
-    const hasMoreConnectors = connected
-      .filter(edge => edge.id !== currentEdge.id)
-      .some(edge => isConnector(edge.targetHandle!));
+    nodeToUpdate.data.connectors = updatedConnectors;
 
-    nodeToUpdate.data.hasConnector = hasMoreConnectors;
+    if (updatedConnectors.length === 0) {
+      delete nodeToUpdate.data.connectors;
+      nodeToUpdate.data.hasConnector = false;
+    }
 
     updateNodeData(index, nodeToUpdate, nodes, setNodes);
   }
