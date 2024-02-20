@@ -12,7 +12,9 @@ const Block = (props: CustomNodeProps) => {
         className={`h-12 w-24 rounded-xl bg-${props.data.aspect}`}
       >
         <header className="flex items-center justify-center w-full h-full">
-          <p className="text-black">{props.data.customName ?? props.data.id}</p>
+          <p className="text-black text-center">
+            {props.data.customName ?? props.data.id}
+          </p>
         </header>
       </div>
       <Handles nodeId={props.data.label} />
