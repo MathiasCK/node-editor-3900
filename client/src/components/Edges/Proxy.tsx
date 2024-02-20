@@ -1,5 +1,5 @@
-import { useSidebar } from "@/hooks";
-import type { CustomEdgeProps } from "@/lib/types";
+import { useSidebar } from '@/hooks';
+import type { CustomEdgeProps } from '@/lib/types';
 
 const Proxy = (props: CustomEdgeProps) => {
   const { openSidebar } = useSidebar();

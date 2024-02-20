@@ -4,10 +4,10 @@ import {
   SheetDescription,
   SheetHeader,
   SheetTitle,
-} from "./sheet";
-import { useSettings, useTheme } from "@/hooks";
-import { Switch } from "./switch";
-import { Label } from "./label";
+} from './sheet';
+import { useSettings, useTheme } from '@/hooks';
+import { Switch } from './switch';
+import { Label } from './label';
 
 const SidebarSettings = () => {
   const { isOpen, closeSettings } = useSettings();
@@ -21,10 +21,10 @@ const SidebarSettings = () => {
           </SheetTitle>
           <SheetDescription>Application settings</SheetDescription>
         </SheetHeader>
-        <div className="flex mt-5 items-center">
+        <div className="mt-5 flex items-center">
           <Switch
             className="mr-3"
-            checked={theme === "dark"}
+            checked={theme === 'dark'}
             id="dark-mode"
             onClick={() => {
               toggleTheme();

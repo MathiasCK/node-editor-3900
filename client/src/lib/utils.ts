@@ -1,12 +1,12 @@
-import toast from "react-hot-toast";
+import toast from 'react-hot-toast';
 import {
   getConnectedEdges,
   type Connection,
   type Edge,
   type Node,
-} from "reactflow";
-import { type ClassValue, clsx } from "clsx";
-import { twMerge } from "tailwind-merge";
+} from 'reactflow';
+import { type ClassValue, clsx } from 'clsx';
+import { twMerge } from 'tailwind-merge';
 import {
   AspectType,
   ConnectionWithChildren,
@@ -15,14 +15,14 @@ import {
   NodeRelation,
   NodeType,
   UpdateNode,
-} from "./types";
-import { Sidebar } from "@/hooks/useSidebar";
+} from './types';
+import { Sidebar } from '@/hooks/useSidebar';
 
 export const cn = (...inputs: ClassValue[]) => twMerge(clsx(inputs));
 
 export const checkConnection = (
   params: Edge | Connection,
-  edgeType: EdgeType,
+  edgeType: EdgeType
 ): {
   canConnect: boolean;
   connectionType: EdgeType;
@@ -35,14 +35,14 @@ export const checkConnection = (
   let lockConnection = false;
 
   if (params.source === params.target) {
-    toast.error("Cannot connect node to itself");
+    toast.error('Cannot connect node to itself');
     canConnect = false;
   }
   if (
     isBlock(params.sourceHandle as string) &&
     isBlock(params.targetHandle as string)
   ) {
-    toast.error("Cannot connect block to block");
+    toast.error('Cannot connect block to block');
     canConnect = false;
   }
 
@@ -93,7 +93,7 @@ export const checkConnection = (
 export const handleNewNodeRelations = (
   newNodeRelations: NodeRelation[],
   nodes: Node[],
-  setNodes: (nodes: Node[]) => void,
+  setNodes: (nodes: Node[]) => void
 ) => {
   for (const relation of newNodeRelations) {
     const nodeToUpdate = nodes.find(node => node.id === relation.nodeId);
@@ -115,13 +115,13 @@ export const handleNewNodeRelations = (
   }
 };
 
-export const isBlock = (id: string): boolean => id.includes("block");
+export const isBlock = (id: string): boolean => id.includes('block');
 
-export const isConnector = (id: string): boolean => id.includes("connector");
+export const isConnector = (id: string): boolean => id.includes('connector');
 
-export const isTerminal = (id: string): boolean => id.includes("terminal");
+export const isTerminal = (id: string): boolean => id.includes('terminal');
 
-export const isTextBox = (id: string): boolean => id.includes("textbox");
+export const isTextBox = (id: string): boolean => id.includes('textbox');
 
 export const getSymmetricDifference = (arr1: Edge[], arr2: Edge[]): Edge[] => {
   const set1 = new Set(arr1);
@@ -130,7 +130,7 @@ export const getSymmetricDifference = (arr1: Edge[], arr2: Edge[]): Edge[] => {
   const difference = new Set(
     [...set1]
       .filter(x => !set2.has(x))
-      .concat([...set2].filter(x => !set1.has(x))),
+      .concat([...set2].filter(x => !set1.has(x)))
   );
 
   return Array.from(difference);
@@ -143,7 +143,7 @@ export const addNode = (
   aspect: AspectType,
   type: NodeType,
   nodes: Node[],
-  setNodes: (nodes: Node[]) => void,
+  setNodes: (nodes: Node[]) => void
 ) => {
   const id = nodes.length.toString();
   const currentDate = Date.now();
@@ -180,13 +180,13 @@ export const updateNode = (
   nodeId: string,
   newNodeData: UpdateNode,
   nodes: Node[],
-  setNodes: (nodes: Node[]) => void,
+  setNodes: (nodes: Node[]) => void
 ) => {
   const nodeToUpdate = nodes.find(node => node.id === nodeId);
   const index = nodes.findIndex(node => node.id === nodeId);
 
   if (!nodeToUpdate || index === -1) {
-    toast.error("Could not update name -> no node selected");
+    toast.error('Could not update name -> no node selected');
     return;
   }
 
@@ -198,11 +198,11 @@ export const updateNode = (
   updateNodeData(index, nodeToUpdate, nodes, setNodes);
 
   if (newNodeData.aspect) {
-    toast.success("Aspect type updated");
+    toast.success('Aspect type updated');
   }
 
   if (newNodeData.customName) {
-    toast.success("Name updated");
+    toast.success('Name updated');
   }
 };
 
@@ -211,12 +211,12 @@ export const deleteSelectedNode = (
   edges: Edge[],
   setEdges: (edges: Edge[]) => void,
   nodes: Node[],
-  setNodes: (nodes: Node[]) => void,
+  setNodes: (nodes: Node[]) => void
 ): void => {
   const currentNode = nodes.find(node => node.id === selectedNodeId);
 
   if (!currentNode) {
-    toast.error("Could not delete -> no node selected");
+    toast.error('Could not delete -> no node selected');
     return;
   }
 
@@ -234,7 +234,7 @@ export const deleteSelectedNode = (
   setEdges(updatedEdges);
 
   toast.success(
-    `${capitalizeFirstLetter(currentNode.data.type)} ${selectedNodeId} deleted`,
+    `${capitalizeFirstLetter(currentNode.data.type)} ${selectedNodeId} deleted`
   );
 };
 
@@ -243,12 +243,12 @@ export const deleteEdgeWithRelations = (
   edges: Edge[],
   setEdges: (nodes: Edge[]) => void,
   nodes: Node[],
-  setNodes: (nodes: Node[]) => void,
+  setNodes: (nodes: Node[]) => void
 ) => {
   const currentEdge = edges.find(edge => edge.id === (currentEdgeId as string));
 
   if (!currentEdge) {
-    toast.error("Could not delete -> no edge selected");
+    toast.error('Could not delete -> no edge selected');
     return;
   }
 
@@ -260,7 +260,7 @@ export const deleteEdgeWithRelations = (
 export const updateNodeRelations = (
   currentEdge: Edge,
   nodes: Node[],
-  setNodes: (nodes: Node[]) => void,
+  setNodes: (nodes: Node[]) => void
 ) => {
   if (
     currentEdge.data.lockConnection &&
@@ -274,7 +274,7 @@ export const updateNodeRelations = (
     if (!nodeToUpdate || index === -1) return;
 
     const updatedTerminals = nodeToUpdate.data.terminals.filter(
-      (terminal: { id: string }) => terminal.id !== currentEdge.target,
+      (terminal: { id: string }) => terminal.id !== currentEdge.target
     );
 
     nodeToUpdate.data.terminals = updatedTerminals;
@@ -300,7 +300,7 @@ export const updateNodeRelations = (
     if (!nodeToUpdate || index === -1) return;
 
     const updatedConnectors = nodeToUpdate.data.connectors.filter(
-      (connector: { id: string }) => connector.id !== currentEdge.target,
+      (connector: { id: string }) => connector.id !== currentEdge.target
     );
 
     nodeToUpdate.data.connectors = updatedConnectors;
@@ -318,7 +318,7 @@ export const updateNodeData = (
   index: number,
   nodeToUpdate: Node,
   nodes: Node[],
-  setNodes: (nodes: Node[]) => void,
+  setNodes: (nodes: Node[]) => void
 ) => {
   const newNodes = [...nodes];
   newNodes[index] = nodeToUpdate;
@@ -329,7 +329,7 @@ export const updateNodeData = (
 export const deleteSelectedEdge = (
   selectedEdgeId: string,
   edges: Edge[],
-  setEdges: (edges: Edge[]) => void,
+  setEdges: (edges: Edge[]) => void
 ): void => {
   const updatedEdges = edges.filter(edge => edge.id !== selectedEdgeId);
 
@@ -341,14 +341,14 @@ export const deleteSelectedEdge = (
 export const getRelatedNodesWithRelations = (
   sidebar: Sidebar,
   edges: Edge[],
-  nodes: Node[],
+  nodes: Node[]
 ): ConnectionWithChildren[] => {
   const currentNodeRelations = edges.filter(
-    edge => edge.source === sidebar.currentNode?.id,
+    edge => edge.source === sidebar.currentNode?.id
   );
 
   const relatedNodes = currentNodeRelations?.map(r =>
-    nodes.find(node => node.id === r?.target),
+    nodes.find(node => node.id === r?.target)
   );
 
   const data = currentNodeRelations.map((r, i) => ({
@@ -364,7 +364,7 @@ export const getRelatedNodesWithRelations = (
   const result = data.reduce(
     (accumulator: ConnectionWithChildren[], currentValue) => {
       const existingEntry = accumulator.find(
-        entry => entry.type === currentValue.type,
+        entry => entry.type === currentValue.type
       );
       if (existingEntry) {
         existingEntry.children.push({
@@ -384,7 +384,7 @@ export const getRelatedNodesWithRelations = (
       }
       return accumulator;
     },
-    [],
+    []
   );
 
   return result;
@@ -393,19 +393,19 @@ export const getRelatedNodesWithRelations = (
 export const getReadableEdgeType = (type: EdgeType) => {
   switch (type) {
     case EdgeType.Connected:
-      return "Connected to";
+      return 'Connected to';
     case EdgeType.Fulfilled:
-      return "Fulfilled by";
+      return 'Fulfilled by';
     case EdgeType.Part:
-      return "Part of";
+      return 'Part of';
     case EdgeType.Projection:
-      return "Projected by";
+      return 'Projected by';
     case EdgeType.Proxy:
-      return "Proxy for";
+      return 'Proxy for';
     case EdgeType.Specialisation:
-      return "Specialised by";
+      return 'Specialised by';
     case EdgeType.Transfer:
-      return "Transfer to";
+      return 'Transfer to';
     default:
       return null;
   }

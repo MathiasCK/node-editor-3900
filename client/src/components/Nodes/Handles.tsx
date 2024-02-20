@@ -1,5 +1,5 @@
-import { FC } from "react";
-import { Handle, Position } from "reactflow";
+import { FC } from 'react';
+import { Handle, Position } from 'reactflow';
 
 const Handles: FC<{
   nodeId: string;

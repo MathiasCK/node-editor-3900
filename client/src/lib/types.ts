@@ -1,26 +1,26 @@
-import { EdgeProps, NodeProps } from "reactflow";
+import { EdgeProps, NodeProps } from 'reactflow';
 
 export enum AspectType {
-  Function = "function",
-  Product = "product",
-  Location = "location",
+  Function = 'function',
+  Product = 'product',
+  Location = 'location',
 }
 
 export enum NodeType {
-  Block = "block",
-  Connector = "connector",
-  Terminal = "terminal",
-  TextBox = "textbox",
+  Block = 'block',
+  Connector = 'connector',
+  Terminal = 'terminal',
+  TextBox = 'textbox',
 }
 
 export enum EdgeType {
-  Connected = "connected",
-  Fulfilled = "fulfilled",
-  Part = "part",
-  Projection = "projection",
-  Proxy = "proxy",
-  Specialisation = "specialisation",
-  Transfer = "transfer",
+  Connected = 'connected',
+  Fulfilled = 'fulfilled',
+  Part = 'part',
+  Projection = 'projection',
+  Proxy = 'proxy',
+  Specialisation = 'specialisation',
+  Transfer = 'transfer',
 }
 
 export type UpdateNode = { customName?: string; aspect?: AspectType };
@@ -53,12 +53,12 @@ export type EdgeData = {
   customName?: string;
 };
 
-export type CustomEdgeProps = Omit<EdgeProps, "data"> &
+export type CustomEdgeProps = Omit<EdgeProps, 'data'> &
   EdgeData & {
     data: EdgeData;
   };
 
-export type CustomNodeProps = Omit<NodeProps, "data"> &
+export type CustomNodeProps = Omit<NodeProps, 'data'> &
   NodeData & {
     data: NodeData;
   };

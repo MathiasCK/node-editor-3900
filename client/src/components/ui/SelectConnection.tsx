@@ -1,11 +1,11 @@
-import { FC } from "react";
-import { useConnection } from "@/hooks";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./dialog";
+import { FC } from 'react';
+import { useConnection } from '@/hooks';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from './dialog';
 
-import { EdgeType } from "@/lib/types";
-import { cn } from "@/lib/utils";
-import { buttonVariants } from "@/lib/config";
-import { Button } from "./button";
+import { EdgeType } from '@/lib/types';
+import { cn } from '@/lib/utils';
+import { buttonVariants } from '@/lib/config';
+import { Button } from './button';
 
 interface Props {
   displayDialog: boolean;
@@ -33,14 +33,14 @@ const SelectConnection: FC<Props> = ({
             Select connection type
           </DialogTitle>
         </DialogHeader>
-        <div className="h-full w-full flex items-center justify-center flex-col">
+        <div className="flex h-full w-full flex-col items-center justify-center">
           <button
             className={cn(
               `${buttonVariants.edge} border-green-400 text-green-400 hover:bg-green-400 `,
               {
-                "bg-green-400 text-white border-transparent":
+                'border-transparent bg-green-400 text-white':
                   edgeType === EdgeType.Part,
-              },
+              }
             )}
             onClick={() => setEdgeType(EdgeType.Part)}
           >
@@ -50,9 +50,9 @@ const SelectConnection: FC<Props> = ({
             className={cn(
               `${buttonVariants.edge} border-blue-200 text-blue-200 hover:bg-blue-200 `,
               {
-                "bg-blue-200 text-white border-transparent":
+                'border-transparent bg-blue-200 text-white':
                   edgeType === EdgeType.Connected,
-              },
+              }
             )}
             onClick={() => setEdgeType(EdgeType.Connected)}
           >
@@ -62,9 +62,9 @@ const SelectConnection: FC<Props> = ({
             className={cn(
               `${buttonVariants.edge} border-blue-400 text-blue-400 hover:bg-blue-400 `,
               {
-                "bg-blue-400 text-white border-transparent":
+                'border-transparent bg-blue-400 text-white':
                   edgeType === EdgeType.Transfer,
-              },
+              }
             )}
             onClick={() => setEdgeType(EdgeType.Transfer)}
           >
@@ -74,9 +74,9 @@ const SelectConnection: FC<Props> = ({
             className={cn(
               `${buttonVariants.edge} border-amber-300 text-amber-300 hover:bg-amber-300 `,
               {
-                "bg-amber-300 text-white border-transparent":
+                'border-transparent bg-amber-300 text-white':
                   edgeType === EdgeType.Specialisation,
-              },
+              }
             )}
             onClick={() => setEdgeType(EdgeType.Specialisation)}
           >
@@ -84,11 +84,11 @@ const SelectConnection: FC<Props> = ({
           </button>
           <button
             className={cn(
-              `${buttonVariants.edge} border-amber-300 text-amber-300 hover:bg-amber-300 border-dotted`,
+              `${buttonVariants.edge} border-dotted border-amber-300 text-amber-300 hover:bg-amber-300`,
               {
-                "bg-amber-300 text-white border-transparent":
+                'border-transparent bg-amber-300 text-white':
                   edgeType === EdgeType.Fulfilled,
-              },
+              }
             )}
             onClick={() => setEdgeType(EdgeType.Fulfilled)}
           >
@@ -98,9 +98,9 @@ const SelectConnection: FC<Props> = ({
             className={cn(
               `${buttonVariants.edge} border-gray-200 text-gray-200 hover:bg-gray-200 `,
               {
-                "bg-gray-200 text-white border-transparent":
+                'border-transparent bg-gray-200 text-white':
                   edgeType === EdgeType.Proxy,
-              },
+              }
             )}
             onClick={() => setEdgeType(EdgeType.Proxy)}
           >
@@ -110,9 +110,9 @@ const SelectConnection: FC<Props> = ({
             className={cn(
               `${buttonVariants.edge} border-dotted border-gray-200 text-gray-200 hover:bg-gray-200`,
               {
-                "bg-gray-200 text-white border-transparent":
+                'border-transparent bg-gray-200 text-white':
                   edgeType === EdgeType.Projection,
-              },
+              }
             )}
             onClick={() => setEdgeType(EdgeType.Projection)}
           >

@@ -1,6 +1,6 @@
-import Handles from "./Handles";
-import { useSidebar } from "@/hooks";
-import type { CustomNodeProps } from "@/lib/types";
+import Handles from './Handles';
+import { useSidebar } from '@/hooks';
+import type { CustomNodeProps } from '@/lib/types';
 
 const Block = (props: CustomNodeProps) => {
   const { openSidebar } = useSidebar();
@@ -11,8 +11,8 @@ const Block = (props: CustomNodeProps) => {
         onClick={() => openSidebar(props)}
         className={`h-12 w-24 rounded-xl bg-${props.data.aspect}`}
       >
-        <header className="flex items-center justify-center w-full h-full">
-          <p className="text-black text-center">
+        <header className="flex h-full w-full items-center justify-center">
+          <p className="text-center text-black">
             {props.data.customName ?? props.data.id}
           </p>
         </header>

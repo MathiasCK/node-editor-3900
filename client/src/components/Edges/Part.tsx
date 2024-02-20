@@ -1,5 +1,5 @@
-import { useSidebar } from "@/hooks";
-import type { CustomEdgeProps } from "@/lib/types";
+import { useSidebar } from '@/hooks';
+import type { CustomEdgeProps } from '@/lib/types';
 
 const Part = (props: CustomEdgeProps) => {
   const { openSidebar } = useSidebar();
@@ -23,7 +23,7 @@ const Part = (props: CustomEdgeProps) => {
             xmlns="http://www.w3.org/2000/svg"
           >
             <path
-              className="stroke-part stroke-2 stroke-line"
+              className="stroke-part stroke-line stroke-2"
               d="M11.5757 1.42426C11.81 1.18995 12.1899 1.18995 12.4243 1.42426L22.5757 11.5757C22.81 11.81 22.8101 12.1899 22.5757 12.4243L12.4243 22.5757C12.19 22.81 11.8101 22.8101 11.5757 22.5757L1.42426 12.4243C1.18995 12.19 1.18995 11.8101 1.42426 11.5757L11.5757 1.42426Z"
               strokeLinecap="round"
               strokeLinejoin="round"

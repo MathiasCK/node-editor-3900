@@ -1,4 +1,4 @@
-import { useLoading } from "@/hooks";
+import { useLoading } from '@/hooks';
 
 const Spinner = (props: { size?: number }) => {
   const { isLoading } = useLoading();
@@ -9,9 +9,9 @@ const Spinner = (props: { size?: number }) => {
     <div
       style={{
         zIndex: 100,
-        backgroundColor: "rgba(255, 255, 255, 0.5)",
+        backgroundColor: 'rgba(255, 255, 255, 0.5)',
       }}
-      className="fixed flex justify-center items-center w-screen h-screen"
+      className="fixed flex h-screen w-screen items-center justify-center"
       role="status"
     >
       <svg

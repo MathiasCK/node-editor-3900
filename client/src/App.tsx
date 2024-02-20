@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   type Edge,
   type Connection,
@@ -7,15 +7,15 @@ import {
   Panel,
   EdgeTypes,
   NodeTypes,
-} from "reactflow";
-import { shallow } from "zustand/shallow";
+} from 'reactflow';
+import { shallow } from 'zustand/shallow';
 
-import "reactflow/dist/style.css";
-import { Block, Connector, Terminal, TextBox } from "./components/Nodes";
-import { buttonVariants } from "./lib/config";
-import { AspectType, NodeType } from "./lib/types";
-import { addNode, checkConnection, handleNewNodeRelations } from "./lib/utils";
-import { storeSelector, useConnection, useStore, useTheme } from "./hooks";
+import 'reactflow/dist/style.css';
+import { Block, Connector, Terminal, TextBox } from './components/Nodes';
+import { buttonVariants } from './lib/config';
+import { AspectType, NodeType } from './lib/types';
+import { addNode, checkConnection, handleNewNodeRelations } from './lib/utils';
+import { storeSelector, useConnection, useStore, useTheme } from './hooks';
 
 import {
   Connected,
@@ -25,16 +25,16 @@ import {
   Proxy,
   Specialisation,
   Transfer,
-} from "./components/Edges";
+} from './components/Edges';
 import {
   ControlsStyled,
   MiniMapStyled,
   ReactFlowStyled,
   darkTheme,
   lightTheme,
-} from "./components/ui/styled";
-import { ThemeProvider } from "styled-components";
-import { Sidebar, Settings, SelectConnection } from "./components/ui";
+} from './components/ui/styled';
+import { ThemeProvider } from 'styled-components';
+import { Sidebar, Settings, SelectConnection } from './components/ui';
 
 export default function App() {
   const nodeTypes = useMemo(
@@ -44,7 +44,7 @@ export default function App() {
       terminal: Terminal,
       textbox: TextBox,
     }),
-    [],
+    []
   );
 
   const edgeTypes = useMemo(
@@ -57,7 +57,7 @@ export default function App() {
       specialisation: Specialisation,
       transfer: Transfer,
     }),
-    [],
+    []
   );
 
   const { theme } = useTheme();
@@ -70,24 +70,24 @@ export default function App() {
 
   useEffect(() => {
     if (
-      theme === "dark" &&
-      window.matchMedia("(prefers-color-scheme: dark)").matches
+      theme === 'dark' &&
+      window.matchMedia('(prefers-color-scheme: dark)').matches
     ) {
-      document.documentElement.classList.add("dark");
+      document.documentElement.classList.add('dark');
     } else {
-      document.documentElement.classList.remove("dark");
+      document.documentElement.classList.remove('dark');
     }
 
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Delete" || event.key === "Backspace") {
+      if (event.key === 'Delete' || event.key === 'Backspace') {
         event.stopPropagation();
       }
     };
 
-    document.addEventListener("keydown", handleKeyDown, true);
+    document.addEventListener('keydown', handleKeyDown, true);
 
     return () => {
-      document.removeEventListener("keydown", handleKeyDown, true);
+      document.removeEventListener('keydown', handleKeyDown, true);
     };
   }, [theme]);
 
@@ -133,11 +133,11 @@ export default function App() {
       openDialog();
       setParams(params);
     },
-    [edgeType, openDialog],
+    [edgeType, openDialog]
   );
 
   return (
-    <ThemeProvider theme={theme === "light" ? lightTheme : darkTheme}>
+    <ThemeProvider theme={theme === 'light' ? lightTheme : darkTheme}>
       <ReactFlowStyled
         nodes={nodes}
         edges={edges}
@@ -155,14 +155,14 @@ export default function App() {
         />
         <Panel
           position="top-right"
-          className="h-full w-100 flex justify-center flex-col"
+          className="w-100 flex h-full flex-col justify-center"
         >
           <button
             className={
-              theme === "light" ? buttonVariants.button : buttonVariants.textbox
+              theme === 'light' ? buttonVariants.button : buttonVariants.textbox
             }
             onClick={() =>
-              addNode("white" as AspectType, NodeType.TextBox, nodes, setNodes)
+              addNode('white' as AspectType, NodeType.TextBox, nodes, setNodes)
             }
           >
             Add TextBox

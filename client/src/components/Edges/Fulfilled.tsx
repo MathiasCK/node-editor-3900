@@ -1,5 +1,5 @@
-import { useSidebar } from "@/hooks";
-import type { CustomEdgeProps } from "@/lib/types";
+import { useSidebar } from '@/hooks';
+import type { CustomEdgeProps } from '@/lib/types';
 
 const Fulfilled = (props: CustomEdgeProps) => {
   const { openSidebar } = useSidebar();
@@ -27,9 +27,9 @@ const Fulfilled = (props: CustomEdgeProps) => {
             strokeLinecap="square"
             strokeLinejoin="miter"
           >
-            {" "}
-            <title id="rectangleIconTitle">Rectangle</title>{" "}
-            <rect width="5" height="5" x="0" y="0" />{" "}
+            {' '}
+            <title id="rectangleIconTitle">Rectangle</title>{' '}
+            <rect width="5" height="5" x="0" y="0" />{' '}
           </svg>
         </marker>
       </defs>

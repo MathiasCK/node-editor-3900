@@ -1,6 +1,6 @@
-import type { CustomNodeProps, CustomEdgeProps } from "@/lib/types";
-import { create } from "zustand";
-import { createJSONStorage, persist } from "zustand/middleware";
+import type { CustomNodeProps, CustomEdgeProps } from '@/lib/types';
+import { create } from 'zustand';
+import { createJSONStorage, persist } from 'zustand/middleware';
 
 export type Sidebar = {
   open: boolean;
@@ -17,9 +17,9 @@ type SidebarState = {
 };
 
 const isEdgeProps = (
-  data: CustomNodeProps | CustomEdgeProps,
+  data: CustomNodeProps | CustomEdgeProps
 ): data is CustomEdgeProps =>
-  "sourceHandleId" in data && "targetHandleId" in data;
+  'sourceHandleId' in data && 'targetHandleId' in data;
 
 const useSidebar = create<SidebarState>()(
   persist(
@@ -64,10 +64,10 @@ const useSidebar = create<SidebarState>()(
         }),
     }),
     {
-      name: "sidebar-storage",
+      name: 'sidebar-storage',
       storage: createJSONStorage(() => localStorage),
-    },
-  ),
+    }
+  )
 );
 
 export default useSidebar;

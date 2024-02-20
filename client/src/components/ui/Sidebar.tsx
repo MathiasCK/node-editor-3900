@@ -1,4 +1,4 @@
-import toast from "react-hot-toast";
+import toast from 'react-hot-toast';
 import {
   Sheet,
   SheetContent,
@@ -6,11 +6,11 @@ import {
   SheetFooter,
   SheetHeader,
   SheetTitle,
-} from "./sheet";
-import { storeSelector, useSidebar, useStore } from "@/hooks";
-import { buttonVariants } from "@/lib/config";
-import { Edge, Position, addEdge } from "reactflow";
-import { useEffect, useState } from "react";
+} from './sheet';
+import { storeSelector, useSidebar, useStore } from '@/hooks';
+import { buttonVariants } from '@/lib/config';
+import { Edge, Position, addEdge } from 'reactflow';
+import { useEffect, useState } from 'react';
 import {
   Select,
   SelectContent,
@@ -18,9 +18,9 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "./select";
-import { AspectType, EdgeType, UpdateNode } from "@/lib/types";
-import { Pencil } from "lucide-react";
+} from './select';
+import { AspectType, EdgeType, UpdateNode } from '@/lib/types';
+import { Pencil } from 'lucide-react';
 import {
   capitalizeFirstLetter,
   cn,
@@ -29,10 +29,10 @@ import {
   getReadableEdgeType,
   getRelatedNodesWithRelations,
   updateNode,
-} from "@/lib/utils";
-import { Input } from "./input";
-import { shallow } from "zustand/shallow";
-import { Button } from "./button";
+} from '@/lib/utils';
+import { Input } from './input';
+import { shallow } from 'zustand/shallow';
+import { Button } from './button';
 
 const Sidebar = () => {
   const { sidebar, handleEdit, closeSidebar, openSidebar } = useSidebar();
@@ -43,24 +43,24 @@ const Sidebar = () => {
       ? sidebar.currentNode?.data?.customName
         ? sidebar.currentNode?.data?.customName
         : `${sidebar.currentNode.type} ${sidebar.currentNode.id}`
-      : `Edge ${sidebar.currentEdge?.source} -> ${sidebar.currentEdge?.target}`,
+      : `Edge ${sidebar.currentEdge?.source} -> ${sidebar.currentEdge?.target}`
   );
 
   const createdAt = new Date(
     sidebar.currentNode
       ? (sidebar.currentNode?.data?.createdAt as number)
-      : (sidebar.currentEdge?.data?.createdAt as number),
+      : (sidebar.currentEdge?.data?.createdAt as number)
   ).toLocaleString();
 
   const updatedAt = new Date(
     sidebar.currentNode
       ? (sidebar.currentNode?.data?.updatedAt as number)
-      : (sidebar.currentEdge?.data?.updatedAt as number),
+      : (sidebar.currentEdge?.data?.updatedAt as number)
   ).toLocaleString();
 
-  const [connectionType, setConnectionType] = useState<string>("");
-  const [aspectType, setAspectType] = useState<string>("");
-  const [nodeName, setNodeName] = useState<string>("");
+  const [connectionType, setConnectionType] = useState<string>('');
+  const [aspectType, setAspectType] = useState<string>('');
+  const [nodeName, setNodeName] = useState<string>('');
 
   useEffect(() => {
     setConnectionType(sidebar.currentEdge?.data?.type as string);
@@ -81,7 +81,7 @@ const Sidebar = () => {
         edges,
         setEdges,
         nodes,
-        setNodes,
+        setNodes
       );
     } else {
       deleteEdgeWithRelations(
@@ -89,7 +89,7 @@ const Sidebar = () => {
         edges,
         setEdges,
         nodes,
-        setNodes,
+        setNodes
       );
     }
     closeSidebar();
@@ -127,11 +127,11 @@ const Sidebar = () => {
     const newNodeData: UpdateNode = {};
 
     if (nodeName !== displayName) {
-      newNodeData["customName"] = nodeName;
+      newNodeData['customName'] = nodeName;
     }
 
     if (aspectType !== sidebar.currentNode?.data?.aspect) {
-      newNodeData["aspect"] = aspectType as AspectType;
+      newNodeData['aspect'] = aspectType as AspectType;
     }
 
     updateNode(sidebar.currentNode?.id as string, newNodeData, nodes, setNodes);
@@ -143,7 +143,7 @@ const Sidebar = () => {
 
     if (!node) {
       toast.error(
-        `Could not display node ${newNodeId}. Refresh page & try again`,
+        `Could not display node ${newNodeId}. Refresh page & try again`
       );
       return;
     }
@@ -176,16 +176,16 @@ const Sidebar = () => {
     >
       <SheetContent className="bg:background flex flex-col justify-between">
         <SheetHeader>
-          <SheetTitle className="uppercase flex items-center dark:text-white">
+          <SheetTitle className="flex items-center uppercase dark:text-white">
             {!sidebar.edit ? (
               <Pencil
                 onClick={() => handleEdit(true)}
                 size={15}
                 className={cn(
-                  "text-md font-semibold text-foreground  hover:cursor-pointer",
+                  'text-md text-foreground font-semibold  hover:cursor-pointer',
                   {
                     hidden: sidebar.currentEdge,
-                  },
+                  }
                 )}
               />
             ) : null}
@@ -194,7 +194,7 @@ const Sidebar = () => {
               disabled={!sidebar.edit}
               value={nodeName}
               onChange={e => setNodeName(e.target.value)}
-              className="border-none text-lg font-semibold text-foreground"
+              className="text-foreground border-none text-lg font-semibold"
             />
           </SheetTitle>
           <SheetDescription>Created: {createdAt}</SheetDescription>
@@ -202,7 +202,7 @@ const Sidebar = () => {
         </SheetHeader>
         {sidebar.currentNode && (
           <div>
-            <p className="text-sm text-muted-foreground mb-2">Aspect type</p>
+            <p className="text-muted-foreground mb-2 text-sm">Aspect type</p>
             <Select value={aspectType} onValueChange={e => setAspectType(e)}>
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder={aspectType} />
@@ -221,7 +221,7 @@ const Sidebar = () => {
           <>
             {nodesWithRelations.map(nodeRelation => (
               <div key={nodeRelation.type}>
-                <p className="text-sm text-muted-foreground mb-2">
+                <p className="text-muted-foreground mb-2 text-sm">
                   {getReadableEdgeType(nodeRelation.type as EdgeType)}
                 </p>
                 {nodeRelation.children.map(c => (
@@ -240,7 +240,7 @@ const Sidebar = () => {
 
         {sidebar.currentEdge && (
           <div>
-            <p className="text-sm text-muted-foreground mb-2">
+            <p className="text-muted-foreground mb-2 text-sm">
               Connection type
             </p>
             <Select

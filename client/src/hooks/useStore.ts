@@ -1,4 +1,4 @@
-import { create } from "zustand";
+import { create } from 'zustand';
 import {
   Edge,
   EdgeChange,
@@ -8,8 +8,8 @@ import {
   OnEdgesChange,
   applyNodeChanges,
   applyEdgeChanges,
-} from "reactflow";
-import { persist } from "zustand/middleware";
+} from 'reactflow';
+import { persist } from 'zustand/middleware';
 
 type RFState = {
   nodes: Node[];
@@ -44,10 +44,10 @@ export const useStore = create<RFState>(
       },
     }),
     {
-      name: "store-storage",
+      name: 'store-storage',
       getStorage: () => localStorage,
-    },
-  ),
+    }
+  )
 );
 
 export const storeSelector = (state: RFState) => ({

@@ -1,5 +1,5 @@
-import { create } from "zustand";
-import { createJSONStorage, persist } from "zustand/middleware";
+import { create } from 'zustand';
+import { createJSONStorage, persist } from 'zustand/middleware';
 
 type SettingsState = {
   isOpen: boolean;
@@ -21,10 +21,10 @@ const useSettings = create<SettingsState>()(
         }),
     }),
     {
-      name: "settings-storage",
+      name: 'settings-storage',
       storage: createJSONStorage(() => localStorage),
-    },
-  ),
+    }
+  )
 );
 
 export default useSettings;

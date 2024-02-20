@@ -1,5 +1,5 @@
-import { useSidebar } from "@/hooks";
-import type { CustomEdgeProps } from "@/lib/types";
+import { useSidebar } from '@/hooks';
+import type { CustomEdgeProps } from '@/lib/types';
 
 const Transfer = (props: CustomEdgeProps) => {
   const { openSidebar } = useSidebar();
@@ -19,7 +19,7 @@ const Transfer = (props: CustomEdgeProps) => {
         </marker>
       </defs>
       <path
-        className="stroke-2 stroke-transfer"
+        className="stroke-transfer stroke-2"
         d={`M${props.sourceX},${props.sourceY}L${props.targetX},${props.targetY}`}
         markerEnd="url(#transferhead)"
       />

@@ -1,5 +1,5 @@
-import { EdgeType } from "@/lib/types";
-import { create } from "zustand";
+import { EdgeType } from '@/lib/types';
+import { create } from 'zustand';
 
 type ConnectionState = {
   dialogOpen: boolean;
