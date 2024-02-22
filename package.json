@@ -1,15 +1,14 @@
 {
   "name": "node-editor",
   "version": "1.0.0",
-  "workspaces": [
-    "client"
-  ],
   "scripts": {
+    "install:client": "cd client && npm install",
+    "postinstall": "npm run install:client",
     "start:dev": "npm-run-all --parallel server:dev client:dev",
     "start": "npm-run-all --parallel server client:serve",
-    "client:dev": "npm run dev --workspace=client",
-    "client:serve": "npm run serve --workspace=client",
-    "client:build": "npm run build --workspace=client",
+    "client:dev": "cd client && npm run dev",
+    "client:serve": "cd client && npm run serve",
+    "client:build": "cd client && npm run build",
     "server:dev": "cd server && dotnet run",
     "server": "cd server && dotnet publish -c Release && cd bin/Release/net7.0/publish && dotnet server.dll",
     "server:build": "cd server && dotnet build",
