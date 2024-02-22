@@ -69,26 +69,7 @@ export default function App() {
     useStore(storeSelector, shallow);
 
   useEffect(() => {
-    if (
-      theme === 'dark' &&
-      window.matchMedia('(prefers-color-scheme: dark)').matches
-    ) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Delete' || event.key === 'Backspace') {
-        event.stopPropagation();
-      }
-    };
-
-    document.addEventListener('keydown', handleKeyDown, true);
-
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown, true);
-    };
+    document.documentElement.classList.toggle('dark', theme === 'dark');
   }, [theme]);
 
   const createNewConnection = () => {
