@@ -2,6 +2,7 @@
 
 Before you get started, make sure you have the following requirements in place:
 
+- [.NET Core SDK](https://dotnet.microsoft.com/download) (v7.0.307) - Verify by running `dotnet --version` ✔️
 - [npm](https://www.npmjs.com/) (v9.8.1) - Verify by running `npm --version` ✔️
 - [node](https://nodejs.org/en) (v17.0.0) - Verify by running `node --version` ✔️
 
