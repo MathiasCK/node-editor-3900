@@ -1,12 +1,14 @@
-public class Terminal {
-    public int terminalId { get; set; }
-    public string user { get; set; }
-    public DateTime createTime { get; set; }
-    public string medium { get; set; }
-    public string direction { get; set; }
-    public int blockId { get; set; }
-    public int connectorId { get; set; }
-    public string? transferTo { get; set; }
-    public List<Connector>? connectedTo { get; set; }
-    public List <Attribute> attributes { get; set; }
+namespace mymvc.Models {
+    public class Terminal {
+    public int TerminalId { get; set; }
+    public string User { get; set; } = string.Empty;
+    public DateTime CreateTime { get; set; } 
+    public string Medium { get; set; } = string.Empty;
+    public string Direction { get; set; } = string.Empty;
+    public int BlockId { get; set; }
+    public int ConnectorId { get; set; }
+    public string? TransferTo { get; set; }
+    public List<Connector>? ConnectedTo { get; set; }
+    public List <Attribute>? Attributes { get; set; }
+}
 }

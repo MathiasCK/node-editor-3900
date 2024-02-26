@@ -1,9 +1,11 @@
+namespace mymvc.Models {
 public class Attribute {
-    public string user { get; set; }
-    public DateTime createtime { get; set; }
-    public int id { get; set; }
-    public string name { get; set; }
-    public string value { get; set; }
-    public string unit { get; set; }
-    public string group { get; set; }
+    public string User { get; set; } = string.Empty;
+    public DateTime Createtime { get; set; }
+    public int Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public string Value { get; set; } = string.Empty;
+    public string Unit { get; set; } = string.Empty;
+    public string Group { get; set; } = string.Empty;
+}
 }
