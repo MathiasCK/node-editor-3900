@@ -105,7 +105,6 @@ const CurrentEdge: FC<Props> = ({ currentEdge }) => {
             <SelectGroup>
               <SelectItem value={EdgeType.Part}>Part of</SelectItem>
               <SelectItem value={EdgeType.Connected}>Connected to</SelectItem>
-              <SelectItem value={EdgeType.Transfer}>Transfer to</SelectItem>
               <SelectItem value={EdgeType.Fulfilled}>Fulfilled by</SelectItem>
             </SelectGroup>
           </SelectContent>

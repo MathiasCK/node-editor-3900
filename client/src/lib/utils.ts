@@ -94,6 +94,26 @@ export const checkConnection = (
     }
   }
 
+  if (
+    isBlock(params.sourceHandle as string) &&
+    isTerminal(params.targetHandle as string)
+  ) {
+    lockConnection = true;
+    connectionType = EdgeType.Connected;
+
+    newNodeRelations.push({
+      nodeId: params.source as string,
+      array: {
+        terminals: {
+          id: params.target as string,
+        },
+      },
+      value: {
+        hasTerminal: true,
+      },
+    });
+  }
+
   if (connectionType === EdgeType.Fulfilled) {
     newNodeRelations.push({
       nodeId: params.source as string,

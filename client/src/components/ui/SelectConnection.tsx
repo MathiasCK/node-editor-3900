@@ -58,18 +58,7 @@ const SelectConnection: FC<Props> = ({
           >
             Connected to
           </button>
-          <button
-            className={cn(
-              `${buttonVariants.edge} border-blue-400 text-blue-400 hover:bg-blue-400 `,
-              {
-                'border-transparent bg-blue-400 text-white':
-                  edgeType === EdgeType.Transfer,
-              }
-            )}
-            onClick={() => setEdgeType(EdgeType.Transfer)}
-          >
-            Transfer to
-          </button>
+
           <button
             className={cn(
               `${buttonVariants.edge} border-dotted border-amber-300 text-amber-300 hover:bg-amber-300`,
