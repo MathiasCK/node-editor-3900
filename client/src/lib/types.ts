@@ -34,6 +34,11 @@ export type NodeData = {
   connectedTo?: {
     id: string;
   }[];
+  hasDirectPart?: boolean;
+  directParts?: {
+    id: string;
+  }[];
+  directPartOf?: string;
   id: string;
   label: string;
   type: string;

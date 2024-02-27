@@ -118,6 +118,28 @@ export const handleNewNodeRelations = (
     updateNodeData(index, nodeToUpdate, nodes, setNodes);
   }
 
+  if (connectionType === EdgeType.Part) {
+    const targetNode = nodes.find(node => node.id === params.target);
+    const targetIndex = nodes.findIndex(node => node.id === params.target);
+
+    if (!targetNode || targetIndex === -1) return;
+
+    newNodeRelations.push({
+      nodeId: params.source as string,
+      array: {
+        directParts: {
+          id: params.target as string,
+        },
+      },
+      value: {
+        hasDirectPart: true,
+      },
+    });
+
+    targetNode.data.directPartOf = params.source as string;
+    updateNodeData(targetIndex, targetNode, nodes, setNodes);
+  }
+
   for (const relation of newNodeRelations) {
     const nodeToUpdate = nodes.find(node => node.id === relation.nodeId);
     const index = nodes.findIndex(node => node.id === relation.nodeId);
@@ -201,6 +223,9 @@ export const addNode = (
   }
 
   newNode.data.connectedTo = null;
+  newNode.data.hasDirectPart = false;
+  newNode.data.directParts = null;
+  newNode.data.directPartOf = null;
 
   setNodes([...nodes, newNode]);
 };
@@ -387,6 +412,41 @@ export const updateNodeRelations = (
     }
 
     updateNodeData(index, nodeToUpdate, nodes, setNodes);
+  }
+
+  if (currentEdge.type === EdgeType.Part) {
+    const sourceNode = nodes.find(node => node.id === currentEdge.source);
+    const sourceNodeIndex = nodes.findIndex(
+      node => node.id === currentEdge.source
+    );
+    const targetNode = nodes.find(node => node.id === currentEdge.target);
+    const targetNodeIndex = nodes.findIndex(
+      node => node.id === currentEdge.target
+    );
+
+    if (
+      !sourceNode ||
+      !targetNode ||
+      sourceNodeIndex === -1 ||
+      targetNodeIndex === -1
+    )
+      return;
+
+    targetNode.data.directPartOf = null;
+
+    const filteredDirectParts = sourceNode.data.directParts.filter(
+      (part: { id: string }) => part.id !== currentEdge.target
+    );
+
+    sourceNode.data.directParts = filteredDirectParts;
+
+    if (filteredDirectParts.length === 0) {
+      sourceNode.data.directParts = null;
+      sourceNode.data.hasDirectPart = false;
+    }
+
+    updateNodeData(sourceNodeIndex, sourceNode, nodes, setNodes);
+    updateNodeData(targetNodeIndex, targetNode, nodes, setNodes);
   }
 };
 
