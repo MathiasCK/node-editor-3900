@@ -35,6 +35,7 @@ export type NodeData = {
   connectors?: {
     id: string;
   }[];
+  terminalOf?: string;
   id: string;
   label: string;
   type: string;
@@ -65,7 +66,7 @@ export type CustomNodeProps = Omit<NodeProps, 'data'> &
 
 export type NodeRelation = {
   nodeId: string;
-  value: {
+  value?: {
     [key: string]: boolean;
   };
   array: {

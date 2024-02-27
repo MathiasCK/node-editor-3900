@@ -47,6 +47,20 @@ export const checkConnection = (
   }
 
   if (
+    isTerminal(params.sourceHandle as string) &&
+    isBlock(params.targetHandle as string)
+  ) {
+    newNodeRelations.push({
+      nodeId: params.source as string,
+      array: {
+        terminalOf: {
+          id: params.target as string,
+        },
+      },
+    });
+  }
+
+  if (
     isBlock(params.sourceHandle as string) &&
     isTerminal(params.targetHandle as string)
   ) {
@@ -101,10 +115,12 @@ export const handleNewNodeRelations = (
 
     if (!nodeToUpdate || index === -1) return;
 
-    const keyToUpdate = Object.keys(relation.value)[0];
-    const arrayToUpdate = Object.keys(relation.array)[0];
+    if (relation.value) {
+      const keyToUpdate = Object.keys(relation.value)[0];
+      nodeToUpdate.data[keyToUpdate] = relation.value[keyToUpdate];
+    }
 
-    nodeToUpdate.data[keyToUpdate] = relation.value[keyToUpdate];
+    const arrayToUpdate = Object.keys(relation.array)[0];
 
     nodeToUpdate.data[arrayToUpdate] = [
       ...(nodeToUpdate.data[arrayToUpdate] ?? []),
@@ -171,6 +187,7 @@ export const addNode = (
 
   if (isTerminal(type)) {
     newNode.data.hasConnector = false;
+    newNode.data.terminalOf = null;
   }
 
   setNodes([...nodes, newNode]);
@@ -262,6 +279,28 @@ export const updateNodeRelations = (
   nodes: Node[],
   setNodes: (nodes: Node[]) => void
 ) => {
+  if (
+    isTerminal(currentEdge.sourceHandle!) &&
+    isBlock(currentEdge.targetHandle!)
+  ) {
+    // Deleting a block -> terminal connection where terminalOf array should be updated
+    const nodeToUpdate = nodes.find(node => node.id === currentEdge.source);
+    const index = nodes.findIndex(node => node.id === currentEdge.source);
+
+    if (!nodeToUpdate || index === -1) return;
+
+    const updatedTerminalOf = nodeToUpdate.data.terminalOf.filter(
+      (terminal: { id: string }) => terminal.id !== currentEdge.target
+    );
+
+    nodeToUpdate.data.terminalOf = updatedTerminalOf;
+
+    if (updatedTerminalOf.length === 0) {
+      nodeToUpdate.data.terminalOf = null;
+    }
+
+    updateNodeData(index, nodeToUpdate, nodes, setNodes);
+  }
   if (
     currentEdge.data.lockConnection &&
     isBlock(currentEdge.sourceHandle!) &&
