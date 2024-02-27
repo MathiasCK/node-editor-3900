@@ -39,13 +39,6 @@ export const checkConnection = (
     toast.error('Cannot connect node to itself');
     canConnect = false;
   }
-  if (
-    isBlock(params.sourceHandle as string) &&
-    isBlock(params.targetHandle as string)
-  ) {
-    toast.error('Cannot connect block to block');
-    canConnect = false;
-  }
 
   if (
     isTerminal(params.sourceHandle as string) &&
