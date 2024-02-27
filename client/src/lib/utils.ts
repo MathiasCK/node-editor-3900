@@ -40,6 +40,7 @@ export const checkConnection = (
     canConnect = false;
   }
 
+  // Set terminalOf property for terminal
   if (
     isTerminal(params.sourceHandle as string) &&
     isBlock(params.targetHandle as string)
@@ -54,6 +55,7 @@ export const checkConnection = (
     });
   }
 
+  // Set transfersTo property for terminal
   if (
     isTerminal(params.sourceHandle as string) &&
     isTerminal(params.targetHandle as string)
@@ -90,47 +92,6 @@ export const checkConnection = (
         },
       });
     }
-  }
-
-  if (
-    isBlock(params.sourceHandle as string) &&
-    isTerminal(params.targetHandle as string)
-  ) {
-    lockConnection = true;
-    connectionType = EdgeType.Connected;
-
-    newNodeRelations.push({
-      nodeId: params.source as string,
-      value: {
-        hasTerminal: true,
-      },
-      array: {
-        terminals: {
-          id: params.target as string,
-        },
-      },
-    });
-  }
-
-  if (
-    (isBlock(params.sourceHandle as string) ||
-      isTerminal(params.sourceHandle as string)) &&
-    isConnector(params.targetHandle as string)
-  ) {
-    lockConnection = true;
-    connectionType = EdgeType.Connected;
-
-    newNodeRelations.push({
-      nodeId: params.source as string,
-      value: {
-        hasConnector: true,
-      },
-      array: {
-        connectors: {
-          id: params.target as string,
-        },
-      },
-    });
   }
 
   return { canConnect, connectionType, lockConnection, newNodeRelations };
