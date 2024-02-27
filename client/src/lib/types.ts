@@ -39,6 +39,12 @@ export type NodeData = {
     id: string;
   }[];
   directPartOf?: string;
+  fulfilledBy?: {
+    id: string;
+  }[];
+  fullFills?: {
+    id: string;
+  }[];
   id: string;
   label: string;
   type: string;

@@ -140,6 +140,26 @@ export const handleNewNodeRelations = (
     updateNodeData(targetIndex, targetNode, nodes, setNodes);
   }
 
+  if (connectionType === EdgeType.Fulfilled) {
+    newNodeRelations.push({
+      nodeId: params.source as string,
+      array: {
+        fulfilledBy: {
+          id: params.target as string,
+        },
+      },
+    });
+
+    newNodeRelations.push({
+      nodeId: params.target as string,
+      array: {
+        fullFills: {
+          id: params.source as string,
+        },
+      },
+    });
+  }
+
   for (const relation of newNodeRelations) {
     const nodeToUpdate = nodes.find(node => node.id === relation.nodeId);
     const index = nodes.findIndex(node => node.id === relation.nodeId);
@@ -213,7 +233,7 @@ export const addNode = (
     },
   };
 
-  if (isBlock(type)) {
+  if (isBlock(type) || isConnector(type)) {
     newNode.data.hasTerminal = false;
   }
 
@@ -226,6 +246,8 @@ export const addNode = (
   newNode.data.hasDirectPart = false;
   newNode.data.directParts = null;
   newNode.data.directPartOf = null;
+  newNode.data.fulfilledBy = null;
+  newNode.data.fullFills = null;
 
   setNodes([...nodes, newNode]);
 };
@@ -444,6 +466,42 @@ export const updateNodeRelations = (
       sourceNode.data.directParts = null;
       sourceNode.data.hasDirectPart = false;
     }
+
+    updateNodeData(sourceNodeIndex, sourceNode, nodes, setNodes);
+    updateNodeData(targetNodeIndex, targetNode, nodes, setNodes);
+  }
+
+  if (currentEdge.type === EdgeType.Fulfilled) {
+    const sourceNode = nodes.find(node => node.id === currentEdge.source);
+    const sourceNodeIndex = nodes.findIndex(
+      node => node.id === currentEdge.source
+    );
+    const targetNode = nodes.find(node => node.id === currentEdge.target);
+    const targetNodeIndex = nodes.findIndex(
+      node => node.id === currentEdge.target
+    );
+
+    if (
+      !sourceNode ||
+      !targetNode ||
+      sourceNodeIndex === -1 ||
+      targetNodeIndex === -1
+    )
+      return;
+
+    const updatedFulfilledBy = sourceNode.data.fulfilledBy.filter(
+      (node: { id: string }) => node.id !== currentEdge.target
+    );
+
+    sourceNode.data.fulfilledBy =
+      updatedFulfilledBy.length === 0 ? null : updatedFulfilledBy;
+
+    const updatedFullFills = targetNode.data.fullFills.filter(
+      (node: { id: string }) => node.id !== currentEdge.source
+    );
+
+    targetNode.data.fullFills =
+      updatedFullFills.length === 0 ? null : updatedFullFills;
 
     updateNodeData(sourceNodeIndex, sourceNode, nodes, setNodes);
     updateNodeData(targetNodeIndex, targetNode, nodes, setNodes);
