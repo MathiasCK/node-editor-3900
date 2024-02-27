@@ -33,6 +33,7 @@ export type NodeData = {
     id: string;
   }[];
   terminalOf?: string;
+  transfersTo?: string;
   id: string;
   label: string;
   type: string;
@@ -64,9 +65,9 @@ export type CustomNodeProps = Omit<NodeProps, 'data'> &
 export type NodeRelation = {
   nodeId: string;
   value?: {
-    [key: string]: boolean;
+    [key: string]: boolean | string;
   };
-  array: {
+  array?: {
     [key: string]: {
       id: string;
     };

@@ -61,6 +61,28 @@ export const checkConnection = (
   }
 
   if (
+    isTerminal(params.sourceHandle as string) &&
+    isTerminal(params.targetHandle as string)
+  ) {
+    lockConnection = true;
+    connectionType = EdgeType.Transfer;
+
+    newNodeRelations.push({
+      nodeId: params.source as string,
+      value: {
+        transfersTo: params.target as string,
+      },
+    });
+
+    newNodeRelations.push({
+      nodeId: params.target as string,
+      value: {
+        transfersTo: params.source as string,
+      },
+    });
+  }
+
+  if (
     isBlock(params.sourceHandle as string) &&
     isTerminal(params.targetHandle as string)
   ) {
@@ -120,12 +142,14 @@ export const handleNewNodeRelations = (
       nodeToUpdate.data[keyToUpdate] = relation.value[keyToUpdate];
     }
 
-    const arrayToUpdate = Object.keys(relation.array)[0];
+    if (relation.array) {
+      const arrayToUpdate = Object.keys(relation.array)[0];
 
-    nodeToUpdate.data[arrayToUpdate] = [
-      ...(nodeToUpdate.data[arrayToUpdate] ?? []),
-      relation.array[arrayToUpdate],
-    ];
+      nodeToUpdate.data[arrayToUpdate] = [
+        ...(nodeToUpdate.data[arrayToUpdate] ?? []),
+        relation.array[arrayToUpdate],
+      ];
+    }
 
     updateNodeData(index, nodeToUpdate, nodes, setNodes);
   }
@@ -279,6 +303,38 @@ export const updateNodeRelations = (
   nodes: Node[],
   setNodes: (nodes: Node[]) => void
 ) => {
+  if (
+    isTerminal(currentEdge.sourceHandle!) &&
+    isTerminal(currentEdge.targetHandle!)
+  ) {
+    // Deleting a terminal -> terminal connection where "transfersTo" should be updated
+    const sourceTerminal = nodes.find(
+      terminal => terminal.id === currentEdge.source
+    );
+    const sourceIndex = nodes.findIndex(
+      terminal => terminal.id === currentEdge.source
+    );
+    const targetTerminal = nodes.find(
+      terminal => terminal.id === currentEdge.target
+    );
+    const targetIndex = nodes.findIndex(
+      terminal => terminal.id === currentEdge.target
+    );
+
+    if (
+      !sourceTerminal ||
+      !targetTerminal ||
+      sourceIndex === -1 ||
+      targetIndex === -1
+    )
+      return;
+
+    targetTerminal.data.transfersTo = null;
+    sourceTerminal.data.transfersTo = null;
+
+    updateNodeData(sourceIndex, sourceTerminal, nodes, setNodes);
+    updateNodeData(targetIndex, targetTerminal, nodes, setNodes);
+  }
   if (
     isTerminal(currentEdge.sourceHandle!) &&
     isBlock(currentEdge.targetHandle!)
