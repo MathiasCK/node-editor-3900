@@ -22,7 +22,8 @@ export const cn = (...inputs: ClassValue[]) => twMerge(clsx(inputs));
 
 export const checkConnection = (
   params: Edge | Connection,
-  edgeType: EdgeType
+  edgeType: EdgeType,
+  nodes: Node[]
 ): {
   canConnect: boolean;
   connectionType: EdgeType;
@@ -64,22 +65,38 @@ export const checkConnection = (
     isTerminal(params.sourceHandle as string) &&
     isTerminal(params.targetHandle as string)
   ) {
-    lockConnection = true;
-    connectionType = EdgeType.Transfer;
+    // Check if terminal is already connected to other terminals
+    const targetTerminal = nodes.find(node => node.id === params.target);
+    const sourceTerminal = nodes.find(node => node.id === params.source);
 
-    newNodeRelations.push({
-      nodeId: params.source as string,
-      value: {
-        transfersTo: params.target as string,
-      },
-    });
+    if (targetTerminal?.data?.transfersTo) {
+      toast.error(
+        `Terminal ${params.target} is already transfered to another terminal`
+      );
+      canConnect = false;
+    } else if (sourceTerminal?.data?.transfersTo) {
+      toast.error(
+        `Terminal ${params.source} is already transfered to another terminal`
+      );
+      canConnect = false;
+    } else {
+      lockConnection = true;
+      connectionType = EdgeType.Transfer;
 
-    newNodeRelations.push({
-      nodeId: params.target as string,
-      value: {
-        transfersTo: params.source as string,
-      },
-    });
+      newNodeRelations.push({
+        nodeId: params.source as string,
+        value: {
+          transfersTo: params.target as string,
+        },
+      });
+
+      newNodeRelations.push({
+        nodeId: params.target as string,
+        value: {
+          transfersTo: params.source as string,
+        },
+      });
+    }
   }
 
   if (
@@ -212,6 +229,7 @@ export const addNode = (
   if (isTerminal(type)) {
     newNode.data.hasConnector = false;
     newNode.data.terminalOf = null;
+    newNode.data.transfersTo = null;
   }
 
   setNodes([...nodes, newNode]);

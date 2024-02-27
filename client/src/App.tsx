@@ -65,7 +65,7 @@ export default function App() {
     if (!params) return;
 
     const { connectionType, lockConnection, newNodeRelations } =
-      checkConnection(params, edgeType);
+      checkConnection(params, edgeType, nodes);
 
     const currentDate = Date.now();
     const id = edges.length.toString();
@@ -92,7 +92,11 @@ export default function App() {
 
   const onConnect = useCallback(
     (params: Edge | Connection) => {
-      const { canConnect, lockConnection } = checkConnection(params, edgeType);
+      const { canConnect, lockConnection } = checkConnection(
+        params,
+        edgeType,
+        nodes
+      );
       if (!canConnect) return;
 
       if (lockConnection) {
@@ -103,7 +107,7 @@ export default function App() {
       openDialog();
       setParams(params);
     },
-    [edgeType, openDialog]
+    [edgeType, openDialog, nodes, edges]
   );
 
   return (
