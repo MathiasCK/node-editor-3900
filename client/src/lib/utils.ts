@@ -98,10 +98,26 @@ export const checkConnection = (
 };
 
 export const handleNewNodeRelations = (
+  params: Edge | Connection,
+  connectionType: EdgeType,
   newNodeRelations: NodeRelation[],
   nodes: Node[],
   setNodes: (nodes: Node[]) => void
 ) => {
+  // If connectionType is connected set connectedTo equals to params.target to source node
+  if (connectionType === EdgeType.Connected) {
+    const nodeToUpdate = nodes.find(node => node.id === params.source);
+    const index = nodes.findIndex(node => node.id === params.source);
+
+    if (!nodeToUpdate || index === -1) return;
+
+    nodeToUpdate.data.connectedTo = [
+      ...nodeToUpdate.data.connectedTo,
+      params.target as string,
+    ];
+    updateNodeData(index, nodeToUpdate, nodes, setNodes);
+  }
+
   for (const relation of newNodeRelations) {
     const nodeToUpdate = nodes.find(node => node.id === relation.nodeId);
     const index = nodes.findIndex(node => node.id === relation.nodeId);
@@ -177,14 +193,14 @@ export const addNode = (
 
   if (isBlock(type)) {
     newNode.data.hasTerminal = false;
-    newNode.data.hasConnector = false;
   }
 
   if (isTerminal(type)) {
-    newNode.data.hasConnector = false;
     newNode.data.terminalOf = null;
     newNode.data.transfersTo = null;
   }
+
+  newNode.data.connectedTo = null;
 
   setNodes([...nodes, newNode]);
 };
@@ -354,27 +370,20 @@ export const updateNodeRelations = (
     updateNodeData(index, nodeToUpdate, nodes, setNodes);
   }
 
-  if (
-    currentEdge.data.lockConnection &&
-    (isBlock(currentEdge.sourceHandle!) ||
-      isTerminal(currentEdge.sourceHandle!)) &&
-    isConnector(currentEdge.targetHandle!)
-  ) {
-    // Deleting a connection where block or terminal has hasConnector set to true
+  if (currentEdge.type === EdgeType.Connected) {
     const nodeToUpdate = nodes.find(node => node.id === currentEdge.source);
     const index = nodes.findIndex(node => node.id === currentEdge.source);
 
     if (!nodeToUpdate || index === -1) return;
 
-    const updatedConnectors = nodeToUpdate.data.connectors.filter(
-      (connector: { id: string }) => connector.id !== currentEdge.target
+    const updatedConnectedTo = nodeToUpdate.data.connectedTo.filter(
+      (id: string) => id !== currentEdge.target
     );
 
-    nodeToUpdate.data.connectors = updatedConnectors;
+    nodeToUpdate.data.connectedTo = updatedConnectedTo;
 
-    if (updatedConnectors.length === 0) {
-      delete nodeToUpdate.data.connectors;
-      nodeToUpdate.data.hasConnector = false;
+    if (updatedConnectedTo.length === 0) {
+      nodeToUpdate.data.connectedTo = null;
     }
 
     updateNodeData(index, nodeToUpdate, nodes, setNodes);

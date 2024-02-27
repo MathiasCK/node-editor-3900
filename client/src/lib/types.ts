@@ -29,12 +29,11 @@ export type NodeData = {
   terminals?: {
     id: string;
   }[];
-  hasConnector?: boolean;
-  connectors?: {
-    id: string;
-  }[];
   terminalOf?: string;
   transfersTo?: string;
+  connectedTo?: {
+    id: string;
+  }[];
   id: string;
   label: string;
   type: string;
