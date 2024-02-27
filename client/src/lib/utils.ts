@@ -94,52 +94,6 @@ export const checkConnection = (
     }
   }
 
-  return { canConnect, connectionType, lockConnection, newNodeRelations };
-};
-
-export const handleNewNodeRelations = (
-  params: Edge | Connection,
-  connectionType: EdgeType,
-  newNodeRelations: NodeRelation[],
-  nodes: Node[],
-  setNodes: (nodes: Node[]) => void
-) => {
-  // If connectionType is connected set connectedTo equals to params.target to source node
-  if (connectionType === EdgeType.Connected) {
-    const nodeToUpdate = nodes.find(node => node.id === params.source);
-    const index = nodes.findIndex(node => node.id === params.source);
-
-    if (!nodeToUpdate || index === -1) return;
-
-    nodeToUpdate.data.connectedTo = [
-      ...nodeToUpdate.data.connectedTo,
-      params.target as string,
-    ];
-    updateNodeData(index, nodeToUpdate, nodes, setNodes);
-  }
-
-  if (connectionType === EdgeType.Part) {
-    const targetNode = nodes.find(node => node.id === params.target);
-    const targetIndex = nodes.findIndex(node => node.id === params.target);
-
-    if (!targetNode || targetIndex === -1) return;
-
-    newNodeRelations.push({
-      nodeId: params.source as string,
-      array: {
-        directParts: {
-          id: params.target as string,
-        },
-      },
-      value: {
-        hasDirectPart: true,
-      },
-    });
-
-    targetNode.data.directPartOf = params.source as string;
-    updateNodeData(targetIndex, targetNode, nodes, setNodes);
-  }
-
   if (connectionType === EdgeType.Fulfilled) {
     newNodeRelations.push({
       nodeId: params.source as string,
@@ -160,6 +114,46 @@ export const handleNewNodeRelations = (
     });
   }
 
+  if (connectionType === EdgeType.Connected) {
+    newNodeRelations.push({
+      nodeId: params.source as string,
+      array: {
+        connectedTo: {
+          id: params.target as string,
+        },
+      },
+    });
+  }
+
+  if (connectionType === EdgeType.Part) {
+    newNodeRelations.push({
+      nodeId: params.source as string,
+      array: {
+        directParts: {
+          id: params.target as string,
+        },
+      },
+      value: {
+        hasDirectPart: true,
+      },
+    });
+
+    newNodeRelations.push({
+      nodeId: params.target as string,
+      value: {
+        directPartOf: params.source as string,
+      },
+    });
+  }
+
+  return { canConnect, connectionType, lockConnection, newNodeRelations };
+};
+
+export const handleNewNodeRelations = (
+  newNodeRelations: NodeRelation[],
+  nodes: Node[],
+  setNodes: (nodes: Node[]) => void
+) => {
   for (const relation of newNodeRelations) {
     const nodeToUpdate = nodes.find(node => node.id === relation.nodeId);
     const index = nodes.findIndex(node => node.id === relation.nodeId);
@@ -369,6 +363,7 @@ export const updateNodeRelations = (
 
     updateNodeData(sourceIndex, sourceTerminal, nodes, setNodes);
     updateNodeData(targetIndex, targetTerminal, nodes, setNodes);
+    return;
   }
   if (
     isTerminal(currentEdge.sourceHandle!) &&
@@ -391,6 +386,7 @@ export const updateNodeRelations = (
     }
 
     updateNodeData(index, nodeToUpdate, nodes, setNodes);
+    return;
   }
   if (
     currentEdge.data.lockConnection &&
@@ -415,6 +411,7 @@ export const updateNodeRelations = (
     }
 
     updateNodeData(index, nodeToUpdate, nodes, setNodes);
+    return;
   }
 
   if (currentEdge.type === EdgeType.Connected) {
@@ -424,16 +421,15 @@ export const updateNodeRelations = (
     if (!nodeToUpdate || index === -1) return;
 
     const updatedConnectedTo = nodeToUpdate.data.connectedTo.filter(
-      (id: string) => id !== currentEdge.target
+      (node: { id: string }) => node.id !== currentEdge.target
     );
 
-    nodeToUpdate.data.connectedTo = updatedConnectedTo;
-
-    if (updatedConnectedTo.length === 0) {
-      nodeToUpdate.data.connectedTo = null;
-    }
+    nodeToUpdate.data.connectedTo = updatedConnectedTo.length
+      ? updatedConnectedTo
+      : null;
 
     updateNodeData(index, nodeToUpdate, nodes, setNodes);
+    return;
   }
 
   if (currentEdge.type === EdgeType.Part) {
@@ -469,6 +465,8 @@ export const updateNodeRelations = (
 
     updateNodeData(sourceNodeIndex, sourceNode, nodes, setNodes);
     updateNodeData(targetNodeIndex, targetNode, nodes, setNodes);
+
+    return;
   }
 
   if (currentEdge.type === EdgeType.Fulfilled) {
@@ -505,6 +503,8 @@ export const updateNodeRelations = (
 
     updateNodeData(sourceNodeIndex, sourceNode, nodes, setNodes);
     updateNodeData(targetNodeIndex, targetNode, nodes, setNodes);
+
+    return;
   }
 };
 

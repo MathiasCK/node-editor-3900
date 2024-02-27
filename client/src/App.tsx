@@ -82,13 +82,7 @@ export default function App() {
       },
     };
 
-    handleNewNodeRelations(
-      params,
-      connectionType,
-      newNodeRelations,
-      nodes,
-      setNodes
-    );
+    handleNewNodeRelations(newNodeRelations, nodes, setNodes);
 
     const newEdges = addEdge(newConnection, edges);
     return setEdges(newEdges);
