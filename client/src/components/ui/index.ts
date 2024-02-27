@@ -1,5 +1,5 @@
 export { default as Settings } from './Settings';
-export { default as Sidebar } from './Sidebar';
+export * from './Sidebar';
 export { default as Navbar } from './Navbar';
 export { default as Spinner } from './Spinner';
 export { default as SelectConnection } from './SelectConnection';
