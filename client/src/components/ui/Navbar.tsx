@@ -88,6 +88,30 @@ const navItems: NavItem[] = [
       },
     ],
   },
+  {
+    title: 'Empty',
+    subtitle: 'Add empty node to editor',
+    children: [
+      {
+        title: 'Block',
+        description:
+          'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quibusdam, laboriosam!',
+        nodeType: NodeType.Block,
+      },
+      {
+        title: 'Connector',
+        description:
+          'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quibusdam, laboriosam!',
+        nodeType: NodeType.Connector,
+      },
+      {
+        title: 'Terminal',
+        description:
+          'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quibusdam, laboriosam!',
+        nodeType: NodeType.Terminal,
+      },
+    ],
+  },
 ];
 
 const Navbar = () => {
@@ -96,7 +120,7 @@ const Navbar = () => {
   const { nodes, setNodes } = useStore(storeSelector, shallow);
 
   return (
-    <NavigationMenu className="dark:bg-background  bg-white">
+    <NavigationMenu className="bg-white  dark:bg-background">
       <NavigationMenuList>
         <NavigationMenuItem className="p-5">
           <AlignJustify
@@ -111,7 +135,7 @@ const Navbar = () => {
           <NavigationMenuItem key={node.title}>
             <NavigationMenuTrigger>{node.title}</NavigationMenuTrigger>
             <NavigationMenuContent>
-              <h1 className="text-muted-foreground p-4">{node.subtitle}</h1>
+              <h1 className="p-4 text-muted-foreground">{node.subtitle}</h1>
               <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
                 {node.children.map(component => (
                   <ListItem
@@ -148,13 +172,13 @@ const ListItem = React.forwardRef<
         <a
           ref={ref}
           className={cn(
-            'hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors',
+            'block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground',
             className
           )}
           {...props}
         >
           <div className="text-sm font-medium leading-none">{title}</div>
-          <p className="text-muted-foreground line-clamp-2 text-sm leading-snug">
+          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
             {children}
           </p>
         </a>

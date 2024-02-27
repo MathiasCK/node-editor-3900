@@ -9,10 +9,14 @@ const Terminal = (props: CustomNodeProps) => {
     <figure id={props.data.label}>
       <div
         onClick={() => openSidebar(props)}
-        className={`h-4 w-4 bg-${props.data.aspect}`}
+        className={`h-4 w-4 bg-${props.data.aspect}-light dark:bg-${props.data.aspect}-dark`}
       >
         <header className="flex h-full w-full items-center justify-center">
-          <p className="uppercase text-black">{props.data.id}</p>
+          <p
+            className={`text-center text-${props.data.aspect}-foreground-light dark:text-${props.data.aspect}-foreground-dark`}
+          >
+            {props.data.id}
+          </p>
         </header>
       </div>
 

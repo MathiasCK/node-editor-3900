@@ -4,6 +4,7 @@ export enum AspectType {
   Function = 'function',
   Product = 'product',
   Location = 'location',
+  Empty = 'empty',
 }
 
 export enum NodeType {
