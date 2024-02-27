@@ -9,14 +9,15 @@ import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import {
   AspectType,
-  ConnectionWithChildren,
-  ConnectionWithTarget,
+  CustomNodeProps,
   EdgeType,
   NodeRelation,
   NodeType,
+  RelationKeys,
+  RelationKeysWithChildren,
+  RelationType,
   UpdateNode,
 } from './types';
-import { Sidebar } from '@/hooks/useSidebar';
 
 export const cn = (...inputs: ClassValue[]) => twMerge(clsx(inputs));
 
@@ -552,68 +553,52 @@ export const deleteSelectedEdge = (
   toast.success(`Edge ${selectedEdgeId} deleted`);
 };
 
-export const getRelatedNodesWithRelations = (
-  sidebar: Sidebar,
-  edges: Edge[],
-  nodes: Node[]
-): ConnectionWithChildren[] => {
-  const currentNodeRelations = edges.filter(
-    edge => edge.source === sidebar.currentNode?.id
-  );
+export const getNodeRelations = (
+  currentNode: CustomNodeProps
+): RelationKeysWithChildren[] => {
+  const transformableKeys: RelationKeys[] = [
+    'connectedTo',
+    'directParts',
+    'fulfilledBy',
+    'terminals',
+  ];
 
-  const relatedNodes = currentNodeRelations?.map(r =>
-    nodes.find(node => node.id === r?.target)
-  );
+  return transformableKeys.reduce(
+    (acc: RelationKeysWithChildren[], key: RelationKeys) => {
+      if (currentNode.data[key]?.length ?? 0 > 0) {
+        let children = currentNode.data[key];
 
-  const data = currentNodeRelations.map((r, i) => ({
-    type: r.data.type,
-    target: relatedNodes?.[i]?.id,
-    displayName:
-      relatedNodes?.[i]?.data?.customName ??
-      `${capitalizeFirstLetter(relatedNodes?.[i]?.type as string)} ${
-        relatedNodes?.[i]?.id
-      }`,
-  })) as ConnectionWithTarget[];
+        // If processing 'connectedTo', filter out duplicates that are in 'terminals'.
+        if (key === 'connectedTo' && currentNode.data.terminals) {
+          const terminalIds = new Set(
+            currentNode.data.terminals.map(terminal => terminal.id)
+          );
+          children = children?.filter(
+            connectedToItem => !terminalIds.has(connectedToItem.id)
+          );
+        }
 
-  const result = data.reduce(
-    (accumulator: ConnectionWithChildren[], currentValue) => {
-      const existingEntry = accumulator.find(
-        entry => entry.type === currentValue.type
-      );
-      if (existingEntry) {
-        existingEntry.children.push({
-          id: currentValue.target,
-          displayName: currentValue.displayName,
-        });
-      } else {
-        accumulator.push({
-          type: currentValue.type,
-          children: [
-            {
-              id: currentValue.target,
-              displayName: currentValue.displayName,
-            },
-          ],
+        acc.push({
+          key,
+          children,
         });
       }
-      return accumulator;
+      return acc;
     },
     []
   );
-
-  return result;
 };
 
-export const getReadableEdgeType = (type: EdgeType) => {
+export const getReadableRelation = (type: RelationType): string | null => {
   switch (type) {
-    case EdgeType.Connected:
+    case RelationType.DirectParts:
+      return 'Direct parts';
+    case RelationType.ConnectedTo:
       return 'Connected to';
-    case EdgeType.Fulfilled:
+    case RelationType.FulfilledBy:
       return 'Fulfilled by';
-    case EdgeType.Part:
-      return 'Part of';
-    case EdgeType.Transfer:
-      return 'Transfer to';
+    case RelationType.Terminals:
+      return 'Terminals';
     default:
       return null;
   }

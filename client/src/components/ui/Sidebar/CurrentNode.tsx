@@ -1,14 +1,14 @@
 import {
   AspectType,
-  EdgeType,
   type CustomNodeProps,
   UpdateNode,
+  RelationType,
 } from '@/lib/types';
 import {
   capitalizeFirstLetter,
   deleteSelectedNode,
-  getReadableEdgeType,
-  getRelatedNodesWithRelations,
+  getReadableRelation,
+  getNodeRelations,
   updateNode,
 } from '@/lib/utils';
 import { FC, useState } from 'react';
@@ -52,11 +52,7 @@ const CurrentNode: FC<Props> = ({ currentNode }) => {
   const [nodeName, setNodeName] = useState<string>(displayName);
   const [aspectType, setAspectType] = useState<string>(currentNode.data.aspect);
 
-  const nodesWithRelations = getRelatedNodesWithRelations(
-    sidebar,
-    edges,
-    nodes
-  );
+  const nodeRelations = getNodeRelations(currentNode);
 
   const displayNewNode = (newNodeId: string) => {
     const node = nodes.find(n => n.id === newNodeId);
@@ -160,26 +156,23 @@ const CurrentNode: FC<Props> = ({ currentNode }) => {
           </SelectContent>
         </Select>
       </div>
-      {nodesWithRelations.length > 0 && (
-        <>
-          {nodesWithRelations.map(nodeRelation => (
-            <div key={nodeRelation.type}>
-              <p className="mb-2 text-sm text-muted-foreground">
-                {getReadableEdgeType(nodeRelation.type as EdgeType)}
-              </p>
-              {nodeRelation.children.map(c => (
-                <Button
-                  key={`${nodeRelation}_${c.displayName}_link_button`}
-                  variant="ghost"
-                  onClick={() => displayNewNode(c.id as string)}
-                >
-                  {c.displayName}
-                </Button>
-              ))}
-            </div>
-          ))}
-        </>
-      )}
+      {nodeRelations.length > 0 &&
+        nodeRelations.map(nodeRelation => (
+          <div key={nodeRelation.key}>
+            <p className="mb-2 text-sm text-muted-foreground">
+              {getReadableRelation(nodeRelation.key as RelationType)}
+            </p>
+            {nodeRelation.children?.map(c => (
+              <Button
+                key={`${nodeRelation.key}_${c.id}_link_button`}
+                variant="ghost"
+                onClick={() => displayNewNode(c.id as string)}
+              >
+                {c.id}
+              </Button>
+            ))}
+          </div>
+        ))}
       <SheetFooter>
         {displayEdit && (
           <Button

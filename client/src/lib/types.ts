@@ -21,6 +21,13 @@ export enum EdgeType {
   Transfer = 'transfer',
 }
 
+export enum RelationType {
+  ConnectedTo = 'connectedTo',
+  DirectParts = 'directParts',
+  FulfilledBy = 'fulfilledBy',
+  Terminals = 'terminals',
+}
+
 export type UpdateNode = { customName?: string; aspect?: AspectType };
 
 export type NodeData = {
@@ -95,16 +102,13 @@ export type NavItem = {
   }[];
 };
 
-export type ConnectionWithChildren = {
-  type: string;
-  children: {
-    id: string;
-    displayName: string;
-  }[];
-};
+export type RelationKeys =
+  | 'connectedTo'
+  | 'directParts'
+  | 'fulfilledBy'
+  | 'terminals';
 
-export type ConnectionWithTarget = {
-  type: string;
-  target: string;
-  displayName: string;
+export type RelationKeysWithChildren = {
+  key: RelationKeys;
+  children: NodeData[RelationKeys];
 };
