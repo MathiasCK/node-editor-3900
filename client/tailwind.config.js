@@ -45,6 +45,7 @@ module.exports = {
         connector: '#5f5fff',
         terminal: '#5fff5f',
         fulfilled: '#fcd34c',
+        connected: '#bfdbfe',
         part: '#4ade80',
         transfer: '#60a5fa',
         'function-light': '#ffff00',
