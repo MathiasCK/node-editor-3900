@@ -29,7 +29,7 @@ const SelectConnection: FC<Props> = ({
     <Dialog open={dialogOpen}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle className="text-muted-foreground text-center">
+          <DialogTitle className="text-center text-muted-foreground">
             Select connection type
           </DialogTitle>
         </DialogHeader>
@@ -72,18 +72,6 @@ const SelectConnection: FC<Props> = ({
           </button>
           <button
             className={cn(
-              `${buttonVariants.edge} border-amber-300 text-amber-300 hover:bg-amber-300 `,
-              {
-                'border-transparent bg-amber-300 text-white':
-                  edgeType === EdgeType.Specialisation,
-              }
-            )}
-            onClick={() => setEdgeType(EdgeType.Specialisation)}
-          >
-            Specialisation of
-          </button>
-          <button
-            className={cn(
               `${buttonVariants.edge} border-dotted border-amber-300 text-amber-300 hover:bg-amber-300`,
               {
                 'border-transparent bg-amber-300 text-white':
@@ -93,30 +81,6 @@ const SelectConnection: FC<Props> = ({
             onClick={() => setEdgeType(EdgeType.Fulfilled)}
           >
             Fulfilled by
-          </button>
-          <button
-            className={cn(
-              `${buttonVariants.edge} border-gray-200 text-gray-200 hover:bg-gray-200 `,
-              {
-                'border-transparent bg-gray-200 text-white':
-                  edgeType === EdgeType.Proxy,
-              }
-            )}
-            onClick={() => setEdgeType(EdgeType.Proxy)}
-          >
-            Proxy
-          </button>
-          <button
-            className={cn(
-              `${buttonVariants.edge} border-dotted border-gray-200 text-gray-200 hover:bg-gray-200`,
-              {
-                'border-transparent bg-gray-200 text-white':
-                  edgeType === EdgeType.Projection,
-              }
-            )}
-            onClick={() => setEdgeType(EdgeType.Projection)}
-          >
-            Projection
           </button>
           <Button
             onClick={() => {

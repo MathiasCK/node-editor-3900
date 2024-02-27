@@ -182,7 +182,7 @@ const Sidebar = () => {
                 onClick={() => handleEdit(true)}
                 size={15}
                 className={cn(
-                  'text-md text-foreground font-semibold  hover:cursor-pointer',
+                  'text-md font-semibold text-foreground  hover:cursor-pointer',
                   {
                     hidden: sidebar.currentEdge,
                   }
@@ -194,7 +194,7 @@ const Sidebar = () => {
               disabled={!sidebar.edit}
               value={nodeName}
               onChange={e => setNodeName(e.target.value)}
-              className="text-foreground border-none text-lg font-semibold"
+              className="border-none text-lg font-semibold text-foreground"
             />
           </SheetTitle>
           <SheetDescription>Created: {createdAt}</SheetDescription>
@@ -202,7 +202,7 @@ const Sidebar = () => {
         </SheetHeader>
         {sidebar.currentNode && (
           <div>
-            <p className="text-muted-foreground mb-2 text-sm">Aspect type</p>
+            <p className="mb-2 text-sm text-muted-foreground">Aspect type</p>
             <Select value={aspectType} onValueChange={e => setAspectType(e)}>
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder={aspectType} />
@@ -221,7 +221,7 @@ const Sidebar = () => {
           <>
             {nodesWithRelations.map(nodeRelation => (
               <div key={nodeRelation.type}>
-                <p className="text-muted-foreground mb-2 text-sm">
+                <p className="mb-2 text-sm text-muted-foreground">
                   {getReadableEdgeType(nodeRelation.type as EdgeType)}
                 </p>
                 {nodeRelation.children.map(c => (
@@ -240,7 +240,7 @@ const Sidebar = () => {
 
         {sidebar.currentEdge && (
           <div>
-            <p className="text-muted-foreground mb-2 text-sm">
+            <p className="mb-2 text-sm text-muted-foreground">
               Connection type
             </p>
             <Select
@@ -258,16 +258,9 @@ const Sidebar = () => {
                     Connected to
                   </SelectItem>
                   <SelectItem value={EdgeType.Transfer}>Transfer to</SelectItem>
-                  <SelectItem value={EdgeType.Specialisation}>
-                    Specialisation of
-                  </SelectItem>
                   <SelectItem value={EdgeType.Fulfilled}>
                     Fulfilled by
                   </SelectItem>
-                  <SelectItem value={EdgeType.Projection}>
-                    Projection
-                  </SelectItem>
-                  <SelectItem value={EdgeType.Proxy}>Proxy</SelectItem>
                 </SelectGroup>
               </SelectContent>
             </Select>

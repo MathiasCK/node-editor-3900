@@ -437,12 +437,6 @@ export const getReadableEdgeType = (type: EdgeType) => {
       return 'Fulfilled by';
     case EdgeType.Part:
       return 'Part of';
-    case EdgeType.Projection:
-      return 'Projected by';
-    case EdgeType.Proxy:
-      return 'Proxy for';
-    case EdgeType.Specialisation:
-      return 'Specialised by';
     case EdgeType.Transfer:
       return 'Transfer to';
     default:

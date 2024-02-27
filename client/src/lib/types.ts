@@ -17,9 +17,6 @@ export enum EdgeType {
   Connected = 'connected',
   Fulfilled = 'fulfilled',
   Part = 'part',
-  Projection = 'projection',
-  Proxy = 'proxy',
-  Specialisation = 'specialisation',
   Transfer = 'transfer',
 }
 

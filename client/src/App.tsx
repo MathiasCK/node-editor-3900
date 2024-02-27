@@ -17,15 +17,7 @@ import { AspectType, NodeType } from './lib/types';
 import { addNode, checkConnection, handleNewNodeRelations } from './lib/utils';
 import { storeSelector, useConnection, useStore, useTheme } from './hooks';
 
-import {
-  Connected,
-  Fulfilled,
-  Part,
-  Projection,
-  Proxy,
-  Specialisation,
-  Transfer,
-} from './components/Edges';
+import { Connected, Fulfilled, Part, Transfer } from './components/Edges';
 import {
   ControlsStyled,
   MiniMapStyled,
@@ -52,9 +44,6 @@ export default function App() {
       part: Part,
       connected: Connected,
       fulfilled: Fulfilled,
-      projection: Projection,
-      proxy: Proxy,
-      specialisation: Specialisation,
       transfer: Transfer,
     }),
     []
