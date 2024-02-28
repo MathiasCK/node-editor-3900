@@ -115,7 +115,7 @@ export const checkConnection = (
     });
   }
 
-  if (connectionType === EdgeType.Fulfilled) {
+  if (connectionType === EdgeType.Fulfilled && !lockConnection) {
     newNodeRelations.push({
       nodeId: params.source as string,
       array: {
@@ -135,7 +135,7 @@ export const checkConnection = (
     });
   }
 
-  if (connectionType === EdgeType.Connected) {
+  if (connectionType === EdgeType.Connected && !lockConnection) {
     newNodeRelations.push({
       nodeId: params.source as string,
       array: {
@@ -146,7 +146,7 @@ export const checkConnection = (
     });
   }
 
-  if (connectionType === EdgeType.Part) {
+  if (connectionType === EdgeType.Part && !lockConnection) {
     newNodeRelations.push({
       nodeId: params.source as string,
       array: {
@@ -566,17 +566,7 @@ export const getNodeRelations = (
   return transformableKeys.reduce(
     (acc: RelationKeysWithChildren[], key: RelationKeys) => {
       if (currentNode.data[key]?.length ?? 0 > 0) {
-        let children = currentNode.data[key];
-
-        // If processing 'connectedTo', filter out duplicates that are in 'terminals'.
-        if (key === 'connectedTo' && currentNode.data.terminals) {
-          const terminalIds = new Set(
-            currentNode.data.terminals.map(terminal => terminal.id)
-          );
-          children = children?.filter(
-            connectedToItem => !terminalIds.has(connectedToItem.id)
-          );
-        }
+        const children = currentNode.data[key];
 
         acc.push({
           key,
