@@ -26,6 +26,9 @@ export enum RelationType {
   DirectParts = 'directParts',
   FulfilledBy = 'fulfilledBy',
   Terminals = 'terminals',
+  TerminalOf = 'terminalOf',
+  DirectPartOf = 'directPartOf',
+  TransfersTo = 'transfersTo',
 }
 
 export type UpdateNode = { customName?: string; aspect?: AspectType };
@@ -106,9 +109,12 @@ export type RelationKeys =
   | 'connectedTo'
   | 'directParts'
   | 'fulfilledBy'
-  | 'terminals';
+  | 'terminals'
+  | 'terminalOf'
+  | 'directPartOf'
+  | 'transfersTo';
 
 export type RelationKeysWithChildren = {
   key: RelationKeys;
-  children: NodeData[RelationKeys];
+  children: { id: string }[];
 };

@@ -43,15 +43,13 @@ export const checkConnection = (
 
   // Set terminalOf property for terminal
   if (
-    isTerminal(params.sourceHandle as string) &&
-    isBlock(params.targetHandle as string)
+    isTerminal(params.targetHandle as string) &&
+    isBlock(params.sourceHandle as string)
   ) {
     newNodeRelations.push({
-      nodeId: params.source as string,
-      array: {
-        terminalOf: {
-          id: params.target as string,
-        },
+      nodeId: params.target as string,
+      value: {
+        terminalOf: params.source as string,
       },
     });
   }
@@ -561,12 +559,21 @@ export const getNodeRelations = (
     'directParts',
     'fulfilledBy',
     'terminals',
+    'terminalOf',
+    'directPartOf',
+    'transfersTo',
   ];
 
   return transformableKeys.reduce(
     (acc: RelationKeysWithChildren[], key: RelationKeys) => {
-      if (currentNode.data[key]?.length ?? 0 > 0) {
-        const children = currentNode.data[key];
+      if (currentNode.data[key]) {
+        let children: { id: string }[];
+
+        if (typeof currentNode.data[key] === 'string') {
+          children = [{ id: currentNode.data[key] as string }];
+        } else {
+          children = currentNode.data[key] as { id: string }[];
+        }
 
         acc.push({
           key,
@@ -589,6 +596,12 @@ export const getReadableRelation = (type: RelationType): string | null => {
       return 'Fulfilled by';
     case RelationType.Terminals:
       return 'Terminals';
+    case RelationType.TerminalOf:
+      return 'Terminal of';
+    case RelationType.DirectPartOf:
+      return 'Direct part of';
+    case RelationType.TransfersTo:
+      return 'Transfers to';
     default:
       return null;
   }
