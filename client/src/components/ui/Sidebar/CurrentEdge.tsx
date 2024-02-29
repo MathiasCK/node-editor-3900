@@ -1,5 +1,9 @@
 import { EdgeType, type CustomEdgeProps } from '@/lib/types';
-import { deleteEdgeWithRelations, displayNewNode } from '@/lib/utils';
+import {
+  deleteEdgeWithRelations,
+  displayNewNode,
+  updateNodeConnectionData,
+} from '@/lib/utils';
 import { FC, useState } from 'react';
 import {
   SheetContent,
@@ -38,6 +42,17 @@ const CurrentEdge: FC<Props> = ({ currentEdge }) => {
   const displayName = `Edge ${currentEdge.source} -> ${currentEdge.target}`;
 
   const handleConnectionTypeChange = () => {
+    const canUpdate = updateNodeConnectionData(
+      currentEdge.source,
+      currentEdge.target,
+      nodes,
+      setNodes,
+      currentEdge.data?.type as EdgeType,
+      connectionType as EdgeType
+    );
+
+    if (!canUpdate) return;
+
     const clonedConnection = {
       data: {
         label: `Edge ${currentEdge.source} -> ${currentEdge.target}`,

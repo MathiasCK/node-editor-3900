@@ -563,6 +563,7 @@ export const getNodeRelations = (
     'terminalOf',
     'directPartOf',
     'transfersTo',
+    'fullFills',
   ];
 
   return transformableKeys.reduce(
@@ -619,6 +620,99 @@ export const displayNewNode = (
   }, 100);
 };
 
+export const updateNodeConnectionData = (
+  sourceNodeId: string,
+  targetNodeId: string,
+  nodes: Node[],
+  setNodes: (nodes: Node[]) => void,
+  oldConnection: EdgeType,
+  newConnection: EdgeType
+): boolean => {
+  if (
+    oldConnection === EdgeType.Transfer ||
+    newConnection === EdgeType.Transfer
+  ) {
+    toast.error('Transfer connection cannot be updated. Delete & create new.');
+    return false;
+  }
+
+  const targetNode = nodes.find(node => node.id === targetNodeId);
+  const targetNodeIndex = nodes.findIndex(node => node.id === targetNodeId);
+  const sourceNode = nodes.find(node => node.id === sourceNodeId);
+  const sourceNodeIndex = nodes.findIndex(node => node.id === sourceNodeId);
+
+  if (
+    !sourceNode ||
+    !targetNode ||
+    sourceNodeIndex === -1 ||
+    targetNodeIndex === -1
+  ) {
+    toast.error(
+      'Could not find nodes to update connection data. Refresh page & try again.'
+    );
+    return false;
+  }
+
+  if (oldConnection === EdgeType.Part) {
+    targetNode.data.directPartOf = null;
+
+    const filteredDirectParts = sourceNode.data.directParts.filter(
+      (node: CustomNodeProps) => node.id !== targetNode.id
+    );
+
+    sourceNode.data.directParts =
+      filteredDirectParts.length > 0 ? filteredDirectParts : null;
+  } else if (oldConnection === EdgeType.Fulfilled) {
+    const filteredFulfills = targetNode.data.fullFills?.filter(
+      (node: CustomNodeProps) => node.id !== sourceNodeId
+    );
+    targetNode.data.fullFills =
+      filteredFulfills?.length > 0 ? filteredFulfills : null;
+
+    const filteredFulfilledBy = sourceNode.data.fulfilledBy?.filter(
+      (node: CustomNodeProps) => node.id !== targetNodeId
+    );
+
+    sourceNode.data.fulfilledBy =
+      filteredFulfilledBy?.length > 0 ? filteredFulfilledBy : null;
+  } else {
+    const filteredConnections = sourceNode.data.connectedTo?.filter(
+      (node: CustomNodeProps) => node.id !== targetNodeId
+    );
+
+    sourceNode.data.connectedTo =
+      filteredConnections?.length > 0 ? filteredConnections : null;
+  }
+
+  if (newConnection === EdgeType.Fulfilled) {
+    targetNode.data.fullFills = [
+      ...(targetNode.data.fullFills ?? []),
+      { id: sourceNodeId },
+    ];
+
+    sourceNode.data.fulfilledBy = [
+      ...(sourceNode.data.fulfilledBy ?? []),
+      { id: targetNodeId },
+    ];
+  } else if (newConnection === EdgeType.Part) {
+    targetNode.data.directPartOf = sourceNodeId;
+    sourceNode.data.directParts = [
+      ...(sourceNode.data.directParts ?? []),
+      { id: targetNodeId },
+    ];
+  } else {
+    sourceNode.data.connectedTo = [
+      ...(sourceNode.data.connectedTo ?? []),
+      { id: targetNodeId },
+    ];
+  }
+
+  updateNodeData(sourceNodeIndex, sourceNode, nodes, setNodes);
+  updateNodeData(targetNodeIndex, targetNode, nodes, setNodes);
+
+  return true;
+};
+
 export const getReadableRelation = (type: RelationType): string | null => {
   switch (type) {
     case RelationType.DirectParts:
@@ -635,6 +729,8 @@ export const getReadableRelation = (type: RelationType): string | null => {
       return 'Direct part of';
     case RelationType.TransfersTo:
       return 'Transfers to';
+    case RelationType.FulFills:
+      return 'Fulfills';
     default:
       return null;
   }

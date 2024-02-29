@@ -29,6 +29,7 @@ export enum RelationType {
   TerminalOf = 'terminalOf',
   DirectPartOf = 'directPartOf',
   TransfersTo = 'transfersTo',
+  FulFills = 'fullFills',
 }
 
 export type UpdateNode = { customName?: string; aspect?: AspectType };
@@ -112,7 +113,8 @@ export type RelationKeys =
   | 'terminals'
   | 'terminalOf'
   | 'directPartOf'
-  | 'transfersTo';
+  | 'transfersTo'
+  | 'fullFills';
 
 export type RelationKeysWithChildren = {
   key: RelationKeys;
