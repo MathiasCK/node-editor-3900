@@ -4,6 +4,7 @@ import {
   type Connection,
   type Edge,
   type Node,
+  Position,
 } from 'reactflow';
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
@@ -584,6 +585,38 @@ export const getNodeRelations = (
     },
     []
   );
+};
+
+export const displayNewNode = (
+  newNodeId: string,
+  nodes: Node[],
+  openSidebar: (data: CustomNodeProps) => void,
+  closeSidebar: () => void
+) => {
+  const node = nodes.find(n => n.id === newNodeId);
+
+  if (!node) {
+    toast.error(
+      `Could not display node ${newNodeId}. Refresh page & try again`
+    );
+    return;
+  }
+  closeSidebar();
+  setTimeout(() => {
+    openSidebar({
+      data: node.data,
+      dragging: node.dragging as boolean,
+      id: node.id,
+      isConnectable: true,
+      selected: true,
+      type: node.type as string,
+      sourcePosition: Position.Bottom,
+      targetPosition: Position.Top,
+      xPos: node.position.x,
+      yPos: node.position.y,
+      zIndex: 0,
+    } as CustomNodeProps);
+  }, 100);
 };
 
 export const getReadableRelation = (type: RelationType): string | null => {

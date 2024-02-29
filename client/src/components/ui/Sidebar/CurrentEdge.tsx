@@ -1,5 +1,5 @@
 import { EdgeType, type CustomEdgeProps } from '@/lib/types';
-import { deleteEdgeWithRelations } from '@/lib/utils';
+import { deleteEdgeWithRelations, displayNewNode } from '@/lib/utils';
 import { FC, useState } from 'react';
 import {
   SheetContent,
@@ -28,7 +28,7 @@ interface Props {
 }
 
 const CurrentEdge: FC<Props> = ({ currentEdge }) => {
-  const { closeSidebar } = useSidebar();
+  const { openSidebar, closeSidebar } = useSidebar();
   const { edges, setEdges, nodes, setNodes } = useStore();
 
   const [connectionType, setConnectionType] = useState<string>(
@@ -78,7 +78,7 @@ const CurrentEdge: FC<Props> = ({ currentEdge }) => {
           <Input
             disabled={true}
             value={displayName}
-            className="border-none text-lg font-semibold text-foreground"
+            className="text-foreground border-none text-lg font-semibold"
           />
         </SheetTitle>
         <SheetDescription>
@@ -90,9 +90,19 @@ const CurrentEdge: FC<Props> = ({ currentEdge }) => {
           {new Date(currentEdge.data?.updatedAt as number).toLocaleString()}
         </SheetDescription>
       </SheetHeader>
-
       <div>
-        <p className="mb-2 text-sm text-muted-foreground">Connection type</p>
+        <p className="text-muted-foreground mb-2 text-sm">Source node</p>
+        <Button
+          variant="ghost"
+          onClick={() =>
+            displayNewNode(currentEdge.source, nodes, openSidebar, closeSidebar)
+          }
+        >
+          {currentEdge.source}
+        </Button>
+      </div>
+      <div>
+        <p className="text-muted-foreground mb-2 text-sm">Connection type</p>
         <Select
           disabled={currentEdge.data.lockConnection}
           value={connectionType}
@@ -106,11 +116,24 @@ const CurrentEdge: FC<Props> = ({ currentEdge }) => {
               <SelectItem value={EdgeType.Part}>Part of</SelectItem>
               <SelectItem value={EdgeType.Connected}>Connected to</SelectItem>
               <SelectItem value={EdgeType.Fulfilled}>Fulfilled by</SelectItem>
+              <SelectItem className="hidden" value={EdgeType.Transfer}>
+                Transfer
+              </SelectItem>
             </SelectGroup>
           </SelectContent>
         </Select>
       </div>
-
+      <div>
+        <p className="text-muted-foreground mb-2 text-sm">Target node</p>
+        <Button
+          variant="ghost"
+          onClick={() =>
+            displayNewNode(currentEdge.target, nodes, openSidebar, closeSidebar)
+          }
+        >
+          {currentEdge.target}
+        </Button>
+      </div>
       <SheetFooter>
         {connectionType !== currentEdge.data?.type && (
           <Button

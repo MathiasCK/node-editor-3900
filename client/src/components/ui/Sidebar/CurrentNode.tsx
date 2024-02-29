@@ -10,6 +10,7 @@ import {
   getReadableRelation,
   getNodeRelations,
   updateNode,
+  displayNewNode,
 } from '@/lib/utils';
 import { FC, useState } from 'react';
 import {
@@ -23,8 +24,6 @@ import { Pencil } from 'lucide-react';
 import { useSidebar, useStore } from '@/hooks';
 import { Input } from '../input';
 import { Button } from '../button';
-import toast from 'react-hot-toast';
-import { Position } from 'reactflow';
 import { buttonVariants } from '@/lib/config';
 import {
   Select,
@@ -53,34 +52,6 @@ const CurrentNode: FC<Props> = ({ currentNode }) => {
   const [aspectType, setAspectType] = useState<string>(currentNode.data.aspect);
 
   const nodeRelations = getNodeRelations(currentNode);
-
-  const displayNewNode = (newNodeId: string) => {
-    const node = nodes.find(n => n.id === newNodeId);
-
-    if (!node) {
-      toast.error(
-        `Could not display node ${newNodeId}. Refresh page & try again`
-      );
-      return;
-    }
-    closeSidebar();
-    setTimeout(() => {
-      // @ts-ignore
-      openSidebar({
-        data: node.data,
-        dragging: node.dragging as boolean,
-        id: node.id,
-        isConnectable: true,
-        selected: true,
-        type: node.type as string,
-        sourcePosition: Position.Bottom,
-        targetPosition: Position.Top,
-        xPos: node.position.x,
-        yPos: node.position.y,
-        zIndex: 0,
-      });
-    }, 100);
-  };
 
   const updateNodeData = () => {
     const newNodeData: UpdateNode = {};
@@ -120,7 +91,7 @@ const CurrentNode: FC<Props> = ({ currentNode }) => {
             <Pencil
               onClick={() => handleEdit(true)}
               size={15}
-              className="text-md font-semibold text-foreground  hover:cursor-pointer"
+              className="text-md text-foreground font-semibold  hover:cursor-pointer"
             />
           ) : null}
 
@@ -128,7 +99,7 @@ const CurrentNode: FC<Props> = ({ currentNode }) => {
             disabled={!sidebar.edit}
             value={nodeName}
             onChange={e => setNodeName(e.target.value)}
-            className="border-none text-lg font-semibold text-foreground"
+            className="text-foreground border-none text-lg font-semibold"
           />
         </SheetTitle>
         <SheetDescription>
@@ -141,7 +112,7 @@ const CurrentNode: FC<Props> = ({ currentNode }) => {
         </SheetDescription>
       </SheetHeader>
       <div>
-        <p className="mb-2 text-sm text-muted-foreground">Aspect type</p>
+        <p className="text-muted-foreground mb-2 text-sm">Aspect type</p>
         <Select value={aspectType} onValueChange={e => setAspectType(e)}>
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder={aspectType} />
@@ -159,14 +130,21 @@ const CurrentNode: FC<Props> = ({ currentNode }) => {
       {nodeRelations.length > 0 &&
         nodeRelations.map(nodeRelation => (
           <div key={nodeRelation.key}>
-            <p className="mb-2 text-sm text-muted-foreground">
+            <p className="text-muted-foreground mb-2 text-sm">
               {getReadableRelation(nodeRelation.key as RelationType)}
             </p>
             {nodeRelation.children?.map(c => (
               <Button
                 key={`${nodeRelation.key}_${c.id}_link_button`}
                 variant="ghost"
-                onClick={() => displayNewNode(c.id as string)}
+                onClick={() =>
+                  displayNewNode(
+                    c.id as string,
+                    nodes,
+                    openSidebar,
+                    closeSidebar
+                  )
+                }
               >
                 {c.id}
               </Button>
