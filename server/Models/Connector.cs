@@ -7,7 +7,14 @@ namespace mymvc.Models {
     public string Direction { get; set; } = string.Empty;
     public int BlockId { get; set; }
     public int TerminalId { get; set; }
-    public Terminal? HasTerminal { get; set; }
-    public List <Attribute>? Attributes { get; set; }
+
+    public List<Connector> ConnectorOf1 { get; set; } = new List<Connector>();
+    public List<Connector> ConnectorOf2 { get; set; } = new List<Connector>();
+    public List<Element> ConnectTo1 { get; set; } = new List<Element>();
+    public List<Element> ConnectTo2 { get; set; } = new List<Element>();
+    public List<Connector> FulfilledBy { get; set; } = new List<Connector>();
+    public List<Connector> Fulfills { get; set; } = new List<Connector>();
+    public List<Block> PartOf { get; set; } = new List<Block>();
+    public List <Attribute> Attributes { get; set; } = new List<Attribute>();
 }
 }
