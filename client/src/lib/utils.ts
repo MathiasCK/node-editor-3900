@@ -69,9 +69,19 @@ export const checkConnection = (
         `Terminal ${params.target} is already transfered to another terminal`
       );
       canConnect = false;
+    } else if (targetTerminal?.data?.transferedBy) {
+      toast.error(
+        `Terminal ${params.source} is already transfered by from another terminal`
+      );
+      canConnect = false;
     } else if (sourceTerminal?.data?.transfersTo) {
       toast.error(
-        `Terminal ${params.source} is already transfered to another terminal`
+        `Terminal ${params.target} is already transfered to another terminal`
+      );
+      canConnect = false;
+    } else if (sourceTerminal?.data?.transferedBy) {
+      toast.error(
+        `Terminal ${params.source} is already transfered by from another terminal`
       );
       canConnect = false;
     } else {
@@ -88,7 +98,7 @@ export const checkConnection = (
       newNodeRelations.push({
         nodeId: params.target as string,
         value: {
-          transfersTo: params.source as string,
+          transferedBy: params.source as string,
         },
       });
     }
@@ -378,7 +388,7 @@ export const updateNodeRelations = (
     )
       return;
 
-    targetTerminal.data.transfersTo = null;
+    targetTerminal.data.transferedBy = null;
     sourceTerminal.data.transfersTo = null;
 
     updateNodeData(sourceIndex, sourceTerminal, nodes, setNodes);
@@ -563,6 +573,7 @@ export const getNodeRelations = (
     'terminalOf',
     'directPartOf',
     'transfersTo',
+    'transferedBy',
     'fullFills',
   ];
 
@@ -729,6 +740,8 @@ export const getReadableRelation = (type: RelationType): string | null => {
       return 'Direct part of';
     case RelationType.TransfersTo:
       return 'Transfers to';
+    case RelationType.TransferedBy:
+      return 'Transfered by';
     case RelationType.FulFills:
       return 'Fulfills';
     default:

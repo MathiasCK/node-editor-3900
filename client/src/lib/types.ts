@@ -29,6 +29,7 @@ export enum RelationType {
   TerminalOf = 'terminalOf',
   DirectPartOf = 'directPartOf',
   TransfersTo = 'transfersTo',
+  TransferedBy = 'transferedBy',
   FulFills = 'fullFills',
 }
 
@@ -42,6 +43,7 @@ export type NodeData = {
   }[];
   terminalOf?: string;
   transfersTo?: string;
+  transferedBy?: string;
   connectedTo?: {
     id: string;
   }[];
@@ -114,6 +116,7 @@ export type RelationKeys =
   | 'terminalOf'
   | 'directPartOf'
   | 'transfersTo'
+  | 'transferedBy'
   | 'fullFills';
 
 export type RelationKeysWithChildren = {
