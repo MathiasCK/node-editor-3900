@@ -10,7 +10,7 @@ public class Element {
     public string Type { get; set; } = string.Empty;
     public int Height { get; set; }
     public int Width { get; set; }
-    // public Data? Data { get; set;}
-    // public Position? Position { get; set; }
+    public Data? Data { get; set;}
+    public Position? Position { get; set; }
 }
 }

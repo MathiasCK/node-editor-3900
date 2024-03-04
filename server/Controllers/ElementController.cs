@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using mymvc.Models;
 using mymvc.DAL;
+
 
 namespace mymvc.Controllers;
 
@@ -15,40 +15,62 @@ public class ElementController : Controller
         _DbContext = dbContext;
     }
 
-    [HttpGet]
-    public async Task<IActionResult> CreateElement()
+    [HttpPost]
+    public async Task<IActionResult> CreateElement(Element element)
     {
-        var element = new Element
-        {
-            Id = "123",
-            Type = "block",
-            Height = 40,
-            Width = 40
-        };
-
         try {
-            
             await _DbContext.Elements.AddAsync(element);
-            Console.WriteLine("INSERTED");
+            await _DbContext.SaveChangesAsync();
+
+            return Ok(element);
         } catch (Exception e) {
-            Console.WriteLine(e);
+            return BadRequest("Could not create element: " + e.Message);
         };
-        return Ok(element);
     }
 
     [HttpDelete]
-    public async Task<IActionResult> DeleteElement(String id){
-        throw new NotImplementedException();
+    public async Task<IActionResult> DeleteElement(string id){
+        try {
+            var element = await _DbContext.Elements.FindAsync(id);
+
+            if (element == null){
+                throw new Exception("Element with id " + id + " does not exist");
+            }
+
+            _DbContext.Elements.Remove(element);
+            await _DbContext.SaveChangesAsync();
+
+            return Ok("Element deleted");
+        } catch (Exception e) {
+            return BadRequest("Could not delete element: " + e.Message);
+        }
     }
 
     [HttpPut]
     public async Task<IActionResult> UpdateElement(Element element){
-        throw new NotImplementedException();
+        try {
+            _DbContext.Elements.Update(element);
+            await _DbContext.SaveChangesAsync();
+
+            return Ok("Element updated");
+        } catch (Exception e) {
+            return BadRequest("Could not update element: " + e.Message);
+        }
     }
 
-   /* [HttpGet]
-    public async Task<IActionResult> GetElement(String id){
-        throw new NotImplementedException();
+   [HttpGet]
+    public async Task<IActionResult> GetElement(string id){
+        try {
+            var element = await _DbContext.Elements.FindAsync(id);
+            
+            if (element == null){
+                throw new Exception("Element with id " + id + " does not exist");
+            }
+            
+            return Ok(element);
+        } catch (Exception e) {
+            return BadRequest("Could not find element: " + e.Message);
+        }
     }
-    */
+    
 }

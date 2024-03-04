@@ -9,5 +9,9 @@ namespace mymvc.DAL {
     }
     public DbSet<Element> Elements { get; set;}
 
-}
+        internal async Task FindAsync(string id)
+        {
+            throw new NotImplementedException();
+        }
+    }
 }
