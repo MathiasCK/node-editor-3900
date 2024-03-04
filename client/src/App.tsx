@@ -28,32 +28,6 @@ import { Sidebar, Settings, SelectConnection } from './components/ui';
 import { fetchNodes, updateNode } from './api/nodes';
 import { createEdge, fetchEdges } from './api/edges';
 
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import ProtectedRoute from "./components/Session/ProtectedRoute";
-import LoginForm from './components/Session/LoginForm';
-import RegisterForm from './components/Session/RegisterForm';
-
-  const router = createBrowserRouter([
-	{
-		path: "loginform",
-		element: <LoginForm />,
-	},
-  {
-		path: "register",
-		element: <RegisterForm />,
-	},
-
-	{
-		element: <ProtectedRoute />,
-		children: [
-			{
-        path: "/",
-        element: <App />,
-	    },
-		],
-	},
-]);
-
 
 export default function App() {
 
@@ -191,7 +165,6 @@ export default function App() {
         <MiniMapStyled />
         <Background gap={12} size={1} />
       </ReactFlowStyled>
-      <RouterProvider router={router} />
     </ThemeProvider>
   );
 }
