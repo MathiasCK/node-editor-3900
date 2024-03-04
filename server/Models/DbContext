@@ -1,5 +1,0 @@
-public class DbContext : DbContext {
-    public DbContext(DbContextOptions<DbContext> options) : base(options) {
-        
-    }
-}

@@ -1,7 +1,14 @@
+using Microsoft.EntityFrameworkCore;
+using mymvc.DAL;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddDbContext<ElementDbContext>(options => {
+    options.UseSqlite(builder.Configuration["ConnectionStrings:DbConnection"]);
+});
 
 var app = builder.Build();
 
