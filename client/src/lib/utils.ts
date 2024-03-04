@@ -238,7 +238,13 @@ export const addNode = (
   nodes: Node[],
   setNodes: (nodes: Node[]) => void
 ) => {
-  const id = nodes.length.toString();
+  const id =
+    nodes.length === 0
+      ? '0'
+      : nodes
+          .reduce((max, obj) => Math.max(max, Number(obj.id) + 1), 0)
+          .toString();
+
   const currentDate = Date.now();
   const newNode: Node = {
     id,

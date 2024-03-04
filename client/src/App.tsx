@@ -105,7 +105,7 @@ export default function App() {
       openDialog();
       setParams(params);
     },
-    [edgeType, openDialog, nodes, edges]
+    [edgeType, openDialog, nodes]
   );
 
   return (
