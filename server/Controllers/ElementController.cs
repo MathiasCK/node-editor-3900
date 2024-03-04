@@ -15,10 +15,25 @@ public class ElementController : Controller
         _DbContext = dbContext;
     }
 
-    [HttpPost]
-    public async Task<IActionResult> CreateElement(Element element){
-        throw new NotImplementedException();
-    
+    [HttpGet]
+    public async Task<IActionResult> CreateElement()
+    {
+        var element = new Element
+        {
+            Id = "123",
+            Type = "block",
+            Height = 40,
+            Width = 40
+        };
+
+        try {
+            
+            await _DbContext.Elements.AddAsync(element);
+            Console.WriteLine("INSERTED");
+        } catch (Exception e) {
+            Console.WriteLine(e);
+        };
+        return Ok(element);
     }
 
     [HttpDelete]
@@ -31,8 +46,9 @@ public class ElementController : Controller
         throw new NotImplementedException();
     }
 
-    [HttpGet]
+   /* [HttpGet]
     public async Task<IActionResult> GetElement(String id){
         throw new NotImplementedException();
     }
+    */
 }
