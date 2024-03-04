@@ -9,9 +9,9 @@ const Block = (props: CustomNodeProps) => {
     <figure id={props.data.label}>
       <div
         onClick={() => openSidebar(props)}
-        className={`h-12 w-24 rounded-xl bg-${props.data.aspect}-light dark:bg-${props.data.aspect}-dark`}
+        className={`min-h-12 w-24 rounded-xl bg-${props.data.aspect}-light dark:bg-${props.data.aspect}-dark`}
       >
-        <header className="flex h-full w-full items-center justify-center">
+        <header className="flex min-h-12 w-full items-center justify-center">
           <p
             className={`text-center text-${props.data.aspect}-foreground-light dark:text-${props.data.aspect}-foreground-dark`}
           >
