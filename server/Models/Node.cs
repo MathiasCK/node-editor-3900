@@ -26,7 +26,8 @@ public class NodeData
     public bool? HasTerminal { get; set; }
      [NotMapped]
     public List<Terminal>? Terminals { get; set; }
-    public string? TerminalOf { get; set; }
+    [NotMapped]
+    public List<TerminalOf>? TerminalOf { get; set; }
     public string? TransfersTo { get; set; }
     public string? TransferedBy { get; set; }
     [NotMapped]
@@ -58,6 +59,11 @@ public enum AspectType
 
 
 public class Terminal
+{
+    public required string Id { get; set; }
+}
+
+public class TerminalOf
 {
     public required string Id { get; set; }
 }
