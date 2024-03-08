@@ -106,17 +106,24 @@ public class NodeController : Controller
     [HttpPut]
     public async Task<IActionResult> UpdateNode(Node node)
     {
+        if (node == null) return BadRequest("Node data is missing.");
+
         try
         {
             _db.Nodes.Update(node);
             await _db.SaveChangesAsync();
 
-            return Ok("Node updated");
+            return CreatedAtAction(nameof(FetchNode), new { id = node.Id }, node);
+        }
+        catch (DbUpdateException dbEx)
+        {
+            _logger.LogError("[NodeController]: Database update failed: {Error}", dbEx.Message);
+            return StatusCode(500, "Failed to update node data due to database error.");
         }
         catch (Exception e)
         {
-            _logger.LogError("[NodeController]: Failed to update node with id {id}: {e}", node.Id, e.Message);
-            return BadRequest("Could not update node: " + e.Message);
+            _logger.LogError("[NodeController]: Failed to update node: {Error}", e.Message);
+            return StatusCode(500, "An unexpected error occurred.");
         }
     }
 

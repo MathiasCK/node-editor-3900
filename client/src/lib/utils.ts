@@ -279,7 +279,7 @@ export const addNode = async (
   newNode.data.fullFills = null;
   newNode.data.customName = null;
 
-  await createNode(newNode, nodes, setNodes);
+  await createNode(newNode as Node, nodes, setNodes);
 };
 
 export const updateNode = (
@@ -754,3 +754,10 @@ export const getReadableRelation = (type: RelationType): string | null => {
       return null;
   }
 };
+
+export const convertNodePropsToNode = (node: CustomNodeProps): Node => ({
+  id: node.id,
+  type: node.type,
+  position: { x: node.xPos, y: node.yPos },
+  data: node.data,
+});

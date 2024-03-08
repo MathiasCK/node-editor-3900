@@ -9,7 +9,6 @@ import {
   deleteSelectedNode,
   getReadableRelation,
   getNodeRelations,
-  updateNode,
   displayNewNode,
 } from '@/lib/utils';
 import { FC, useState } from 'react';
@@ -33,6 +32,7 @@ import {
   SelectGroup,
   SelectItem,
 } from '../select';
+import { updateNode } from '@/lib/routes';
 
 interface Props {
   currentNode: CustomNodeProps;
@@ -64,7 +64,7 @@ const CurrentNode: FC<Props> = ({ currentNode }) => {
       newNodeData['aspect'] = aspectType as AspectType;
     }
 
-    updateNode(currentNode?.id as string, newNodeData, nodes, setNodes);
+    updateNode(newNodeData, currentNode, nodes, setNodes);
     handleEdit(false);
   };
 
