@@ -15,7 +15,7 @@ const Connector = (props: CustomNodeProps) => {
           <p
             className={`text-center text-${props.data.aspect}-foreground-light dark:text-${props.data.aspect}-foreground-dark`}
           >
-            {props.data.id}
+            {props.id}
           </p>
         </header>
       </div>

@@ -15,7 +15,7 @@ const Block = (props: CustomNodeProps) => {
           <p
             className={`text-center text-${props.data.aspect}-foreground-light dark:text-${props.data.aspect}-foreground-dark`}
           >
-            {props.data.customName ?? props.data.id}
+            {props.data.customName ?? props.id}
           </p>
         </header>
       </div>

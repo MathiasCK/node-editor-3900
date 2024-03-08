@@ -58,7 +58,7 @@ export type NodeData = {
   fullFills?: {
     id: string;
   }[];
-  id: string;
+
   label: string;
   type: string;
   createdAt: number;
