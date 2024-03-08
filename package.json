@@ -2,6 +2,7 @@
   "name": "node-editor",
   "version": "1.0.0",
   "scripts": {
+    "db:swipe": "rm -rf server/NodeDatabase.db NodeDatabase.db-shm NodeDatabase.db-wal",
     "install:client": "cd client && npm install",
     "postinstall": "npm run install:client",
     "start:dev": "npm-run-all --parallel server:dev client:dev",
