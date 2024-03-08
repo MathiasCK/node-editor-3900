@@ -17,7 +17,6 @@ import {
   RelationKeys,
   RelationKeysWithChildren,
   RelationType,
-  UpdateNode,
 } from './types';
 import { createNode, updateNode } from './routes';
 
