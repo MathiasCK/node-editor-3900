@@ -1,7 +1,12 @@
 import toast from 'react-hot-toast';
-import { type Node } from 'reactflow';
+import { getConnectedEdges, type Node, type Edge } from 'reactflow';
 import { CustomNodeProps, type UpdateNode } from '@/lib/types';
-import { convertNodePropsToNode } from './utils';
+import {
+  convertNodePropsToNode,
+  getSymmetricDifference,
+  updateNodeData,
+  updateNodeRelations,
+} from './utils';
 
 export const createNode = async (
   node: Node,
@@ -48,17 +53,26 @@ export const createNode = async (
 };
 
 export const updateNode = async (
-  newNodeData: UpdateNode,
-  nodeToUpdate: CustomNodeProps,
+  node: CustomNodeProps | Node,
   nodes: Node[],
-  setNodes: (nodes: Node[]) => void
+  setNodes: (nodes: Node[]) => void,
+  newNodeData?: UpdateNode
 ): Promise<Node | null> => {
   const loadingToastId = toast.loading('Updating node...');
+  const nodeIndex = nodes.findIndex(n => n.id === node.id);
 
-  Object.keys(newNodeData).forEach(key => {
-    // @ts-ignore
-    nodeToUpdate.data[key] = newNodeData[key];
-  });
+  if (newNodeData) {
+    Object.keys(newNodeData).forEach(key => {
+      // @ts-ignore
+      node.data[key] = newNodeData[key];
+    });
+  }
+
+  // Node is of type CustomNodeProps
+  // @ts-ignore
+  if (node.xPos || node.yPos) {
+    node = convertNodePropsToNode(node as CustomNodeProps);
+  }
 
   try {
     const response = await fetch(`${import.meta.env.VITE_API_URL}/api/node`, {
@@ -66,7 +80,7 @@ export const updateNode = async (
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(convertNodePropsToNode(nodeToUpdate)),
+      body: JSON.stringify(node),
     });
 
     if (!response.ok) {
@@ -85,14 +99,66 @@ export const updateNode = async (
     loadingToastId && toast.dismiss(loadingToastId);
 
     if (updatedNode) {
-      updatedNode.id = updatedNode.id.toString();
-      const updatedNodes = nodes.map(n =>
-        n.id === updatedNode.id ? updatedNode : n
+      updateNodeData(
+        nodeIndex,
+        updatedNode as unknown as Node,
+        nodes,
+        setNodes
       );
-      setNodes(updatedNodes);
     }
 
     return updatedNode as Node;
+  } catch (error) {
+    console.error('Error updating node', error);
+    toast.error(`Unexpected error: ${(error as Error).message}`);
+    return null;
+  }
+};
+
+export const deleteNode = async (
+  nodeToDelete: Node,
+  nodes: Node[],
+  setNodes: (nodes: Node[]) => void,
+  edges: Edge[],
+  setEdges: (edges: Edge[]) => void
+) => {
+  const loadingToastId = toast.loading('Deleting node...');
+  const connectedEdges = getConnectedEdges([nodeToDelete], edges);
+
+  for (const edge of connectedEdges) {
+    await updateNodeRelations(edge, nodes, setNodes, nodeToDelete.id);
+  }
+
+  try {
+    const response = await fetch(
+      `${import.meta.env.VITE_API_URL}/api/node/${nodeToDelete.id}`,
+      {
+        method: 'DELETE',
+      }
+    );
+
+    if (!response.ok) {
+      const errorBody = await response.text();
+      const errorMessage =
+        errorBody || 'Error deleting node. Please try again.';
+
+      toast.success(errorMessage);
+      loadingToastId && toast.dismiss(loadingToastId);
+      return null;
+    }
+
+    toast.success('Node deleted successfully!');
+    loadingToastId && toast.dismiss(loadingToastId);
+
+    const updatedNodes = await response.json();
+    for (const node of updatedNodes) {
+      node.id = node.id.toString();
+    }
+
+    setNodes(nodes.filter(node => node.id !== nodeToDelete.id));
+
+    const updatedEdges = getSymmetricDifference(edges, connectedEdges);
+    setEdges(updatedEdges);
   } catch (error) {
     console.error('Error updating node', error);
     toast.error(`Unexpected error: ${(error as Error).message}`);

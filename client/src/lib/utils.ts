@@ -19,7 +19,7 @@ import {
   RelationType,
   UpdateNode,
 } from './types';
-import { createNode } from './routes';
+import { createNode, updateNode } from './routes';
 
 export const cn = (...inputs: ClassValue[]) => twMerge(clsx(inputs));
 
@@ -43,15 +43,62 @@ export const checkConnection = (
     canConnect = false;
   }
 
-  // Set terminalOf property for terminal
+  // Set terminalOf property for terminal & terminals array for block
   if (
     isTerminal(params.targetHandle as string) &&
     isBlock(params.sourceHandle as string)
   ) {
+    lockConnection = true;
+    connectionType = EdgeType.Connected;
+
     newNodeRelations.push({
       nodeId: params.target as string,
+      array: {
+        terminalOf: {
+          id: params.source as string,
+        },
+      },
+    });
+
+    newNodeRelations.push({
+      nodeId: params.source as string,
+      array: {
+        terminals: {
+          id: params.target as string,
+        },
+      },
       value: {
-        terminalOf: params.source as string,
+        hasTerminal: true,
+      },
+    });
+  }
+
+  // Set terminalOf property for terminal & terminals array for block
+  if (
+    isBlock(params.targetHandle as string) &&
+    isTerminal(params.sourceHandle as string)
+  ) {
+    lockConnection = true;
+    connectionType = EdgeType.Connected;
+
+    newNodeRelations.push({
+      nodeId: params.source as string,
+      array: {
+        terminalOf: {
+          id: params.target as string,
+        },
+      },
+    });
+
+    newNodeRelations.push({
+      nodeId: params.target as string,
+      array: {
+        terminals: {
+          id: params.source as string,
+        },
+      },
+      value: {
+        hasTerminal: true,
       },
     });
   }
@@ -103,26 +150,6 @@ export const checkConnection = (
         },
       });
     }
-  }
-
-  if (
-    isBlock(params.sourceHandle as string) &&
-    isTerminal(params.targetHandle as string)
-  ) {
-    lockConnection = true;
-    connectionType = EdgeType.Connected;
-
-    newNodeRelations.push({
-      nodeId: params.source as string,
-      array: {
-        terminals: {
-          id: params.target as string,
-        },
-      },
-      value: {
-        hasTerminal: true,
-      },
-    });
   }
 
   if (connectionType === EdgeType.Fulfilled && !lockConnection) {
@@ -282,36 +309,6 @@ export const addNode = async (
   await createNode(newNode as Node, nodes, setNodes);
 };
 
-export const updateNode = (
-  nodeId: string,
-  newNodeData: UpdateNode,
-  nodes: Node[],
-  setNodes: (nodes: Node[]) => void
-) => {
-  const nodeToUpdate = nodes.find(node => node.id === nodeId);
-  const index = nodes.findIndex(node => node.id === nodeId);
-
-  if (!nodeToUpdate || index === -1) {
-    toast.error('Could not update name -> no node selected');
-    return;
-  }
-
-  Object.keys(newNodeData).forEach(key => {
-    // @ts-ignore
-    nodeToUpdate.data[key] = newNodeData[key];
-  });
-
-  updateNodeData(index, nodeToUpdate, nodes, setNodes);
-
-  if (newNodeData.aspect) {
-    toast.success('Aspect type updated');
-  }
-
-  if (newNodeData.customName) {
-    toast.success('Name updated');
-  }
-};
-
 export const deleteSelectedNode = (
   selectedNodeId: string,
   edges: Edge[],
@@ -363,10 +360,11 @@ export const deleteEdgeWithRelations = (
   updateNodeRelations(currentEdge, nodes, setNodes);
 };
 
-export const updateNodeRelations = (
+export const updateNodeRelations = async (
   currentEdge: Edge,
   nodes: Node[],
-  setNodes: (nodes: Node[]) => void
+  setNodes: (nodes: Node[]) => void,
+  nodeIdToDelete?: string
 ) => {
   if (
     isTerminal(currentEdge.sourceHandle!) &&
@@ -376,81 +374,75 @@ export const updateNodeRelations = (
     const sourceTerminal = nodes.find(
       terminal => terminal.id === currentEdge.source
     );
-    const sourceIndex = nodes.findIndex(
-      terminal => terminal.id === currentEdge.source
-    );
+
     const targetTerminal = nodes.find(
       terminal => terminal.id === currentEdge.target
     );
-    const targetIndex = nodes.findIndex(
-      terminal => terminal.id === currentEdge.target
-    );
 
-    if (
-      !sourceTerminal ||
-      !targetTerminal ||
-      sourceIndex === -1 ||
-      targetIndex === -1
-    )
-      return;
+    if (!sourceTerminal || !targetTerminal) return;
 
-    targetTerminal.data.transferedBy = null;
-    sourceTerminal.data.transfersTo = null;
-
-    updateNodeData(sourceIndex, sourceTerminal, nodes, setNodes);
-    updateNodeData(targetIndex, targetTerminal, nodes, setNodes);
-    return;
-  }
-  if (
-    isTerminal(currentEdge.sourceHandle!) &&
-    isBlock(currentEdge.targetHandle!)
-  ) {
-    // Deleting a block -> terminal connection where terminalOf array should be updated
-    const nodeToUpdate = nodes.find(node => node.id === currentEdge.source);
-    const index = nodes.findIndex(node => node.id === currentEdge.source);
-
-    if (!nodeToUpdate || index === -1) return;
-
-    const updatedTerminalOf = nodeToUpdate.data.terminalOf.filter(
-      (terminal: { id: string }) => terminal.id !== currentEdge.target
-    );
-
-    nodeToUpdate.data.terminalOf = updatedTerminalOf;
-
-    if (updatedTerminalOf.length === 0) {
-      nodeToUpdate.data.terminalOf = null;
+    if (targetTerminal.id !== nodeIdToDelete) {
+      targetTerminal.data.transferedBy = null;
+      await updateNode(targetTerminal, nodes, setNodes);
     }
 
-    updateNodeData(index, nodeToUpdate, nodes, setNodes);
-    return;
-  }
-  if (
-    currentEdge.data.lockConnection &&
-    isBlock(currentEdge.sourceHandle!) &&
-    isTerminal(currentEdge.targetHandle!)
-  ) {
-    // Deleting a connection where block has hasTerminal set to true
-    const nodeToUpdate = nodes.find(node => node.id === currentEdge.source);
-    const index = nodes.findIndex(node => node.id === currentEdge.source);
-
-    if (!nodeToUpdate || index === -1) return;
-
-    const updatedTerminals = nodeToUpdate.data.terminals.filter(
-      (terminal: { id: string }) => terminal.id !== currentEdge.target
-    );
-
-    nodeToUpdate.data.terminals = updatedTerminals;
-
-    if (updatedTerminals.length === 0) {
-      delete nodeToUpdate.data.terminals;
-      nodeToUpdate.data.hasTerminal = false;
+    if (sourceTerminal.id !== nodeIdToDelete) {
+      sourceTerminal.data.transfersTo = null;
+      await updateNode(sourceTerminal, nodes, setNodes);
     }
 
-    updateNodeData(index, nodeToUpdate, nodes, setNodes);
     return;
   }
 
-  if (currentEdge.type === EdgeType.Connected) {
+  if (
+    (isTerminal(currentEdge.sourceHandle!) &&
+      isBlock(currentEdge.targetHandle!)) ||
+    (isTerminal(currentEdge.targetHandle!) &&
+      isBlock(currentEdge.sourceHandle!))
+  ) {
+    const nodeIdToUpdate =
+      currentEdge.target === nodeIdToDelete
+        ? currentEdge.source
+        : currentEdge.target;
+    // Deleting a connection between block and terminal
+    const nodeToUpdate = nodes.find(node => node.id === nodeIdToUpdate);
+
+    if (!nodeToUpdate) return;
+
+    if (isBlock(nodeToUpdate.type as string)) {
+      const updatedTerminals = nodeToUpdate.data.terminals.filter(
+        (terminal: { id: string }) => terminal.id !== nodeIdToDelete
+      );
+
+      nodeToUpdate.data.terminals = updatedTerminals;
+
+      if (updatedTerminals.length === 0) {
+        delete nodeToUpdate.data.terminals;
+        nodeToUpdate.data.terminals = null;
+        nodeToUpdate.data.hasTerminal = false;
+      }
+    }
+
+    if (isTerminal(nodeToUpdate.type as string)) {
+      const updatedTerminalOf = nodeToUpdate.data.terminalOf.filter(
+        (block: { id: string }) => block.id !== nodeIdToDelete
+      );
+      nodeToUpdate.data.terminalOf = updatedTerminalOf;
+
+      if (updatedTerminalOf.length === 0) {
+        nodeToUpdate.data.updatedTerminalOf = null;
+      }
+    }
+
+    await updateNode(nodeToUpdate, nodes, setNodes);
+
+    return;
+  }
+
+  if (
+    currentEdge.type === EdgeType.Connected &&
+    !currentEdge.data.lockCoonection
+  ) {
     const nodeToUpdate = nodes.find(node => node.id === currentEdge.source);
     const index = nodes.findIndex(node => node.id === currentEdge.source);
 

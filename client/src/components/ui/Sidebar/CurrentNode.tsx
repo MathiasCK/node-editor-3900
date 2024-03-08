@@ -6,12 +6,12 @@ import {
 } from '@/lib/types';
 import {
   capitalizeFirstLetter,
-  deleteSelectedNode,
   getReadableRelation,
   getNodeRelations,
   displayNewNode,
 } from '@/lib/utils';
 import { FC, useState } from 'react';
+import { type Node } from 'reactflow';
 import {
   SheetContent,
   SheetDescription,
@@ -32,7 +32,7 @@ import {
   SelectGroup,
   SelectItem,
 } from '../select';
-import { updateNode } from '@/lib/routes';
+import { updateNode, deleteNode } from '@/lib/routes';
 
 interface Props {
   currentNode: CustomNodeProps;
@@ -64,17 +64,17 @@ const CurrentNode: FC<Props> = ({ currentNode }) => {
       newNodeData['aspect'] = aspectType as AspectType;
     }
 
-    updateNode(newNodeData, currentNode, nodes, setNodes);
+    updateNode(currentNode, nodes, setNodes, newNodeData);
     handleEdit(false);
   };
 
   const handleDelete = () => {
-    deleteSelectedNode(
-      currentNode.id as string,
-      edges,
-      setEdges,
+    deleteNode(
+      currentNode as unknown as Node,
       nodes,
-      setNodes
+      setNodes,
+      edges,
+      setEdges
     );
 
     closeSidebar();
