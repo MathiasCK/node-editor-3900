@@ -95,7 +95,10 @@ export const updateNode = async (
 
     const updatedNode = await response.json();
 
-    toast.success('Node updated successfully!');
+    if (newNodeData) {
+      toast.success('Node updated successfully!');
+    }
+
     loadingToastId && toast.dismiss(loadingToastId);
 
     if (updatedNode) {
