@@ -8,12 +8,12 @@ namespace server.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class NodeController : Controller
+public class NodesController : Controller
 {
     private readonly DB _db;
-    private readonly ILogger<NodeController> _logger;
+    private readonly ILogger<NodesController> _logger;
 
-    public NodeController(DB db, ILogger<NodeController> logger)
+    public NodesController(DB db, ILogger<NodesController> logger)
     {
         _db = db;
         _logger = logger;
@@ -29,7 +29,7 @@ public class NodeController : Controller
         }
         catch (Exception e)
         {
-            _logger.LogError("[NodeController]: Failed to fetch all nodes: {e}", e.Message);
+            _logger.LogError("[NodesController]: Failed to fetch all nodes: {e}", e.Message);
             return BadRequest("Could not fetch nodes: " + e.Message);
         }
     }
@@ -50,7 +50,7 @@ public class NodeController : Controller
         }
         catch (Exception e)
         {
-            _logger.LogError("[NodeController]: Failed to fetch node with id {id}: {e}", id, e.Message);
+            _logger.LogError("[NodesController]: Failed to fetch node with id {id}: {e}", id, e.Message);
             return BadRequest("Could not find node: " + e.Message);
         }
     }
@@ -69,22 +69,24 @@ public class NodeController : Controller
         }
         catch (DbUpdateException dbEx)
         {
-            _logger.LogError("[NodeController]: Database update failed: {Error}", dbEx.Message);
+            _logger.LogError("[NodesController]: Database update failed: {Error}", dbEx.Message);
             return StatusCode(500, "Failed to save node data due to database error.");
         }
         catch (Exception e)
         {
-            _logger.LogError("[NodeController]: Failed to create node: {Error}", e.Message);
+            _logger.LogError("[NodesController]: Failed to create node: {Error}", e.Message);
             return StatusCode(500, "An unexpected error occurred.");
         }
     }
 
-    [HttpDelete]
+    [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteNode(string id)
     {
+        if (id == null) return BadRequest("Node id is missing.");
+
         try
         {
-            var node = await _db.Nodes.FindAsync(id);
+            var node = await _db.Nodes.FindAsync(Int32.Parse(id));
 
             if (node == null)
             {
@@ -94,12 +96,17 @@ public class NodeController : Controller
             _db.Nodes.Remove(node);
             await _db.SaveChangesAsync();
 
-            return Ok("Node deleted");
+            return Ok(await _db.Nodes.ToListAsync());
+        }
+        catch (DbUpdateException dbEx)
+        {
+            _logger.LogError("[NodesController]: Database deletion failed: {Error}", dbEx.Message);
+            return StatusCode(500, "Failed to delete node due to database error.");
         }
         catch (Exception e)
         {
-            _logger.LogError("[NodeController]: Failed to delete node with id {id}: {e}", id, e.Message);
-            return BadRequest("Could not delete node: " + e.Message);
+            _logger.LogError("[NodesController]: Failed to delete node with id {id}: {e}", id, e.Message);
+            return StatusCode(500, "An unexpected error occurred.");
         }
     }
 
@@ -117,12 +124,12 @@ public class NodeController : Controller
         }
         catch (DbUpdateException dbEx)
         {
-            _logger.LogError("[NodeController]: Database update failed: {Error}", dbEx.Message);
+            _logger.LogError("[NodesController]: Database update failed: {Error}", dbEx.Message);
             return StatusCode(500, "Failed to update node data due to database error.");
         }
         catch (Exception e)
         {
-            _logger.LogError("[NodeController]: Failed to update node: {Error}", e.Message);
+            _logger.LogError("[NodesController]: Failed to update node: {Error}", e.Message);
             return StatusCode(500, "An unexpected error occurred.");
         }
     }

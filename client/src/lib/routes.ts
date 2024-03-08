@@ -16,7 +16,7 @@ export const createNode = async (
   const loadingToastId = toast.loading('Creating node...');
 
   try {
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/node`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/nodes`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -75,7 +75,7 @@ export const updateNode = async (
   }
 
   try {
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/node`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/nodes`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -131,7 +131,7 @@ export const deleteNode = async (
 
   try {
     const response = await fetch(
-      `${import.meta.env.VITE_API_URL}/api/node/${nodeToDelete.id}`,
+      `${import.meta.env.VITE_API_URL}/api/nodes/${nodeToDelete.id}`,
       {
         method: 'DELETE',
       }
