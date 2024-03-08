@@ -8,6 +8,32 @@ import {
   updateNodeRelations,
 } from './utils';
 
+export const fetchNodes = async (): Promise<Node[] | null> => {
+  try {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/nodes`);
+
+    if (!response.ok) {
+      const errorBody = await response.text();
+      const errorMessage =
+        errorBody || 'Error fetching nodes. Please try again.';
+
+      toast.error(errorMessage);
+      return null;
+    }
+
+    const nodes = await response.json();
+    for (const node of nodes) {
+      node.id = node.id.toString();
+    }
+
+    return nodes;
+  } catch (error) {
+    console.error('Error fetching nodes', error);
+    toast.error(`Unexpected error: ${(error as Error).message}`);
+    return null;
+  }
+};
+
 export const createNode = async (
   node: Node,
   nodes: Node[],

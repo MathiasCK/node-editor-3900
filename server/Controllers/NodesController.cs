@@ -27,10 +27,15 @@ public class NodesController : Controller
             var nodes = await _db.Nodes.ToListAsync();
             return Ok(nodes);
         }
+        catch (DbUpdateException dbEx)
+        {
+            _logger.LogError("[NodesController]: Database fetch failed: {Error}", dbEx.Message);
+            return StatusCode(500, "Failed to fetch nodes due to database error.");
+        }
         catch (Exception e)
         {
-            _logger.LogError("[NodesController]: Failed to fetch all nodes: {e}", e.Message);
-            return BadRequest("Could not fetch nodes: " + e.Message);
+            _logger.LogError("[NodesController]: Failed to fetch nodes: {Error}", e.Message);
+            return StatusCode(500, "An unexpected error occurred.");
         }
     }
 
@@ -48,10 +53,15 @@ public class NodesController : Controller
 
             return Ok(node);
         }
+        catch (DbUpdateException dbEx)
+        {
+            _logger.LogError("[NodesController]: Database fetch failed: {Error}", dbEx.Message);
+            return StatusCode(500, "Failed to fetch nodes due to database error.");
+        }
         catch (Exception e)
         {
-            _logger.LogError("[NodesController]: Failed to fetch node with id {id}: {e}", id, e.Message);
-            return BadRequest("Could not find node: " + e.Message);
+            _logger.LogError("[NodesController]: Failed to fetch nodes: {Error}", e.Message);
+            return StatusCode(500, "An unexpected error occurred.");
         }
     }
 
