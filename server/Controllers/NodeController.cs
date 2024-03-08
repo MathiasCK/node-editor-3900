@@ -58,18 +58,25 @@ public class NodeController : Controller
     [HttpPost]
     public async Task<IActionResult> CreateNode(Node node)
     {
+        if (node == null) return BadRequest("Node data is missing.");
+
         try
         {
             await _db.Nodes.AddAsync(node);
             await _db.SaveChangesAsync();
 
-            return Ok(node);
+            return CreatedAtAction(nameof(FetchNode), new { id = node.Id }, node);
+        }
+        catch (DbUpdateException dbEx)
+        {
+            _logger.LogError("[NodeController]: Database update failed: {Error}", dbEx.Message);
+            return StatusCode(500, "Failed to save node data due to database error.");
         }
         catch (Exception e)
         {
-            _logger.LogError("[NodeController]: Failed to create node: {e}", e.Message);
-            return BadRequest("Could not create node: " + e.Message);
-        };
+            _logger.LogError("[NodeController]: Failed to create node: {Error}", e.Message);
+            return StatusCode(500, "An unexpected error occurred.");
+        }
     }
 
     [HttpDelete]

@@ -19,6 +19,7 @@ import {
   RelationType,
   UpdateNode,
 } from './types';
+import { createNode } from './routes';
 
 export const cn = (...inputs: ClassValue[]) => twMerge(clsx(inputs));
 
@@ -232,7 +233,7 @@ export const getSymmetricDifference = (arr1: Edge[], arr2: Edge[]): Edge[] => {
 export const capitalizeFirstLetter = (string: string) =>
   string.charAt(0).toUpperCase() + string.slice(1);
 
-export const addNode = (
+export const addNode = async (
   aspect: AspectType,
   type: NodeType,
   nodes: Node[],
@@ -246,8 +247,7 @@ export const addNode = (
           .toString();
 
   const currentDate = Date.now();
-  const newNode: Node = {
-    id,
+  const newNode: Omit<Node, 'id'> = {
     type,
     position: {
       x: window.innerWidth / 2,
@@ -257,7 +257,6 @@ export const addNode = (
       aspect,
       label: `${type}_${id}`,
       type,
-      id,
       createdAt: currentDate,
       updatedAt: currentDate,
     },
@@ -278,8 +277,9 @@ export const addNode = (
   newNode.data.directPartOf = null;
   newNode.data.fulfilledBy = null;
   newNode.data.fullFills = null;
+  newNode.data.customName = null;
 
-  setNodes([...nodes, newNode]);
+  await createNode(newNode, nodes, setNodes);
 };
 
 export const updateNode = (
