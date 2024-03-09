@@ -26,6 +26,7 @@ import {
 } from './components/ui/styled';
 import { ThemeProvider } from 'styled-components';
 import { Sidebar, Settings, SelectConnection } from './components/ui';
+import { createEdge } from './api/edges';
 
 export default function App() {
   const nodeTypes = useMemo(
@@ -83,9 +84,7 @@ export default function App() {
     };
 
     handleNewNodeRelations(newNodeRelations, nodes, setNodes);
-
-    const newEdges = edges.concat(newEdge as Edge);
-    return setEdges(newEdges);
+    createEdge(newEdge as Edge, edges, setEdges);
   };
 
   const onConnect = useCallback(

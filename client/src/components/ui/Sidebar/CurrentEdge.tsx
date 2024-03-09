@@ -35,9 +35,8 @@ const CurrentEdge: FC<Props> = ({ currentEdge }) => {
   const { openSidebar, closeSidebar } = useSidebar();
   const { edges, setEdges, nodes, setNodes } = useStore();
 
-  const [connectionType, setConnectionType] = useState<string>(
-    currentEdge.type as string
-  );
+  const { type } = edges.find(e => e.id === currentEdge.id) as Edge;
+  const [connectionType, setConnectionType] = useState<string>(type as string);
 
   const displayName = `Edge ${currentEdge.source} -> ${currentEdge.target}`;
 

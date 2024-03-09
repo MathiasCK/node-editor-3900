@@ -231,7 +231,7 @@ export const handleNewNodeRelations = (
       ];
     }
 
-    updateNodeData(index, nodeToUpdate, nodes, setNodes);
+    updateNode(nodeToUpdate, nodes, setNodes);
   }
 };
 
