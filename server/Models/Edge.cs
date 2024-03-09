@@ -8,12 +8,12 @@ public class Edge
 {
     [Key]
     public string EdgeId { get; set; }
-    public string Id { get; set; } = string.Empty;
-    public string Source = string.Empty;
-    public string SourceHandle = string.Empty;
-    public string Target = string.Empty;
-    public string TargetHandle = string.Empty;
-    public EdgeType Type;
+    public required string Id { get; set; }
+    public required string Source { get; set; }
+    public required string SourceHandle { get; set; }
+    public required string Target { get; set; }
+    public required string TargetHandle { get; set; }
+    public required EdgeType Type { get; set; }
     public required EdgeData Data { get; set; }
 
     public Edge()
@@ -24,11 +24,11 @@ public class Edge
 
 public class EdgeData
 {
-    public string? Id { get; set; }
-    public long? CreatedAt { get; set; }
-    public long? UpdatedAt { get; set; }
-    public bool? LockConnection { get; set; }
-    public string? Label { get; set; }
+    public required string Id { get; set; }
+    public required long CreatedAt { get; set; }
+    public required long UpdatedAt { get; set; }
+    public required bool LockConnection { get; set; }
+    public required string Label { get; set; }
 }
 
 [JsonConverter(typeof(EdgeTypeConverter))]
