@@ -11,7 +11,7 @@ builder.Services.AddDbContext<DB>(options =>
     options.UseSqlite(builder.Configuration["ConnectionStrings:DbConnection"]);
 });
 
-var clientUrl = builder.Configuration["ClientURL"] ?? throw new ArgumentNullException("ClientURL is not set in appsettings.json");
+var clientUrl = builder.Configuration["ClientUrl"] ?? throw new ArgumentNullException("ClientUrl is not set in appsettings.json");
 
 builder.Services.AddCors(options =>
 {
