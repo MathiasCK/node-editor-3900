@@ -11,7 +11,7 @@ public class Node
     public string Id { get; set; }
     public required NodeData Data { get; set; }
     public required Position Position { get; set; }
-    public required string Type { get; set; }
+    public required NodeType Type { get; set; }
 
     public Node()
     {
@@ -30,21 +30,21 @@ public class NodeData
     public AspectType Aspect { get; set; }
     public bool? HasTerminal { get; set; }
     [NotMapped]
-    public List<Terminal>? Terminals { get; set; }
+    public List<Relation>? Terminals { get; set; }
     [NotMapped]
-    public List<TerminalOf>? TerminalOf { get; set; }
+    public List<Relation>? TerminalOf { get; set; }
     public string? TransfersTo { get; set; }
     public string? TransferedBy { get; set; }
     [NotMapped]
-    public List<ConnectedTo>? ConnectedTo { get; set; }
+    public List<Relation>? ConnectedTo { get; set; }
     public bool? HasDirectPart { get; set; }
     [NotMapped]
-    public List<DirectPart>? DirectParts { get; set; }
+    public List<Relation>? DirectParts { get; set; }
     public string? DirectPartOf { get; set; }
     [NotMapped]
-    public List<FulfilledBy>? FulfilledBy { get; set; }
+    public List<Relation>? FulfilledBy { get; set; }
     [NotMapped]
-    public List<FullFills>? FullFills { get; set; }
+    public List<Relation>? FullFills { get; set; }
     public string? Id { get; set; }
     public string? Label { get; set; }
     public string? Type { get; set; }
@@ -62,33 +62,15 @@ public enum AspectType
     Empty
 }
 
-
-public class Terminal
+[JsonConverter(typeof(NodeTypeConverter))]
+public enum NodeType
 {
-    public required string Id { get; set; }
+    Block,
+    Terminal,
+    Connector,
 }
 
-public class TerminalOf
+public struct Relation
 {
-    public required string Id { get; set; }
-}
-
-public class ConnectedTo
-{
-    public required string Id { get; set; }
-}
-
-public class DirectPart
-{
-    public required string Id { get; set; }
-}
-
-public class FulfilledBy
-{
-    public required string Id { get; set; }
-}
-
-public class FullFills
-{
-    public required string Id { get; set; }
+    public string Id { get; set; }
 }
