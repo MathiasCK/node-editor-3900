@@ -273,8 +273,9 @@ export const addNode = async (
           .toString();
 
   const currentDate = Date.now();
-  const newNode: Omit<Node, 'id'> = {
+  const newNode: Node = {
     type,
+    id,
     position: {
       x: window.innerWidth / 2,
       y: window.innerHeight / 2,

@@ -1,17 +1,22 @@
-using System;
-using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
-using server.DAL;
 
 namespace server.Models;
 
 public class Node
 {
-    public int Id { get; set; }
+    [Key]
+    public string NodeId { get; set; }
+    public string Id { get; set; }
     public required NodeData Data { get; set; }
     public required Position Position { get; set; }
     public required string Type { get; set; }
+
+    public Node()
+    {
+        NodeId = Guid.NewGuid().ToString();
+    }
 }
 
 public class Position
@@ -24,7 +29,7 @@ public class NodeData
 {
     public AspectType Aspect { get; set; }
     public bool? HasTerminal { get; set; }
-     [NotMapped]
+    [NotMapped]
     public List<Terminal>? Terminals { get; set; }
     [NotMapped]
     public List<TerminalOf>? TerminalOf { get; set; }
@@ -33,12 +38,12 @@ public class NodeData
     [NotMapped]
     public List<ConnectedTo>? ConnectedTo { get; set; }
     public bool? HasDirectPart { get; set; }
-     [NotMapped]
+    [NotMapped]
     public List<DirectPart>? DirectParts { get; set; }
     public string? DirectPartOf { get; set; }
-     [NotMapped]
+    [NotMapped]
     public List<FulfilledBy>? FulfilledBy { get; set; }
-     [NotMapped]
+    [NotMapped]
     public List<FullFills>? FullFills { get; set; }
     public string? Id { get; set; }
     public string? Label { get; set; }

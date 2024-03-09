@@ -22,9 +22,6 @@ export const fetchNodes = async (): Promise<Node[] | null> => {
     }
 
     const nodes = await response.json();
-    for (const node of nodes) {
-      node.id = node.id.toString();
-    }
 
     return nodes;
   } catch (error) {
@@ -65,7 +62,6 @@ export const createNode = async (
     loadingToastId && toast.dismiss(loadingToastId);
 
     if (createdNode) {
-      createdNode.id = createdNode.id.toString();
       setNodes([...nodes, createdNode]);
     }
 
@@ -176,11 +172,6 @@ export const deleteNode = async (
     }
 
     toast.success('Node deleted successfully!');
-
-    const updatedNodes = await response.json();
-    for (const node of updatedNodes) {
-      node.id = node.id.toString();
-    }
 
     setNodes(nodes.filter(node => node.id !== nodeToDelete.id));
 
