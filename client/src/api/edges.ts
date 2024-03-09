@@ -1,6 +1,29 @@
 import toast from 'react-hot-toast';
 import { type Edge } from 'reactflow';
 
+export const fetchEdges = async (): Promise<Edge[] | null> => {
+  try {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/edges`);
+
+    if (!response.ok) {
+      const errorBody = await response.text();
+      const errorMessage =
+        errorBody || 'Error fetching edges. Please try again.';
+
+      toast.error(errorMessage);
+      return null;
+    }
+
+    const edges = await response.json();
+
+    return edges;
+  } catch (error) {
+    console.error('Error fetching edges', error);
+    toast.error(`Unexpected error: ${(error as Error).message}`);
+    return null;
+  }
+};
+
 export const createEdge = async (
   edge: Edge,
   edges: Edge[],
@@ -29,7 +52,7 @@ export const createEdge = async (
 
     const createdEdge = await response.json();
 
-    toast.success('Node created successfully!');
+    toast.success('Edge created successfully!');
     loadingToastId && toast.dismiss(loadingToastId);
 
     if (createdEdge) {
