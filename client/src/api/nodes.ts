@@ -81,7 +81,11 @@ export const updateNode = async (
   setNodes: (nodes: Node[]) => void,
   newNodeData?: UpdateNode
 ): Promise<Node | null> => {
-  const loadingToastId = toast.loading('Updating node...');
+  let loadingToastId: string | undefined;
+  if (newNodeData) {
+    loadingToastId = toast.loading('Updating node...');
+  }
+
   const nodeIndex = nodes.findIndex(n => n.id === node.id);
 
   if (newNodeData) {
