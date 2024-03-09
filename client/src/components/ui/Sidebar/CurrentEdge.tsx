@@ -36,7 +36,7 @@ const CurrentEdge: FC<Props> = ({ currentEdge }) => {
   const { edges, setEdges, nodes, setNodes } = useStore();
 
   const [connectionType, setConnectionType] = useState<string>(
-    currentEdge.data?.type as string
+    currentEdge.type as string
   );
 
   const displayName = `Edge ${currentEdge.source} -> ${currentEdge.target}`;
@@ -47,7 +47,7 @@ const CurrentEdge: FC<Props> = ({ currentEdge }) => {
       currentEdge.target,
       nodes,
       setNodes,
-      currentEdge.data?.type as EdgeType,
+      currentEdge.type as EdgeType,
       connectionType as EdgeType
     );
 
@@ -150,7 +150,7 @@ const CurrentEdge: FC<Props> = ({ currentEdge }) => {
         </Button>
       </div>
       <SheetFooter>
-        {connectionType !== currentEdge.data?.type && (
+        {connectionType !== currentEdge.type && (
           <Button
             className={buttonVariants.verbose}
             variant="outline"

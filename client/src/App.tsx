@@ -3,7 +3,6 @@ import {
   type Edge,
   type Connection,
   Background,
-  addEdge,
   Panel,
   EdgeTypes,
   NodeTypes,
@@ -69,13 +68,14 @@ export default function App() {
 
     const currentDate = Date.now();
     const id = edges.length.toString();
-    const newConnection = {
+
+    const newEdge = {
       ...params,
+      id: `reactflow__edge-${params.source}${params.sourceHandle}-${params.target}${params.targetHandle}`,
       type: connectionType,
       data: {
         id,
         label: `Edge ${id}`,
-        type: connectionType,
         lockConnection,
         createdAt: currentDate,
         updatedAt: currentDate,
@@ -84,7 +84,7 @@ export default function App() {
 
     handleNewNodeRelations(newNodeRelations, nodes, setNodes);
 
-    const newEdges = addEdge(newConnection, edges);
+    const newEdges = edges.concat(newEdge as Edge);
     return setEdges(newEdges);
   };
 

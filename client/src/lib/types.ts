@@ -71,7 +71,6 @@ export type NodeData = {
 export type EdgeData = {
   id: string;
   label: string;
-  type: string;
   lockConnection: boolean;
   createdAt: number;
   updatedAt: number;
@@ -81,6 +80,7 @@ export type EdgeData = {
 export type CustomEdgeProps = Omit<EdgeProps, 'data'> &
   EdgeData & {
     data: EdgeData;
+    type: string;
   };
 
 export type CustomNodeProps = Omit<NodeProps, 'data'> &
