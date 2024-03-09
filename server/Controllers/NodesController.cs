@@ -96,7 +96,7 @@ public class NodesController : Controller
 
         try
         {
-            var node = await _db.Nodes.FindAsync(Int32.Parse(id));
+            var node = await _db.Nodes.FindAsync(id);
 
             if (node == null)
             {

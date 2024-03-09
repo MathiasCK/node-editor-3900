@@ -11,7 +11,6 @@ import {
   displayNewNode,
 } from '@/lib/utils';
 import { FC, useState } from 'react';
-import { type Node } from 'reactflow';
 import {
   SheetContent,
   SheetDescription,
@@ -69,13 +68,7 @@ const CurrentNode: FC<Props> = ({ currentNode }) => {
   };
 
   const handleDelete = () => {
-    deleteNode(
-      currentNode as unknown as Node,
-      nodes,
-      setNodes,
-      edges,
-      setEdges
-    );
+    deleteNode(currentNode.id as string, nodes, setNodes, edges, setEdges);
 
     closeSidebar();
     handleEdit(false);

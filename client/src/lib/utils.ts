@@ -341,25 +341,6 @@ export const deleteSelectedNode = (
   );
 };
 
-export const deleteEdgeWithRelations = (
-  currentEdgeId: string,
-  edges: Edge[],
-  setEdges: (nodes: Edge[]) => void,
-  nodes: Node[],
-  setNodes: (nodes: Node[]) => void
-) => {
-  const currentEdge = edges.find(edge => edge.id === (currentEdgeId as string));
-
-  if (!currentEdge) {
-    toast.error('Could not delete -> no edge selected');
-    return;
-  }
-
-  deleteSelectedEdge(currentEdge.id, edges, setEdges);
-
-  updateNodeRelations(currentEdge, nodes, setNodes);
-};
-
 export const updateNodeRelations = async (
   currentEdge: Edge,
   nodes: Node[],
@@ -444,9 +425,8 @@ export const updateNodeRelations = async (
     !currentEdge.data.lockCoonection
   ) {
     const nodeToUpdate = nodes.find(node => node.id === currentEdge.source);
-    const index = nodes.findIndex(node => node.id === currentEdge.source);
 
-    if (!nodeToUpdate || index === -1) return;
+    if (!nodeToUpdate) return;
 
     const updatedConnectedTo = nodeToUpdate.data.connectedTo.filter(
       (node: { id: string }) => node.id !== currentEdge.target
@@ -456,27 +436,15 @@ export const updateNodeRelations = async (
       ? updatedConnectedTo
       : null;
 
-    updateNodeData(index, nodeToUpdate, nodes, setNodes);
+    updateNode(nodeToUpdate, nodes, setNodes);
     return;
   }
 
   if (currentEdge.type === EdgeType.Part) {
     const sourceNode = nodes.find(node => node.id === currentEdge.source);
-    const sourceNodeIndex = nodes.findIndex(
-      node => node.id === currentEdge.source
-    );
     const targetNode = nodes.find(node => node.id === currentEdge.target);
-    const targetNodeIndex = nodes.findIndex(
-      node => node.id === currentEdge.target
-    );
 
-    if (
-      !sourceNode ||
-      !targetNode ||
-      sourceNodeIndex === -1 ||
-      targetNodeIndex === -1
-    )
-      return;
+    if (!sourceNode || !targetNode) return;
 
     targetNode.data.directPartOf = null;
 
@@ -491,29 +459,17 @@ export const updateNodeRelations = async (
       sourceNode.data.hasDirectPart = false;
     }
 
-    updateNodeData(sourceNodeIndex, sourceNode, nodes, setNodes);
-    updateNodeData(targetNodeIndex, targetNode, nodes, setNodes);
+    updateNode(sourceNode, nodes, setNodes);
+    updateNode(targetNode, nodes, setNodes);
 
     return;
   }
 
   if (currentEdge.type === EdgeType.Fulfilled) {
     const sourceNode = nodes.find(node => node.id === currentEdge.source);
-    const sourceNodeIndex = nodes.findIndex(
-      node => node.id === currentEdge.source
-    );
     const targetNode = nodes.find(node => node.id === currentEdge.target);
-    const targetNodeIndex = nodes.findIndex(
-      node => node.id === currentEdge.target
-    );
 
-    if (
-      !sourceNode ||
-      !targetNode ||
-      sourceNodeIndex === -1 ||
-      targetNodeIndex === -1
-    )
-      return;
+    if (!sourceNode || !targetNode) return;
 
     const updatedFulfilledBy = sourceNode.data.fulfilledBy.filter(
       (node: { id: string }) => node.id !== currentEdge.target
@@ -529,8 +485,8 @@ export const updateNodeRelations = async (
     targetNode.data.fullFills =
       updatedFullFills.length === 0 ? null : updatedFullFills;
 
-    updateNodeData(sourceNodeIndex, sourceNode, nodes, setNodes);
-    updateNodeData(targetNodeIndex, targetNode, nodes, setNodes);
+    updateNode(sourceNode, nodes, setNodes);
+    updateNode(targetNode, nodes, setNodes);
 
     return;
   }

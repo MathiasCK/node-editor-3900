@@ -1,4 +1,4 @@
-import { EdgeProps, NodeProps } from 'reactflow';
+import type { Edge, EdgeProps, Node, NodeProps } from 'reactflow';
 
 export enum AspectType {
   Function = 'function',
@@ -124,4 +124,12 @@ export type RelationKeys =
 export type RelationKeysWithChildren = {
   key: RelationKeys;
   children: { id: string }[];
+};
+
+export type NodeWithNodeId = Node & {
+  nodeId: string;
+};
+
+export type EdgeWithEdgeId = Edge & {
+  edgeId: string;
 };

@@ -1,6 +1,6 @@
 import toast from 'react-hot-toast';
 import { getConnectedEdges, type Node, type Edge } from 'reactflow';
-import { CustomNodeProps, type UpdateNode } from '@/lib/types';
+import { CustomNodeProps, NodeWithNodeId, type UpdateNode } from '@/lib/types';
 import {
   convertNodePropsToNode,
   getSymmetricDifference,
@@ -145,12 +145,21 @@ export const updateNode = async (
 };
 
 export const deleteNode = async (
-  nodeToDelete: Node,
+  nodeToDeleteId: string,
   nodes: Node[],
   setNodes: (nodes: Node[]) => void,
   edges: Edge[],
   setEdges: (edges: Edge[]) => void
 ) => {
+  const nodeToDelete = nodes.find(
+    node => node.id === nodeToDeleteId
+  ) as NodeWithNodeId;
+
+  if (!nodeToDelete.nodeId) {
+    toast.error(`Error deleting node - ${nodeToDeleteId} not found`);
+    return;
+  }
+
   const loadingToastId = toast.loading('Deleting node...');
   const connectedEdges = getConnectedEdges([nodeToDelete], edges);
 
@@ -160,7 +169,7 @@ export const deleteNode = async (
 
   try {
     const response = await fetch(
-      `${import.meta.env.VITE_API_URL}/api/nodes/${nodeToDelete.id}`,
+      `${import.meta.env.VITE_API_URL}/api/nodes/${nodeToDelete.nodeId}`,
       {
         method: 'DELETE',
       }

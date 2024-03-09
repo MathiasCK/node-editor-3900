@@ -96,7 +96,7 @@ public class EdgesController : Controller
 
         try
         {
-            var edge = await _db.Edges.FindAsync(Int32.Parse(id));
+            var edge = await _db.Edges.FindAsync(id);
 
             if (edge == null)
             {

@@ -1,9 +1,5 @@
 import { EdgeType, type CustomEdgeProps } from '@/lib/types';
-import {
-  deleteEdgeWithRelations,
-  displayNewNode,
-  updateNodeConnectionData,
-} from '@/lib/utils';
+import { displayNewNode, updateNodeConnectionData } from '@/lib/utils';
 import { FC, useState } from 'react';
 import {
   SheetContent,
@@ -26,6 +22,7 @@ import { buttonVariants } from '@/lib/config';
 import { useSidebar, useStore } from '@/hooks';
 import { type Edge, addEdge } from 'reactflow';
 import toast from 'react-hot-toast';
+import { deleteEdge } from '@/api/edges';
 
 interface Props {
   currentEdge: CustomEdgeProps;
@@ -75,13 +72,7 @@ const CurrentEdge: FC<Props> = ({ currentEdge }) => {
   };
 
   const handleDelete = () => {
-    deleteEdgeWithRelations(
-      currentEdge.id as string,
-      edges,
-      setEdges,
-      nodes,
-      setNodes
-    );
+    deleteEdge(currentEdge.id as string, edges, setEdges, nodes, setNodes);
 
     closeSidebar();
   };
