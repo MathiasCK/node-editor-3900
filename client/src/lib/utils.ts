@@ -18,7 +18,7 @@ import {
   RelationKeysWithChildren,
   RelationType,
 } from './types';
-import { createNode, updateNode } from './routes';
+import { createNode, updateNode } from '@/api/nodes';
 
 export const cn = (...inputs: ClassValue[]) => twMerge(clsx(inputs));
 

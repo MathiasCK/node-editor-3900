@@ -6,7 +6,7 @@ import {
   getSymmetricDifference,
   updateNodeData,
   updateNodeRelations,
-} from './utils';
+} from '@/lib/utils';
 
 export const fetchNodes = async (): Promise<Node[] | null> => {
   try {
@@ -56,7 +56,6 @@ export const createNode = async (
         errorBody || 'Error creating node. Please try again.';
 
       toast.error(errorMessage);
-      loadingToastId && toast.dismiss(loadingToastId);
       return null;
     }
 
@@ -75,6 +74,8 @@ export const createNode = async (
     console.error('Error creating node', error);
     toast.error(`Unexpected error: ${(error as Error).message}`);
     return null;
+  } finally {
+    loadingToastId && toast.dismiss(loadingToastId);
   }
 };
 
@@ -113,9 +114,8 @@ export const updateNode = async (
       const errorBody = await response.text();
       const errorMessage =
         errorBody || 'Error updating node. Please try again.';
-
       toast.error(errorMessage);
-      loadingToastId && toast.dismiss(loadingToastId);
+
       return null;
     }
 
@@ -124,8 +124,6 @@ export const updateNode = async (
     if (newNodeData) {
       toast.success('Node updated successfully!');
     }
-
-    loadingToastId && toast.dismiss(loadingToastId);
 
     if (updatedNode) {
       updateNodeData(
@@ -141,6 +139,8 @@ export const updateNode = async (
     console.error('Error updating node', error);
     toast.error(`Unexpected error: ${(error as Error).message}`);
     return null;
+  } finally {
+    loadingToastId && toast.dismiss(loadingToastId);
   }
 };
 
@@ -172,12 +172,10 @@ export const deleteNode = async (
         errorBody || 'Error deleting node. Please try again.';
 
       toast.success(errorMessage);
-      loadingToastId && toast.dismiss(loadingToastId);
       return null;
     }
 
     toast.success('Node deleted successfully!');
-    loadingToastId && toast.dismiss(loadingToastId);
 
     const updatedNodes = await response.json();
     for (const node of updatedNodes) {
@@ -192,5 +190,7 @@ export const deleteNode = async (
     console.error('Error updating node', error);
     toast.error(`Unexpected error: ${(error as Error).message}`);
     return null;
+  } finally {
+    loadingToastId && toast.dismiss(loadingToastId);
   }
 };

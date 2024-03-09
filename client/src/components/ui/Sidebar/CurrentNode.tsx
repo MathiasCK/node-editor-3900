@@ -32,7 +32,7 @@ import {
   SelectGroup,
   SelectItem,
 } from '../select';
-import { updateNode, deleteNode } from '@/lib/routes';
+import { updateNode, deleteNode } from '@/api/nodes';
 
 interface Props {
   currentNode: CustomNodeProps;
