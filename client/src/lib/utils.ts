@@ -231,7 +231,7 @@ export const handleNewNodeRelations = (
       ];
     }
 
-    updateNode(nodeToUpdate, nodes, setNodes);
+    updateNode(nodeToUpdate.id, nodes, setNodes);
   }
 };
 
@@ -364,12 +364,12 @@ export const updateNodeRelations = async (
 
     if (targetTerminal.id !== nodeIdToDelete) {
       targetTerminal.data.transferedBy = null;
-      await updateNode(targetTerminal, nodes, setNodes);
+      await updateNode(targetTerminal.id, nodes, setNodes);
     }
 
     if (sourceTerminal.id !== nodeIdToDelete) {
       sourceTerminal.data.transfersTo = null;
-      await updateNode(sourceTerminal, nodes, setNodes);
+      await updateNode(sourceTerminal.id, nodes, setNodes);
     }
 
     return;
@@ -415,7 +415,7 @@ export const updateNodeRelations = async (
       }
     }
 
-    await updateNode(nodeToUpdate, nodes, setNodes);
+    await updateNode(nodeToUpdate.id, nodes, setNodes);
 
     return;
   }
@@ -436,7 +436,7 @@ export const updateNodeRelations = async (
       ? updatedConnectedTo
       : null;
 
-    updateNode(nodeToUpdate, nodes, setNodes);
+    updateNode(nodeToUpdate.id, nodes, setNodes);
     return;
   }
 

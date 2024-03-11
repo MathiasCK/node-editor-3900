@@ -76,7 +76,7 @@ export const createNode = async (
 };
 
 export const updateNode = async (
-  node: CustomNodeProps | Node,
+  nodeToUpdateId: string,
   nodes: Node[],
   setNodes: (nodes: Node[]) => void,
   newNodeData?: UpdateNode
@@ -86,19 +86,19 @@ export const updateNode = async (
     loadingToastId = toast.loading('Updating node...');
   }
 
-  const nodeIndex = nodes.findIndex(n => n.id === node.id);
+  const nodeToUpdate = nodes.find(n => n.id === nodeToUpdateId);
+  const nodeIndex = nodes.findIndex(n => n.id === nodeToUpdateId);
+
+  if (!nodeToUpdate) {
+    toast.error(`Node with id ${nodeToUpdateId} not found. Please try again.`);
+    return null;
+  }
 
   if (newNodeData) {
     Object.keys(newNodeData).forEach(key => {
       // @ts-ignore
-      node.data[key] = newNodeData[key];
+      nodeToUpdate.data[key] = newNodeData[key];
     });
-  }
-
-  // Node is of type CustomNodeProps
-  // @ts-ignore
-  if (node.xPos || node.yPos) {
-    node = convertNodePropsToNode(node as CustomNodeProps);
   }
 
   try {
@@ -107,7 +107,7 @@ export const updateNode = async (
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(node),
+      body: JSON.stringify(nodeToUpdate),
     });
 
     if (!response.ok) {

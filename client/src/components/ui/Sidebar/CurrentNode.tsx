@@ -63,7 +63,7 @@ const CurrentNode: FC<Props> = ({ currentNode }) => {
       newNodeData['aspect'] = aspectType as AspectType;
     }
 
-    updateNode(currentNode, nodes, setNodes, newNodeData);
+    updateNode(currentNode.id, nodes, setNodes, newNodeData);
     handleEdit(false);
   };
 
