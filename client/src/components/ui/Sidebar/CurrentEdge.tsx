@@ -20,9 +20,7 @@ import {
 import { Button } from '../button';
 import { buttonVariants } from '@/lib/config';
 import { useSidebar, useStore } from '@/hooks';
-import { type Edge, addEdge } from 'reactflow';
-import toast from 'react-hot-toast';
-import { deleteEdge } from '@/api/edges';
+import { deleteEdge, updateEdge } from '@/api/edges';
 
 interface Props {
   currentEdge: CustomEdgeProps;
@@ -38,8 +36,14 @@ const CurrentEdge: FC<Props> = ({ currentEdge }) => {
 
   const displayName = `Edge ${currentEdge.source} -> ${currentEdge.target}`;
 
-  const handleConnectionTypeChange = () => {
-    const canUpdate = updateNodeConnectionData(
+  const handleConnectionTypeChange = async () => {
+    await updateEdge(
+      currentEdge.id as string,
+      edges,
+      setEdges,
+      connectionType as EdgeType
+    );
+    await updateNodeConnectionData(
       currentEdge.source,
       currentEdge.target,
       nodes,
@@ -48,32 +52,17 @@ const CurrentEdge: FC<Props> = ({ currentEdge }) => {
       connectionType as EdgeType
     );
 
-    if (!canUpdate) return;
-
-    const clonedConnection = {
-      data: {
-        label: `Edge ${currentEdge.source} -> ${currentEdge.target}`,
-        type: connectionType,
-        createdAt: currentEdge.data?.createdAt,
-        updatedAt: Date.now(),
-      },
-      source: currentEdge.source,
-      sourceHandle: currentEdge.sourceHandleId,
-      target: currentEdge.target,
-      targetHandle: currentEdge.targetHandleId,
-      type: connectionType,
-    };
-
-    const filteredEdges = edges.filter(e => e.id !== currentEdge.id);
-
-    const newEdges = addEdge(clonedConnection as Edge, filteredEdges);
-    setEdges(newEdges);
     closeSidebar();
-    toast.success(`${displayName} connection updated`);
   };
 
-  const handleDelete = () => {
-    deleteEdge(currentEdge.id as string, edges, setEdges, nodes, setNodes);
+  const handleDelete = async () => {
+    await deleteEdge(
+      currentEdge.id as string,
+      edges,
+      setEdges,
+      nodes,
+      setNodes
+    );
 
     closeSidebar();
   };

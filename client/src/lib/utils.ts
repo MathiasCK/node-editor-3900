@@ -585,14 +585,14 @@ export const displayNewNode = (
   }, 100);
 };
 
-export const updateNodeConnectionData = (
+export const updateNodeConnectionData = async (
   sourceNodeId: string,
   targetNodeId: string,
   nodes: Node[],
   setNodes: (nodes: Node[]) => void,
   oldConnection: EdgeType,
   newConnection: EdgeType
-): boolean => {
+): Promise<boolean> => {
   if (
     oldConnection === EdgeType.Transfer ||
     newConnection === EdgeType.Transfer
@@ -602,16 +602,9 @@ export const updateNodeConnectionData = (
   }
 
   const targetNode = nodes.find(node => node.id === targetNodeId);
-  const targetNodeIndex = nodes.findIndex(node => node.id === targetNodeId);
   const sourceNode = nodes.find(node => node.id === sourceNodeId);
-  const sourceNodeIndex = nodes.findIndex(node => node.id === sourceNodeId);
 
-  if (
-    !sourceNode ||
-    !targetNode ||
-    sourceNodeIndex === -1 ||
-    targetNodeIndex === -1
-  ) {
+  if (!sourceNode || !targetNode) {
     toast.error(
       'Could not find nodes to update connection data. Refresh page & try again.'
     );
@@ -672,8 +665,8 @@ export const updateNodeConnectionData = (
     ];
   }
 
-  updateNodeData(sourceNodeIndex, sourceNode, nodes, setNodes);
-  updateNodeData(targetNodeIndex, targetNode, nodes, setNodes);
+  await updateNode(sourceNode.id, nodes, setNodes);
+  await updateNode(targetNode.id, nodes, setNodes);
 
   return true;
 };

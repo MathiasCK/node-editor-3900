@@ -1,4 +1,4 @@
-import { EdgeWithEdgeId } from '@/lib/types';
+import { EdgeType, EdgeWithEdgeId } from '@/lib/types';
 import { updateNodeRelations } from '@/lib/utils';
 import toast from 'react-hot-toast';
 import { type Edge, type Node } from 'reactflow';
@@ -112,5 +112,66 @@ export const deleteEdge = async (
   } finally {
     loadingToastId && toast.dismiss(loadingToastId);
     updateNodeRelations(edgeToDelete, nodes, setNodes);
+  }
+};
+
+export const updateEdge = async (
+  edgeToUpdateId: string,
+  edges: Edge[],
+  setEdges: (edges: Edge[]) => void,
+  newConnection: EdgeType
+) => {
+  const edgeToUpdate = edges.find(edge => edge.id === edgeToUpdateId);
+
+  if (!edgeToUpdate) {
+    toast.error(`Error updating edge - ${edgeToUpdateId} not found`);
+    return;
+  }
+
+  const loadingToastId = toast.loading('Updating edge...');
+
+  edgeToUpdate.type = newConnection;
+
+  try {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/edges`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(edgeToUpdate),
+    });
+
+    if (!response.ok) {
+      const errorBody = await response.text();
+      const errorMessage =
+        errorBody || 'Error updating edge. Please try again.';
+
+      toast.error(errorMessage);
+      loadingToastId && toast.dismiss(loadingToastId);
+      return null;
+    }
+
+    toast.success('Edge updated successfully!');
+
+    const updatedEdge = await response.json();
+
+    if (updatedEdge) {
+      const newEdges = edges.map(edge => {
+        if (edge.id === updatedEdge.id) {
+          return updatedEdge;
+        }
+        return edge;
+      });
+
+      setEdges(newEdges);
+    }
+
+    return updatedEdge as Edge;
+  } catch (error) {
+    console.error('Error updating edge', error);
+    toast.error(`Unexpected error: ${(error as Error).message}`);
+    return null;
+  } finally {
+    loadingToastId && toast.dismiss(loadingToastId);
   }
 };
