@@ -76,7 +76,8 @@ export const deleteEdge = async (
   edges: Edge[],
   setEdges: (edges: Edge[]) => void,
   nodes: Node[],
-  setNodes: (nodes: Node[]) => void
+  setNodes: (nodes: Node[]) => void,
+  nodeToDeleteId?: string
 ) => {
   const edgeToDelete = edges.find(
     edge => edge.id === edgeIdToDelete
@@ -111,7 +112,7 @@ export const deleteEdge = async (
   } catch (error) {
   } finally {
     loadingToastId && toast.dismiss(loadingToastId);
-    updateNodeRelations(edgeToDelete, nodes, setNodes);
+    updateNodeRelations(edgeToDelete, nodes, setNodes, nodeToDeleteId);
   }
 };
 

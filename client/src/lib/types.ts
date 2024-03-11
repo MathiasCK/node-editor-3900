@@ -31,39 +31,37 @@ export enum RelationType {
   DirectPartOf = 'directPartOf',
   TransfersTo = 'transfersTo',
   TransferedBy = 'transferedBy',
-  FulFills = 'fullFills',
+  Fulfills = 'fulfills',
 }
 
 export type UpdateNode = { customName?: string; aspect?: AspectType };
 
 export type NodeData = {
   aspect: AspectType;
+  parent: 'void' | string;
+  children?: {
+    id: string;
+  }[];
   terminals?: {
     id: string;
   }[];
-  terminalOf?: {
+  terminalOf?: string;
+  transfersTo?: {
     id: string;
   }[];
-  transfersTo?: string;
   transferedBy?: string;
   connectedTo?: {
     id: string;
   }[];
-  connectedBy?: {
-    id: string;
-  }[];
+  connectedBy?: string;
   directParts?: {
     id: string;
   }[];
-  directPartOf?: {
+  directPartOf?: string;
+  fulfills?: {
     id: string;
   }[];
-  fulfilledBy?: {
-    id: string;
-  }[];
-  fullFills?: {
-    id: string;
-  }[];
+  fulfilledBy?: string;
   label: string;
   type: string;
   createdAt: number;
@@ -93,10 +91,10 @@ export type CustomNodeProps = Omit<NodeProps, 'data'> &
 
 export type NodeRelation = {
   nodeId: string;
-  value?: {
-    [key: string]: boolean | string;
+  relation?: {
+    [key: string]: string;
   };
-  array?: {
+  relations?: {
     [key: string]: {
       id: string;
     };
@@ -122,7 +120,7 @@ export type RelationKeys =
   | 'directPartOf'
   | 'transfersTo'
   | 'transferedBy'
-  | 'fullFills'
+  | 'fulfills'
   | 'connectedBy';
 
 export type RelationKeysWithChildren = {

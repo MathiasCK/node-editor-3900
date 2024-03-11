@@ -1,11 +1,5 @@
 import toast from 'react-hot-toast';
-import {
-  getConnectedEdges,
-  type Connection,
-  type Edge,
-  type Node,
-  Position,
-} from 'reactflow';
+import { type Connection, type Edge, type Node, Position } from 'reactflow';
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import {
@@ -39,7 +33,12 @@ export const checkConnection = (
 
   if (params.source === params.target) {
     toast.error('Cannot connect node to itself');
-    canConnect = false;
+    return {
+      canConnect: false,
+      newNodeRelations: [],
+      connectionType: '' as EdgeType,
+      lockConnection: false,
+    };
   }
 
   // Set terminalOf property for terminal & terminals array for block
@@ -47,22 +46,36 @@ export const checkConnection = (
     isTerminal(params.targetHandle as string) &&
     isBlock(params.sourceHandle as string)
   ) {
+    const terminal = nodes.find(t => t.id === params.target);
+
+    if (terminal?.data?.parent !== 'void') {
+      toast.error(`Terminal ${params.target} already has a parent`);
+      return {
+        canConnect: false,
+        newNodeRelations: [],
+        connectionType: '' as EdgeType,
+        lockConnection: false,
+      };
+    }
+
     lockConnection = true;
     connectionType = EdgeType.Connected;
 
     newNodeRelations.push({
       nodeId: params.target as string,
-      array: {
-        terminalOf: {
-          id: params.source as string,
-        },
+      relation: {
+        terminalOf: params.source as string,
+        parent: params.source as string,
       },
     });
 
     newNodeRelations.push({
       nodeId: params.source as string,
-      array: {
+      relations: {
         terminals: {
+          id: params.target as string,
+        },
+        children: {
           id: params.target as string,
         },
       },
@@ -74,22 +87,36 @@ export const checkConnection = (
     isBlock(params.targetHandle as string) &&
     isTerminal(params.sourceHandle as string)
   ) {
+    const terminal = nodes.find(t => t.id === params.source);
+
+    if (terminal?.data?.parent !== 'void') {
+      toast.error(`Terminal ${params.source} already has a parent`);
+      return {
+        canConnect: false,
+        newNodeRelations: [],
+        connectionType: '' as EdgeType,
+        lockConnection: false,
+      };
+    }
+
     lockConnection = true;
     connectionType = EdgeType.Connected;
 
     newNodeRelations.push({
       nodeId: params.source as string,
-      array: {
-        terminalOf: {
-          id: params.target as string,
-        },
+      relation: {
+        parent: params.target as string,
+        terminalOf: params.target as string,
       },
     });
 
     newNodeRelations.push({
       nodeId: params.target as string,
-      array: {
+      relations: {
         terminals: {
+          id: params.source as string,
+        },
+        children: {
           id: params.source as string,
         },
       },
@@ -103,53 +130,27 @@ export const checkConnection = (
   ) {
     // Check if terminal is already connected to other terminals
     const targetTerminal = nodes.find(node => node.id === params.target);
-    const sourceTerminal = nodes.find(node => node.id === params.source);
 
-    if (targetTerminal?.data?.transfersTo) {
-      toast.error(
-        `Terminal ${params.target} is already transfered to another terminal`
-      );
-      canConnect = false;
-    } else if (targetTerminal?.data?.transferedBy) {
-      toast.error(
-        `Terminal ${params.source} is already transfered by from another terminal`
-      );
-      canConnect = false;
-    } else if (sourceTerminal?.data?.transfersTo) {
-      toast.error(
-        `Terminal ${params.target} is already transfered to another terminal`
-      );
-      canConnect = false;
-    } else if (sourceTerminal?.data?.transferedBy) {
-      toast.error(
-        `Terminal ${params.source} is already transfered by from another terminal`
-      );
-      canConnect = false;
-    } else {
-      lockConnection = true;
-      connectionType = EdgeType.Transfer;
-
-      newNodeRelations.push({
-        nodeId: params.source as string,
-        value: {
-          transfersTo: params.target as string,
-        },
-      });
-
-      newNodeRelations.push({
-        nodeId: params.target as string,
-        value: {
-          transferedBy: params.source as string,
-        },
-      });
+    if (targetTerminal?.data?.parent !== 'void') {
+      toast.error(`Terminal ${params.target} already has a parent`);
+      return {
+        canConnect: false,
+        newNodeRelations: [],
+        connectionType: '' as EdgeType,
+        lockConnection: false,
+      };
     }
-  }
 
-  if (connectionType === EdgeType.Fulfilled && !lockConnection) {
+    lockConnection = true;
+    connectionType = EdgeType.Transfer;
+
     newNodeRelations.push({
       nodeId: params.source as string,
-      array: {
-        fulfilledBy: {
+      relations: {
+        transfersTo: {
+          id: params.target as string,
+        },
+        children: {
           id: params.target as string,
         },
       },
@@ -157,10 +158,43 @@ export const checkConnection = (
 
     newNodeRelations.push({
       nodeId: params.target as string,
-      array: {
-        fullFills: {
-          id: params.source as string,
+      relation: {
+        transferedBy: params.source as string,
+        parent: params.source as string,
+      },
+    });
+  }
+
+  const targetNode = nodes.find(node => node.id === params.target);
+
+  if (targetNode?.data?.parent !== 'void') {
+    toast.error(`Node ${params.target} already has a parent`);
+    return {
+      canConnect: false,
+      newNodeRelations: [],
+      connectionType: '' as EdgeType,
+      lockConnection: false,
+    };
+  }
+
+  if (connectionType === EdgeType.Fulfilled && !lockConnection) {
+    newNodeRelations.push({
+      nodeId: params.source as string,
+      relations: {
+        fulfills: {
+          id: params.target as string,
         },
+        children: {
+          id: params.target as string,
+        },
+      },
+    });
+
+    newNodeRelations.push({
+      nodeId: params.target as string,
+      relation: {
+        parent: params.source as string,
+        fulfilledBy: params.source as string,
       },
     });
   }
@@ -168,8 +202,11 @@ export const checkConnection = (
   if (connectionType === EdgeType.Connected && !lockConnection) {
     newNodeRelations.push({
       nodeId: params.source as string,
-      array: {
+      relations: {
         connectedTo: {
+          id: params.target as string,
+        },
+        children: {
           id: params.target as string,
         },
       },
@@ -177,10 +214,9 @@ export const checkConnection = (
 
     newNodeRelations.push({
       nodeId: params.target as string,
-      array: {
-        connectedBy: {
-          id: params.source as string,
-        },
+      relation: {
+        parent: params.source as string,
+        connectedBy: params.source as string,
       },
     });
   }
@@ -188,8 +224,11 @@ export const checkConnection = (
   if (connectionType === EdgeType.Part && !lockConnection) {
     newNodeRelations.push({
       nodeId: params.source as string,
-      array: {
+      relations: {
         directParts: {
+          id: params.target as string,
+        },
+        children: {
           id: params.target as string,
         },
       },
@@ -197,10 +236,9 @@ export const checkConnection = (
 
     newNodeRelations.push({
       nodeId: params.target as string,
-      array: {
-        directPartOf: {
-          id: params.source as string,
-        },
+      relation: {
+        parent: params.source as string,
+        directPartOf: params.source as string,
       },
     });
   }
@@ -219,18 +257,19 @@ export const handleNewNodeRelations = (
 
     if (!nodeToUpdate || index === -1) return;
 
-    if (relation.value) {
-      const keyToUpdate = Object.keys(relation.value)[0];
-      nodeToUpdate.data[keyToUpdate] = relation.value[keyToUpdate];
+    if (relation.relation) {
+      Object.keys(relation.relation).forEach(keyToUpdate => {
+        nodeToUpdate.data[keyToUpdate] = relation.relation![keyToUpdate];
+      });
     }
 
-    if (relation.array) {
-      const arrayToUpdate = Object.keys(relation.array)[0];
-
-      nodeToUpdate.data[arrayToUpdate] = [
-        ...(nodeToUpdate.data[arrayToUpdate] ?? []),
-        relation.array[arrayToUpdate],
-      ];
+    if (relation.relations) {
+      Object.keys(relation.relations).forEach(r => {
+        nodeToUpdate.data[r] = [
+          ...(nodeToUpdate.data[r] ?? []),
+          relation.relations![r],
+        ];
+      });
     }
 
     updateNode(nodeToUpdate.id, nodes, setNodes);
@@ -296,47 +335,17 @@ export const addNode = async (
     newNode.data.transfersTo = null;
   }
 
+  newNode.data.parent = 'void';
+  newNode.data.children = null;
   newNode.data.connectedTo = null;
   newNode.data.connectedBy = null;
   newNode.data.directParts = null;
   newNode.data.directPartOf = null;
   newNode.data.fulfilledBy = null;
-  newNode.data.fullFills = null;
+  newNode.data.fulfills = null;
   newNode.data.customName = null;
 
   await createNode(newNode as Node, nodes, setNodes);
-};
-
-export const deleteSelectedNode = (
-  selectedNodeId: string,
-  edges: Edge[],
-  setEdges: (edges: Edge[]) => void,
-  nodes: Node[],
-  setNodes: (nodes: Node[]) => void
-): void => {
-  const currentNode = nodes.find(node => node.id === selectedNodeId);
-
-  if (!currentNode) {
-    toast.error('Could not delete -> no node selected');
-    return;
-  }
-
-  const connectedEdges = getConnectedEdges([currentNode], edges);
-
-  for (const edge of connectedEdges) {
-    updateNodeRelations(edge, nodes, setNodes);
-  }
-
-  const updatedEdges = getSymmetricDifference(edges, connectedEdges);
-
-  const updatedNodes = nodes.filter(node => node.id !== selectedNodeId);
-
-  setNodes(updatedNodes);
-  setEdges(updatedEdges);
-
-  toast.success(
-    `${capitalizeFirstLetter(currentNode.data.type)} ${selectedNodeId} deleted`
-  );
 };
 
 export const updateNodeRelations = async (
@@ -362,10 +371,17 @@ export const updateNodeRelations = async (
 
     if (targetTerminal.id !== nodeIdToDelete) {
       targetTerminal.data.transferedBy = null;
+      targetTerminal.data.parent = 'void';
       await updateNode(targetTerminal.id, nodes, setNodes);
     }
 
     if (sourceTerminal.id !== nodeIdToDelete) {
+      const filteredChildren = sourceTerminal.data.children.filter(
+        (child: { id: string }) => child.id !== targetTerminal.id
+      );
+      sourceTerminal.data.children = filteredChildren.length
+        ? filteredChildren
+        : null;
       sourceTerminal.data.transfersTo = null;
       await updateNode(sourceTerminal.id, nodes, setNodes);
     }
@@ -373,47 +389,70 @@ export const updateNodeRelations = async (
     return;
   }
 
+  // Deleting a terminal -> block connection
   if (
-    (isTerminal(currentEdge.sourceHandle!) &&
-      isBlock(currentEdge.targetHandle!)) ||
-    (isTerminal(currentEdge.targetHandle!) &&
-      isBlock(currentEdge.sourceHandle!))
+    isTerminal(currentEdge.sourceHandle!) &&
+    isBlock(currentEdge.targetHandle!)
   ) {
-    const nodeIdToUpdate =
-      currentEdge.target === nodeIdToDelete
-        ? currentEdge.source
-        : currentEdge.target;
-    // Deleting a connection between block and terminal
-    const nodeToUpdate = nodes.find(node => node.id === nodeIdToUpdate);
+    const terminal = nodes.find(node => node.id === currentEdge.source);
+    const block = nodes.find(node => node.id === currentEdge.target);
 
-    if (!nodeToUpdate) return;
+    if (!terminal || !block) return;
 
-    if (isBlock(nodeToUpdate.type as string)) {
-      const updatedTerminals = nodeToUpdate.data.terminals.filter(
-        (terminal: { id: string }) => terminal.id !== nodeIdToDelete
-      );
+    if (terminal.id !== nodeIdToDelete) {
+      terminal.data.terminalOf = null;
+      terminal.data.parent = 'void';
 
-      nodeToUpdate.data.terminals = updatedTerminals;
-
-      if (updatedTerminals.length === 0) {
-        nodeToUpdate.data.terminals = null;
-      }
+      await updateNode(terminal.id, nodes, setNodes);
     }
 
-    if (isTerminal(nodeToUpdate.type as string)) {
-      const updatedTerminalOf = nodeToUpdate.data.terminalOf.filter(
-        (block: { id: string }) => block.id !== nodeIdToDelete
+    if (block.id !== nodeIdToDelete) {
+      const filteredTerminals = block.data.terminals.filter(
+        (id: string) => id !== terminal.id
       );
-      nodeToUpdate.data.terminalOf = updatedTerminalOf;
-
-      if (updatedTerminalOf.length === 0) {
-        nodeToUpdate.data.updatedTerminalOf = null;
-      }
+      const filteredChildren = block.data.children.filter(
+        (child: { id: string }) => child.id !== terminal.id
+      );
+      block.data.terminals = filteredTerminals.length
+        ? filteredTerminals
+        : null;
+      block.data.children = filteredChildren.length ? filteredChildren : null;
     }
 
-    await updateNode(nodeToUpdate.id, nodes, setNodes);
+    await updateNode(block.id, nodes, setNodes);
+  }
 
-    return;
+  // Deleting a block -> terminal connection
+  if (
+    isTerminal(currentEdge.targetHandle!) &&
+    isBlock(currentEdge.sourceHandle!)
+  ) {
+    const terminal = nodes.find(node => node.id === currentEdge.source);
+    const block = nodes.find(node => node.id === currentEdge.target);
+
+    if (!terminal || !block) return;
+
+    if (terminal.id !== nodeIdToDelete) {
+      terminal.data.terminalOf = null;
+      terminal.data.parent = 'void';
+
+      await updateNode(terminal.id, nodes, setNodes);
+    }
+
+    if (block.id !== nodeIdToDelete) {
+      const filteredTerminals = block.data.terminals.filter(
+        (id: string) => id !== terminal.id
+      );
+      const filteredChildren = block.data.children.filter(
+        (child: { id: string }) => child.id !== terminal.id
+      );
+      block.data.terminals = filteredTerminals.length
+        ? filteredTerminals
+        : null;
+      block.data.children = filteredChildren.length ? filteredChildren : null;
+    }
+
+    await updateNode(block.id, nodes, setNodes);
   }
 
   if (
@@ -425,24 +464,32 @@ export const updateNodeRelations = async (
 
     if (!sourceNode || !targetNode) return;
 
-    const updatedConnectedTo = sourceNode.data.connectedTo.filter(
-      (node: { id: string }) => node.id !== currentEdge.target
-    );
+    if (sourceNode.id !== nodeIdToDelete) {
+      const updatedConnectedTo = sourceNode.data.connectedTo.filter(
+        (node: { id: string }) => node.id !== currentEdge.target
+      );
 
-    sourceNode.data.connectedTo = updatedConnectedTo.length
-      ? updatedConnectedTo
-      : null;
+      sourceNode.data.connectedTo = updatedConnectedTo.length
+        ? updatedConnectedTo
+        : null;
 
-    const updatedConnectedBy = targetNode.data.connectedBy.filter(
-      (node: { id: string }) => node.id !== currentEdge.source
-    );
+      const updatedChildren = sourceNode.data.children.filter(
+        (child: { id: string }) => child.id !== currentEdge.target
+      );
 
-    targetNode.data.connectedBy = updatedConnectedBy.length
-      ? updatedConnectedBy
-      : null;
+      sourceNode.data.children = updatedChildren.length
+        ? updatedChildren
+        : null;
 
-    updateNode(sourceNode.id, nodes, setNodes);
-    updateNode(targetNode.id, nodes, setNodes);
+      await updateNode(sourceNode.id, nodes, setNodes);
+    }
+
+    if (targetNode.id !== nodeIdToDelete) {
+      targetNode.data.connectedBy = null;
+      targetNode.data.parent = 'void';
+
+      await updateNode(targetNode.id, nodes, setNodes);
+    }
     return;
   }
 
@@ -452,22 +499,30 @@ export const updateNodeRelations = async (
 
     if (!sourceNode || !targetNode) return;
 
-    const filteredDirectPartOf = targetNode.data.directPartOf.filter(
-      (part: { id: string }) => part.id !== currentEdge.source
-    );
+    if (sourceNode.id !== nodeIdToDelete) {
+      const filteredDirectParts = sourceNode.data.directParts.filter(
+        (part: { id: string }) => part.id !== currentEdge.target
+      );
 
-    targetNode.data.directPartOf =
-      filteredDirectPartOf.length > 0 ? filteredDirectPartOf : null;
+      sourceNode.data.directParts =
+        filteredDirectParts.length > 0 ? filteredDirectParts : null;
 
-    const filteredDirectParts = sourceNode.data.directParts.filter(
-      (part: { id: string }) => part.id !== currentEdge.target
-    );
+      const filteredChildren = sourceNode.data.children.filter(
+        (child: { id: string }) => child.id !== currentEdge.target
+      );
 
-    sourceNode.data.directParts =
-      filteredDirectParts.length > 0 ? filteredDirectParts : null;
+      sourceNode.data.children = filteredChildren.length
+        ? filteredChildren
+        : null;
 
-    updateNode(sourceNode.id, nodes, setNodes);
-    updateNode(targetNode.id, nodes, setNodes);
+      await updateNode(sourceNode.id, nodes, setNodes);
+    }
+
+    if (targetNode.id !== nodeIdToDelete) {
+      targetNode.data.directPartOf = null;
+      targetNode.data.parent = 'void';
+      await updateNode(targetNode.id, nodes, setNodes);
+    }
 
     return;
   }
@@ -478,49 +533,33 @@ export const updateNodeRelations = async (
 
     if (!sourceNode || !targetNode) return;
 
-    const updatedFulfilledBy = sourceNode.data.fulfilledBy.filter(
-      (node: { id: string }) => node.id !== currentEdge.target
-    );
+    if (sourceNode.id !== nodeIdToDelete) {
+      const filteredFulfills = sourceNode.data.fulfills.filter(
+        (node: { id: string }) => node.id !== currentEdge.target
+      );
 
-    sourceNode.data.fulfilledBy =
-      updatedFulfilledBy.length === 0 ? null : updatedFulfilledBy;
+      sourceNode.data.fulfills =
+        filteredFulfills.length === 0 ? null : filteredFulfills;
 
-    const updatedFullFills = targetNode.data.fullFills.filter(
-      (node: { id: string }) => node.id !== currentEdge.source
-    );
+      const filteredChildren = sourceNode.data.children.filter(
+        (child: { id: string }) => child.id !== currentEdge.target
+      );
 
-    targetNode.data.fullFills =
-      updatedFullFills.length === 0 ? null : updatedFullFills;
+      sourceNode.data.children = filteredChildren.length
+        ? filteredChildren
+        : null;
 
-    updateNode(sourceNode.id, nodes, setNodes);
-    updateNode(targetNode.id, nodes, setNodes);
+      await updateNode(sourceNode.id, nodes, setNodes);
+    }
+
+    if (targetNode.id !== nodeIdToDelete) {
+      targetNode.data.fulfilledBy = null;
+      targetNode.data.parent = 'void';
+      await updateNode(targetNode.id, nodes, setNodes);
+    }
 
     return;
   }
-};
-
-export const updateNodeData = (
-  index: number,
-  nodeToUpdate: Node,
-  nodes: Node[],
-  setNodes: (nodes: Node[]) => void
-) => {
-  const newNodes = [...nodes];
-  newNodes[index] = nodeToUpdate;
-
-  setNodes(newNodes);
-};
-
-export const deleteSelectedEdge = (
-  selectedEdgeId: string,
-  edges: Edge[],
-  setEdges: (edges: Edge[]) => void
-): void => {
-  const updatedEdges = edges.filter(edge => edge.id !== selectedEdgeId);
-
-  setEdges(updatedEdges);
-
-  toast.success(`Edge ${selectedEdgeId} deleted`);
 };
 
 export const getNodeRelations = (
@@ -536,7 +575,7 @@ export const getNodeRelations = (
     'directPartOf',
     'transfersTo',
     'transferedBy',
-    'fullFills',
+    'fulfills',
   ];
 
   return transformableKeys.reduce(
@@ -634,10 +673,10 @@ export const updateNodeConnectionData = async (
     sourceNode.data.directParts =
       filteredDirectParts.length > 0 ? filteredDirectParts : null;
   } else if (oldConnection === EdgeType.Fulfilled) {
-    const filteredFulfills = targetNode.data.fullFills?.filter(
+    const filteredFulfills = targetNode.data.fulfills?.filter(
       (node: CustomNodeProps) => node.id !== sourceNodeId
     );
-    targetNode.data.fullFills =
+    targetNode.data.fulfills =
       filteredFulfills?.length > 0 ? filteredFulfills : null;
 
     const filteredFulfilledBy = sourceNode.data.fulfilledBy?.filter(
@@ -663,8 +702,8 @@ export const updateNodeConnectionData = async (
   }
 
   if (newConnection === EdgeType.Fulfilled) {
-    targetNode.data.fullFills = [
-      ...(targetNode.data.fullFills ?? []),
+    targetNode.data.fulfills = [
+      ...(targetNode.data.fulfills ?? []),
       { id: sourceNodeId },
     ];
 
@@ -719,7 +758,7 @@ export const getReadableRelation = (type: RelationType): string | null => {
       return 'Transfers to';
     case RelationType.TransferedBy:
       return 'Transfered by';
-    case RelationType.FulFills:
+    case RelationType.Fulfills:
       return 'Fulfills';
     default:
       return null;

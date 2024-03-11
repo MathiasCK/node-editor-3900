@@ -21,13 +21,19 @@ public class DB : DbContext
                     .OwnsOne(n => n.Data, data =>
                     {
 
+                        data.Property(nd => nd.Children)
+                            .HasConversion(
+                                v => JsonSerializer.Serialize(v, (JsonSerializerOptions)null),
+                                v => JsonSerializer.Deserialize<List<Relation>>(v, (JsonSerializerOptions)null))
+                            .HasColumnType("json");
+
                         data.Property(nd => nd.Terminals)
                             .HasConversion(
                                 v => JsonSerializer.Serialize(v, (JsonSerializerOptions)null),
                                 v => JsonSerializer.Deserialize<List<Relation>>(v, (JsonSerializerOptions)null))
                             .HasColumnType("json");
 
-                        data.Property(nd => nd.TerminalOf)
+                        data.Property(nd => nd.TransfersTo)
                             .HasConversion(
                                 v => JsonSerializer.Serialize(v, (JsonSerializerOptions)null),
                                 v => JsonSerializer.Deserialize<List<Relation>>(v, (JsonSerializerOptions)null))
@@ -38,27 +44,12 @@ public class DB : DbContext
                             v => JsonSerializer.Deserialize<List<Relation>>(v, (JsonSerializerOptions)null))
                             .HasColumnType("json");
 
-                        data.Property(nd => nd.ConnectedBy).HasConversion(
-                            v => JsonSerializer.Serialize(v, (JsonSerializerOptions)null),
-                            v => JsonSerializer.Deserialize<List<Relation>>(v, (JsonSerializerOptions)null))
-                            .HasColumnType("json");
-
                         data.Property(nd => nd.DirectParts).HasConversion(
                             v => JsonSerializer.Serialize(v, (JsonSerializerOptions)null),
                             v => JsonSerializer.Deserialize<List<Relation>>(v, (JsonSerializerOptions)null))
                             .HasColumnType("json");
 
-                        data.Property(nd => nd.DirectPartOf).HasConversion(
-                            v => JsonSerializer.Serialize(v, (JsonSerializerOptions)null),
-                            v => JsonSerializer.Deserialize<List<Relation>>(v, (JsonSerializerOptions)null))
-                            .HasColumnType("json");
-
-                        data.Property(nd => nd.FulfilledBy).HasConversion(
-                            v => JsonSerializer.Serialize(v, (JsonSerializerOptions)null),
-                            v => JsonSerializer.Deserialize<List<Relation>>(v, (JsonSerializerOptions)null))
-                            .HasColumnType("json");
-
-                        data.Property(nd => nd.FullFills).HasConversion(
+                        data.Property(nd => nd.Fulfills).HasConversion(
                             v => JsonSerializer.Serialize(v, (JsonSerializerOptions)null),
                             v => JsonSerializer.Deserialize<List<Relation>>(v, (JsonSerializerOptions)null))
                             .HasColumnType("json");

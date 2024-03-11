@@ -1,11 +1,7 @@
 import toast from 'react-hot-toast';
 import { getConnectedEdges, type Node, type Edge } from 'reactflow';
 import { NodeWithNodeId, type UpdateNode } from '@/lib/types';
-import {
-  getSymmetricDifference,
-  updateNodeData,
-  updateNodeRelations,
-} from '@/lib/utils';
+import { deleteEdge } from './edges';
 
 export const fetchNodes = async (): Promise<Node[] | null> => {
   try {
@@ -86,7 +82,6 @@ export const updateNode = async (
   }
 
   const nodeToUpdate = nodes.find(n => n.id === nodeToUpdateId);
-  const nodeIndex = nodes.findIndex(n => n.id === nodeToUpdateId);
 
   if (!nodeToUpdate) {
     toast.error(`Node with id ${nodeToUpdateId} not found. Please try again.`);
@@ -125,12 +120,14 @@ export const updateNode = async (
     }
 
     if (updatedNode) {
-      updateNodeData(
-        nodeIndex,
-        updatedNode as unknown as Node,
-        nodes,
-        setNodes
-      );
+      const newNodes = nodes.map(node => {
+        if (node.id === updatedNode.id) {
+          return updatedNode;
+        }
+        return node;
+      });
+
+      setNodes(newNodes);
     }
 
     return updatedNode as Node;
@@ -163,7 +160,14 @@ export const deleteNode = async (
   const connectedEdges = getConnectedEdges([nodeToDelete], edges);
 
   for (const edge of connectedEdges) {
-    await updateNodeRelations(edge, nodes, setNodes, nodeToDelete.id);
+    await deleteEdge(
+      edge.id as string,
+      edges,
+      setEdges,
+      nodes,
+      setNodes,
+      nodeToDeleteId
+    );
   }
 
   try {
@@ -186,9 +190,6 @@ export const deleteNode = async (
     toast.success('Node deleted successfully!');
 
     setNodes(nodes.filter(node => node.id !== nodeToDelete.id));
-
-    const updatedEdges = getSymmetricDifference(edges, connectedEdges);
-    setEdges(updatedEdges);
   } catch (error) {
     console.error('Error updating node', error);
     toast.error(`Unexpected error: ${(error as Error).message}`);

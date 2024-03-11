@@ -27,17 +27,19 @@ public class Position
 
 public class NodeData
 {
+    public string? Parent { get; set; }
+    public List<Relation>? Children { get; set; }
     public AspectType Aspect { get; set; }
     public List<Relation>? Terminals { get; set; }
-    public List<Relation>? TerminalOf { get; set; }
-    public string? TransfersTo { get; set; }
+    public string? TerminalOf { get; set; }
+    public List<Relation>? TransfersTo { get; set; }
     public string? TransferedBy { get; set; }
     public List<Relation>? ConnectedTo { get; set; }
-    public List<Relation>? ConnectedBy { get; set; }
-    public List<Relation>? DirectPartOf { get; set; }
+    public string? ConnectedBy { get; set; }
+    public string? DirectPartOf { get; set; }
     public List<Relation>? DirectParts { get; set; }
-    public List<Relation>? FulfilledBy { get; set; }
-    public List<Relation>? FullFills { get; set; }
+    public string? FulfilledBy { get; set; }
+    public List<Relation>? Fulfills { get; set; }
     public string? Id { get; set; }
     public string? Label { get; set; }
     public string? Type { get; set; }
