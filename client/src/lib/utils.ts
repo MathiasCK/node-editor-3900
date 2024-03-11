@@ -174,6 +174,15 @@ export const checkConnection = (
         },
       },
     });
+
+    newNodeRelations.push({
+      nodeId: params.target as string,
+      array: {
+        connectedBy: {
+          id: params.source as string,
+        },
+      },
+    });
   }
 
   if (connectionType === EdgeType.Part && !lockConnection) {
@@ -288,6 +297,7 @@ export const addNode = async (
   }
 
   newNode.data.connectedTo = null;
+  newNode.data.connectedBy = null;
   newNode.data.directParts = null;
   newNode.data.directPartOf = null;
   newNode.data.fulfilledBy = null;
@@ -410,19 +420,29 @@ export const updateNodeRelations = async (
     currentEdge.type === EdgeType.Connected &&
     !currentEdge.data.lockCoonection
   ) {
-    const nodeToUpdate = nodes.find(node => node.id === currentEdge.source);
+    const sourceNode = nodes.find(node => node.id === currentEdge.source);
+    const targetNode = nodes.find(node => node.id === currentEdge.target);
 
-    if (!nodeToUpdate) return;
+    if (!sourceNode || !targetNode) return;
 
-    const updatedConnectedTo = nodeToUpdate.data.connectedTo.filter(
+    const updatedConnectedTo = sourceNode.data.connectedTo.filter(
       (node: { id: string }) => node.id !== currentEdge.target
     );
 
-    nodeToUpdate.data.connectedTo = updatedConnectedTo.length
+    sourceNode.data.connectedTo = updatedConnectedTo.length
       ? updatedConnectedTo
       : null;
 
-    updateNode(nodeToUpdate.id, nodes, setNodes);
+    const updatedConnectedBy = targetNode.data.connectedBy.filter(
+      (node: { id: string }) => node.id !== currentEdge.source
+    );
+
+    targetNode.data.connectedBy = updatedConnectedBy.length
+      ? updatedConnectedBy
+      : null;
+
+    updateNode(sourceNode.id, nodes, setNodes);
+    updateNode(targetNode.id, nodes, setNodes);
     return;
   }
 
@@ -508,6 +528,7 @@ export const getNodeRelations = (
 ): RelationKeysWithChildren[] => {
   const transformableKeys: RelationKeys[] = [
     'connectedTo',
+    'connectedBy',
     'directParts',
     'fulfilledBy',
     'terminals',
@@ -626,12 +647,19 @@ export const updateNodeConnectionData = async (
     sourceNode.data.fulfilledBy =
       filteredFulfilledBy?.length > 0 ? filteredFulfilledBy : null;
   } else {
-    const filteredConnections = sourceNode.data.connectedTo?.filter(
+    const filteredConnectedTo = sourceNode.data.connectedTo?.filter(
       (node: CustomNodeProps) => node.id !== targetNodeId
     );
 
     sourceNode.data.connectedTo =
-      filteredConnections?.length > 0 ? filteredConnections : null;
+      filteredConnectedTo?.length > 0 ? filteredConnectedTo : null;
+
+    const filteredConnectedBy = targetNode.data.connectedBy?.filter(
+      (node: CustomNodeProps) => node.id !== sourceNodeId
+    );
+
+    targetNode.data.connectedBy =
+      filteredConnectedBy?.length > 0 ? filteredConnectedBy : null;
   }
 
   if (newConnection === EdgeType.Fulfilled) {
@@ -655,6 +683,10 @@ export const updateNodeConnectionData = async (
       { id: targetNodeId },
     ];
   } else {
+    targetNode.data.connectedBy = [
+      ...(targetNode.data.connectedBy ?? []),
+      { id: sourceNodeId },
+    ];
     sourceNode.data.connectedTo = [
       ...(sourceNode.data.connectedTo ?? []),
       { id: targetNodeId },
@@ -673,6 +705,8 @@ export const getReadableRelation = (type: RelationType): string | null => {
       return 'Direct part to';
     case RelationType.ConnectedTo:
       return 'Connected to';
+    case RelationType.ConnectedBy:
+      return 'Connected by';
     case RelationType.FulfilledBy:
       return 'Fulfilled by';
     case RelationType.Terminals:

@@ -23,6 +23,7 @@ export enum EdgeType {
 
 export enum RelationType {
   ConnectedTo = 'connectedTo',
+  ConnectedBy = 'connectedBy',
   DirectParts = 'directParts',
   FulfilledBy = 'fulfilledBy',
   Terminals = 'terminals',
@@ -46,6 +47,9 @@ export type NodeData = {
   transfersTo?: string;
   transferedBy?: string;
   connectedTo?: {
+    id: string;
+  }[];
+  connectedBy?: {
     id: string;
   }[];
   directParts?: {
@@ -118,7 +122,8 @@ export type RelationKeys =
   | 'directPartOf'
   | 'transfersTo'
   | 'transferedBy'
-  | 'fullFills';
+  | 'fullFills'
+  | 'connectedBy';
 
 export type RelationKeysWithChildren = {
   key: RelationKeys;
