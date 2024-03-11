@@ -1,10 +1,15 @@
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json;
 using server.Models;
 
 namespace server.DAL;
 
-public class DB : DbContext {
-    public DB(DbContextOptions<DB> options) : base(options) {
+public class DB : DbContext
+{
+    public DB(DbContextOptions<DB> options) : base(options)
+    {
         Database.EnsureCreated();
     }
 
@@ -13,7 +18,42 @@ public class DB : DbContext {
         modelBuilder.Entity<Node>()
                 .OwnsOne(n => n.Position);
         modelBuilder.Entity<Node>()
-                .OwnsOne(n => n.Data);
+                    .OwnsOne(n => n.Data, data =>
+                    {
+
+                        data.Property(nd => nd.Terminals)
+                            .HasConversion(
+                                v => JsonSerializer.Serialize(v, (JsonSerializerOptions)null),
+                                v => JsonSerializer.Deserialize<List<Relation>>(v, (JsonSerializerOptions)null))
+                            .HasColumnType("json");
+
+                        data.Property(nd => nd.TerminalOf)
+                            .HasConversion(
+                                v => JsonSerializer.Serialize(v, (JsonSerializerOptions)null),
+                                v => JsonSerializer.Deserialize<List<Relation>>(v, (JsonSerializerOptions)null))
+                            .HasColumnType("json");
+
+                        data.Property(nd => nd.ConnectedTo).HasConversion(
+                            v => JsonSerializer.Serialize(v, (JsonSerializerOptions)null),
+                            v => JsonSerializer.Deserialize<List<Relation>>(v, (JsonSerializerOptions)null))
+                            .HasColumnType("json");
+
+                        data.Property(nd => nd.DirectParts).HasConversion(
+                            v => JsonSerializer.Serialize(v, (JsonSerializerOptions)null),
+                            v => JsonSerializer.Deserialize<List<Relation>>(v, (JsonSerializerOptions)null))
+                            .HasColumnType("json");
+
+                        data.Property(nd => nd.FulfilledBy).HasConversion(
+                            v => JsonSerializer.Serialize(v, (JsonSerializerOptions)null),
+                            v => JsonSerializer.Deserialize<List<Relation>>(v, (JsonSerializerOptions)null))
+                            .HasColumnType("json");
+
+                        data.Property(nd => nd.FullFills).HasConversion(
+                            v => JsonSerializer.Serialize(v, (JsonSerializerOptions)null),
+                            v => JsonSerializer.Deserialize<List<Relation>>(v, (JsonSerializerOptions)null))
+                            .HasColumnType("json");
+
+                    });
         modelBuilder.Entity<Node>().HasKey(e => e.NodeId);
         modelBuilder.Entity<Node>().Property(e => e.NodeId).HasMaxLength(255);
 
@@ -23,6 +63,6 @@ public class DB : DbContext {
         modelBuilder.Entity<Edge>().Property(e => e.EdgeId).HasMaxLength(255);
     }
 
-    public DbSet<Node> Nodes { get; set;}
-    public DbSet<Edge> Edges { get; set;}
+    public DbSet<Node> Nodes { get; set; }
+    public DbSet<Edge> Edges { get; set; }
 }

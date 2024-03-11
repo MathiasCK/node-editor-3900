@@ -29,21 +29,15 @@ public class NodeData
 {
     public AspectType Aspect { get; set; }
     public bool? HasTerminal { get; set; }
-    [NotMapped]
     public List<Relation>? Terminals { get; set; }
-    [NotMapped]
     public List<Relation>? TerminalOf { get; set; }
     public string? TransfersTo { get; set; }
     public string? TransferedBy { get; set; }
-    [NotMapped]
     public List<Relation>? ConnectedTo { get; set; }
     public bool? HasDirectPart { get; set; }
-    [NotMapped]
     public List<Relation>? DirectParts { get; set; }
     public string? DirectPartOf { get; set; }
-    [NotMapped]
     public List<Relation>? FulfilledBy { get; set; }
-    [NotMapped]
     public List<Relation>? FullFills { get; set; }
     public string? Id { get; set; }
     public string? Label { get; set; }
@@ -70,7 +64,7 @@ public enum NodeType
     Connector,
 }
 
-public struct Relation
+public class Relation
 {
     public string Id { get; set; }
 }
