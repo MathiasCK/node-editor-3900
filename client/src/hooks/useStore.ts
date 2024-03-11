@@ -1,4 +1,4 @@
-import { create } from 'zustand';
+import { createWithEqualityFn as create } from 'zustand/traditional';
 import {
   Edge,
   EdgeChange,
@@ -9,7 +9,7 @@ import {
   applyNodeChanges,
   applyEdgeChanges,
 } from 'reactflow';
-import { persist } from 'zustand/middleware';
+import { createJSONStorage, persist } from 'zustand/middleware';
 
 type RFState = {
   nodes: Node[];
@@ -45,7 +45,7 @@ export const useStore = create<RFState>(
     }),
     {
       name: 'store-storage',
-      getStorage: () => localStorage,
+      storage: createJSONStorage(() => localStorage),
     }
   )
 );

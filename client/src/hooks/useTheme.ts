@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { createJSONStorage, persist } from 'zustand/middleware';
 
 type ThemeData = {
   theme: 'light' | 'dark';
@@ -11,13 +11,11 @@ const useTheme = create<ThemeData>()(
     set => ({
       theme: 'light',
       toggleTheme: () =>
-        set(state => ({
-          theme: state.theme === 'light' ? 'dark' : 'light',
-        })),
+        set(state => ({ theme: state.theme === 'light' ? 'dark' : 'light' })),
     }),
     {
       name: 'theme-storage',
-      getStorage: () => localStorage,
+      storage: createJSONStorage(() => localStorage),
     }
   )
 );
