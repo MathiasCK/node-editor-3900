@@ -459,8 +459,8 @@ export const updateNodeRelations = async (
       sourceNode.data.hasDirectPart = false;
     }
 
-    updateNode(sourceNode, nodes, setNodes);
-    updateNode(targetNode, nodes, setNodes);
+    updateNode(sourceNode.id, nodes, setNodes);
+    updateNode(targetNode.id, nodes, setNodes);
 
     return;
   }
@@ -485,8 +485,8 @@ export const updateNodeRelations = async (
     targetNode.data.fullFills =
       updatedFullFills.length === 0 ? null : updatedFullFills;
 
-    updateNode(sourceNode, nodes, setNodes);
-    updateNode(targetNode, nodes, setNodes);
+    updateNode(sourceNode.id, nodes, setNodes);
+    updateNode(targetNode.id, nodes, setNodes);
 
     return;
   }
@@ -702,10 +702,3 @@ export const getReadableRelation = (type: RelationType): string | null => {
       return null;
   }
 };
-
-export const convertNodePropsToNode = (node: CustomNodeProps): Node => ({
-  id: node.id,
-  type: node.type,
-  position: { x: node.xPos, y: node.yPos },
-  data: node.data,
-});

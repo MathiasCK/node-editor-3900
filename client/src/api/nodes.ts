@@ -1,8 +1,7 @@
 import toast from 'react-hot-toast';
 import { getConnectedEdges, type Node, type Edge } from 'reactflow';
-import { CustomNodeProps, NodeWithNodeId, type UpdateNode } from '@/lib/types';
+import { NodeWithNodeId, type UpdateNode } from '@/lib/types';
 import {
-  convertNodePropsToNode,
   getSymmetricDifference,
   updateNodeData,
   updateNodeRelations,
