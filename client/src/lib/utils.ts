@@ -330,21 +330,6 @@ export const addNode = async (
     },
   };
 
-  if (isTerminal(type)) {
-    newNode.data.terminalOf = null;
-    newNode.data.transfersTo = null;
-  }
-
-  newNode.data.parent = 'void';
-  newNode.data.children = null;
-  newNode.data.connectedTo = null;
-  newNode.data.connectedBy = null;
-  newNode.data.directParts = null;
-  newNode.data.directPartOf = null;
-  newNode.data.fulfilledBy = null;
-  newNode.data.fulfills = null;
-  newNode.data.customName = null;
-
   await createNode(newNode as Node, nodes, setNodes);
 };
 

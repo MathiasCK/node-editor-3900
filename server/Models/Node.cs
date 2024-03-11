@@ -8,7 +8,7 @@ public class Node
 {
     [Key]
     public string NodeId { get; set; }
-    public string Id { get; set; }
+    public required string Id { get; set; }
     public required NodeData Data { get; set; }
     public required Position Position { get; set; }
     public required NodeType Type { get; set; }
@@ -27,9 +27,8 @@ public class Position
 
 public class NodeData
 {
-    public string? Parent { get; set; }
+    public string Parent { get; set; } = "void";
     public List<Relation>? Children { get; set; }
-    public AspectType Aspect { get; set; }
     public List<Relation>? Terminals { get; set; }
     public string? TerminalOf { get; set; }
     public List<Relation>? TransfersTo { get; set; }
@@ -40,12 +39,11 @@ public class NodeData
     public List<Relation>? DirectParts { get; set; }
     public string? FulfilledBy { get; set; }
     public List<Relation>? Fulfills { get; set; }
-    public string? Id { get; set; }
-    public string? Label { get; set; }
-    public string? Type { get; set; }
-    public long CreatedAt { get; set; }
-    public long UpdatedAt { get; set; }
-    public string? CustomName { get; set; } = string.Empty;
+    public string? CustomName { get; set; }
+    public required AspectType Aspect { get; set; }
+    public required string Label { get; set; }
+    public required long CreatedAt { get; set; }
+    public required long UpdatedAt { get; set; }
 }
 
 [JsonConverter(typeof(AspectTypeConverter))]
@@ -67,5 +65,5 @@ public enum NodeType
 
 public class Relation
 {
-    public string Id { get; set; }
+    public required string Id { get; set; }
 }
