@@ -33,7 +33,8 @@ public class NodeData
     public string? TransfersTo { get; set; }
     public string? TransferedBy { get; set; }
     public List<Relation>? ConnectedTo { get; set; }
-    public string? DirectPartOf { get; set; }
+    public List<Relation>? DirectPartOf { get; set; }
+    public List<Relation>? DirectParts { get; set; }
     public List<Relation>? FulfilledBy { get; set; }
     public List<Relation>? FullFills { get; set; }
     public string? Id { get; set; }

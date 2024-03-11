@@ -188,8 +188,10 @@ export const checkConnection = (
 
     newNodeRelations.push({
       nodeId: params.target as string,
-      value: {
-        directPartOf: params.source as string,
+      array: {
+        directPartOf: {
+          id: params.source as string,
+        },
       },
     });
   }
@@ -430,17 +432,19 @@ export const updateNodeRelations = async (
 
     if (!sourceNode || !targetNode) return;
 
-    targetNode.data.directPartOf = null;
+    const filteredDirectPartOf = targetNode.data.directPartOf.filter(
+      (part: { id: string }) => part.id !== currentEdge.source
+    );
+
+    targetNode.data.directPartOf =
+      filteredDirectPartOf.length > 0 ? filteredDirectPartOf : null;
 
     const filteredDirectParts = sourceNode.data.directParts.filter(
       (part: { id: string }) => part.id !== currentEdge.target
     );
 
-    sourceNode.data.directParts = filteredDirectParts;
-
-    if (filteredDirectParts.length === 0) {
-      sourceNode.data.directParts = null;
-    }
+    sourceNode.data.directParts =
+      filteredDirectParts.length > 0 ? filteredDirectParts : null;
 
     updateNode(sourceNode.id, nodes, setNodes);
     updateNode(targetNode.id, nodes, setNodes);
@@ -595,10 +599,15 @@ export const updateNodeConnectionData = async (
   }
 
   if (oldConnection === EdgeType.Part) {
-    targetNode.data.directPartOf = null;
+    const filteredDirectPartOf = targetNode.data.directPartOf.filter(
+      (part: { id: string }) => part.id !== sourceNode.id
+    );
+
+    targetNode.data.directPartOf =
+      filteredDirectPartOf.length > 0 ? filteredDirectPartOf : null;
 
     const filteredDirectParts = sourceNode.data.directParts.filter(
-      (node: CustomNodeProps) => node.id !== targetNode.id
+      (part: { id: string }) => part.id !== targetNode.id
     );
 
     sourceNode.data.directParts =
@@ -636,7 +645,11 @@ export const updateNodeConnectionData = async (
       { id: targetNodeId },
     ];
   } else if (newConnection === EdgeType.Part) {
-    targetNode.data.directPartOf = sourceNodeId;
+    targetNode.data.directPartOf = [
+      ...(targetNode.data.directPartOf ?? []),
+      { id: sourceNodeId },
+    ];
+
     sourceNode.data.directParts = [
       ...(sourceNode.data.directParts ?? []),
       { id: targetNodeId },
@@ -657,7 +670,7 @@ export const updateNodeConnectionData = async (
 export const getReadableRelation = (type: RelationType): string | null => {
   switch (type) {
     case RelationType.DirectParts:
-      return 'Direct parts';
+      return 'Direct part to';
     case RelationType.ConnectedTo:
       return 'Connected to';
     case RelationType.FulfilledBy:

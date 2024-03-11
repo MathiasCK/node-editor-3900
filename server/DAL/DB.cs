@@ -43,6 +43,11 @@ public class DB : DbContext
                             v => JsonSerializer.Deserialize<List<Relation>>(v, (JsonSerializerOptions)null))
                             .HasColumnType("json");
 
+                        data.Property(nd => nd.DirectPartOf).HasConversion(
+                            v => JsonSerializer.Serialize(v, (JsonSerializerOptions)null),
+                            v => JsonSerializer.Deserialize<List<Relation>>(v, (JsonSerializerOptions)null))
+                            .HasColumnType("json");
+
                         data.Property(nd => nd.FulfilledBy).HasConversion(
                             v => JsonSerializer.Serialize(v, (JsonSerializerOptions)null),
                             v => JsonSerializer.Deserialize<List<Relation>>(v, (JsonSerializerOptions)null))

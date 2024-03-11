@@ -51,7 +51,9 @@ export type NodeData = {
   directParts?: {
     id: string;
   }[];
-  directPartOf?: string;
+  directPartOf?: {
+    id: string;
+  }[];
   fulfilledBy?: {
     id: string;
   }[];
