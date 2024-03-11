@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   type Edge,
+  type Node,
   type Connection,
   Background,
   Panel,
@@ -26,7 +27,8 @@ import {
 } from './components/ui/styled';
 import { ThemeProvider } from 'styled-components';
 import { Sidebar, Settings, SelectConnection } from './components/ui';
-import { createEdge } from './api/edges';
+import { fetchNodes } from './api/nodes';
+import { createEdge, fetchEdges } from './api/edges';
 
 export default function App() {
   const nodeTypes = useMemo(
@@ -60,6 +62,15 @@ export default function App() {
   useEffect(() => {
     document.documentElement.classList.toggle('dark', theme === 'dark');
   }, [theme]);
+
+  useEffect(() => {
+    (async () => {
+      const edges = (await fetchEdges()) ?? [];
+      const nodes = (await fetchNodes()) ?? [];
+      setNodes(nodes as Node[]);
+      setEdges(edges as Edge[]);
+    })();
+  }, []);
 
   const createNewConnection = () => {
     if (!params) return;
