@@ -4,7 +4,7 @@ import type { CustomEdgeProps } from '@/lib/types';
 const Part = (props: CustomEdgeProps) => {
   const { openSidebar } = useSidebar();
   return (
-    <g onClick={() => openSidebar(props)}>
+    <g onClick={() => openSidebar({ ...props, type: 'part' })}>
       <defs>
         <marker
           id="parthead"

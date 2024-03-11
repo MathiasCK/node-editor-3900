@@ -32,8 +32,9 @@ const CurrentEdge: FC<Props> = ({ currentEdge }) => {
   const { openSidebar, closeSidebar } = useSidebar();
   const { edges, setEdges, nodes, setNodes } = useStore();
 
-  const { type } = edges.find(e => e.id === currentEdge.id) as Edge;
-  const [connectionType, setConnectionType] = useState<string>(type as string);
+  const [connectionType, setConnectionType] = useState<string>(
+    currentEdge.type
+  );
 
   const displayName = `Edge ${currentEdge.source} -> ${currentEdge.target}`;
 
@@ -76,6 +77,7 @@ const CurrentEdge: FC<Props> = ({ currentEdge }) => {
 
     closeSidebar();
   };
+
   return (
     <SheetContent className="bg:background flex flex-col justify-between">
       <SheetHeader>

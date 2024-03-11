@@ -5,7 +5,7 @@ const Fulfilled = (props: CustomEdgeProps) => {
   const { openSidebar } = useSidebar();
 
   return (
-    <g onClick={() => openSidebar(props)}>
+    <g onClick={() => openSidebar({ ...props, type: 'fulfilled' })}>
       <defs>
         <marker
           id="fulfilledhead"
