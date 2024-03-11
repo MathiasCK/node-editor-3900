@@ -66,9 +66,6 @@ export const checkConnection = (
           id: params.target as string,
         },
       },
-      value: {
-        hasTerminal: true,
-      },
     });
   }
 
@@ -95,9 +92,6 @@ export const checkConnection = (
         terminals: {
           id: params.source as string,
         },
-      },
-      value: {
-        hasTerminal: true,
       },
     });
   }
@@ -189,9 +183,6 @@ export const checkConnection = (
         directParts: {
           id: params.target as string,
         },
-      },
-      value: {
-        hasDirectPart: true,
       },
     });
 
@@ -289,17 +280,12 @@ export const addNode = async (
     },
   };
 
-  if (isBlock(type) || isConnector(type)) {
-    newNode.data.hasTerminal = false;
-  }
-
   if (isTerminal(type)) {
     newNode.data.terminalOf = null;
     newNode.data.transfersTo = null;
   }
 
   newNode.data.connectedTo = null;
-  newNode.data.hasDirectPart = false;
   newNode.data.directParts = null;
   newNode.data.directPartOf = null;
   newNode.data.fulfilledBy = null;
@@ -398,9 +384,7 @@ export const updateNodeRelations = async (
       nodeToUpdate.data.terminals = updatedTerminals;
 
       if (updatedTerminals.length === 0) {
-        delete nodeToUpdate.data.terminals;
         nodeToUpdate.data.terminals = null;
-        nodeToUpdate.data.hasTerminal = false;
       }
     }
 
@@ -456,7 +440,6 @@ export const updateNodeRelations = async (
 
     if (filteredDirectParts.length === 0) {
       sourceNode.data.directParts = null;
-      sourceNode.data.hasDirectPart = false;
     }
 
     updateNode(sourceNode.id, nodes, setNodes);

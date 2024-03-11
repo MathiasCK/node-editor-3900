@@ -37,7 +37,6 @@ export type UpdateNode = { customName?: string; aspect?: AspectType };
 
 export type NodeData = {
   aspect: AspectType;
-  hasTerminal?: boolean;
   terminals?: {
     id: string;
   }[];
@@ -49,7 +48,6 @@ export type NodeData = {
   connectedTo?: {
     id: string;
   }[];
-  hasDirectPart?: boolean;
   directParts?: {
     id: string;
   }[];
@@ -60,7 +58,6 @@ export type NodeData = {
   fullFills?: {
     id: string;
   }[];
-
   label: string;
   type: string;
   createdAt: number;

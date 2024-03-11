@@ -28,14 +28,11 @@ public class Position
 public class NodeData
 {
     public AspectType Aspect { get; set; }
-    public bool? HasTerminal { get; set; }
     public List<Relation>? Terminals { get; set; }
     public List<Relation>? TerminalOf { get; set; }
     public string? TransfersTo { get; set; }
     public string? TransferedBy { get; set; }
     public List<Relation>? ConnectedTo { get; set; }
-    public bool? HasDirectPart { get; set; }
-    public List<Relation>? DirectParts { get; set; }
     public string? DirectPartOf { get; set; }
     public List<Relation>? FulfilledBy { get; set; }
     public List<Relation>? FullFills { get; set; }
