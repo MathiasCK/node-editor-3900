@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+
 import toast from 'react-hot-toast';
 import { getConnectedEdges, type Node, type Edge } from 'reactflow';
 import { NodeWithNodeId, type UpdateNode } from '@/lib/types';
@@ -21,7 +23,6 @@ export const fetchNodes = async (): Promise<Node[] | null> => {
     return nodes;
   } catch (error) {
     console.error('Error fetching nodes', error);
-    toast.error(`Unexpected error: ${(error as Error).message}`);
     return null;
   }
 };
@@ -62,8 +63,8 @@ export const createNode = async (
 
     return createdNode as Node;
   } catch (error) {
-    console.error('Error creating node', error);
-    toast.error(`Unexpected error: ${(error as Error).message}`);
+    toast.error(`Error creating node: ${(error as Error).message}`);
+    console.error(`Error creating node: ${error}`);
     return null;
   } finally {
     loadingToastId && toast.dismiss(loadingToastId);
@@ -132,8 +133,8 @@ export const updateNode = async (
 
     return updatedNode as Node;
   } catch (error) {
-    console.error('Error updating node', error);
-    toast.error(`Unexpected error: ${(error as Error).message}`);
+    toast.error(`Error updating node: ${(error as Error).message}`);
+    console.error(`Error updating node: ${error}`);
     return null;
   } finally {
     loadingToastId && toast.dismiss(loadingToastId);
@@ -146,29 +147,17 @@ export const deleteNode = async (
   setNodes: (nodes: Node[]) => void,
   edges: Edge[],
   setEdges: (edges: Edge[]) => void
-) => {
+): Promise<string | null> => {
   const nodeToDelete = nodes.find(
     node => node.id === nodeToDeleteId
   ) as NodeWithNodeId;
 
   if (!nodeToDelete.nodeId) {
     toast.error(`Error deleting node - ${nodeToDeleteId} not found`);
-    return;
+    return null;
   }
 
   const loadingToastId = toast.loading('Deleting node...');
-  const connectedEdges = getConnectedEdges([nodeToDelete], edges);
-
-  for (const edge of connectedEdges) {
-    await deleteEdge(
-      edge.id as string,
-      edges,
-      setEdges,
-      nodes,
-      setNodes,
-      nodeToDeleteId
-    );
-  }
 
   try {
     const response = await fetch(
@@ -190,11 +179,24 @@ export const deleteNode = async (
     toast.success('Node deleted successfully!');
 
     setNodes(nodes.filter(node => node.id !== nodeToDelete.id));
+    return nodeToDelete.id;
   } catch (error) {
-    console.error('Error updating node', error);
-    toast.error(`Unexpected error: ${(error as Error).message}`);
+    toast.error(`Error deleting node: ${(error as Error).message}`);
+    console.error(`Error deleting node: ${error}`);
     return null;
   } finally {
     loadingToastId && toast.dismiss(loadingToastId);
+
+    const connectedEdges = getConnectedEdges([nodeToDelete], edges);
+    for (const edge of connectedEdges) {
+      await deleteEdge(
+        edge.id as string,
+        edges,
+        setEdges,
+        nodes,
+        setNodes,
+        nodeToDeleteId
+      );
+    }
   }
 };

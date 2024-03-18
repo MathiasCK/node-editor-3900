@@ -67,9 +67,19 @@ const CurrentNode: FC<Props> = ({ currentNode }) => {
     handleEdit(false);
   };
 
-  const handleDelete = () => {
-    deleteNode(currentNode.id as string, nodes, setNodes, edges, setEdges);
+  const handleDelete = async () => {
+    const deleted = deleteNode(
+      currentNode.id as string,
+      nodes,
+      setNodes,
+      edges,
+      setEdges
+    );
 
+    if (deleted) {
+      closeSidebar();
+      handleEdit(false);
+    }
     closeSidebar();
     handleEdit(false);
   };
@@ -84,7 +94,7 @@ const CurrentNode: FC<Props> = ({ currentNode }) => {
             <Pencil
               onClick={() => handleEdit(true)}
               size={15}
-              className="text-md text-foreground font-semibold  hover:cursor-pointer"
+              className="text-md font-semibold text-foreground  hover:cursor-pointer"
             />
           ) : null}
 
@@ -92,7 +102,7 @@ const CurrentNode: FC<Props> = ({ currentNode }) => {
             disabled={!sidebar.edit}
             value={nodeName}
             onChange={e => setNodeName(e.target.value)}
-            className="text-foreground border-none text-lg font-semibold"
+            className="border-none text-lg font-semibold text-foreground"
           />
         </SheetTitle>
         <SheetDescription>
@@ -105,7 +115,7 @@ const CurrentNode: FC<Props> = ({ currentNode }) => {
         </SheetDescription>
       </SheetHeader>
       <div>
-        <p className="text-muted-foreground mb-2 text-sm">Aspect type</p>
+        <p className="mb-2 text-sm text-muted-foreground">Aspect type</p>
         <Select value={aspectType} onValueChange={e => setAspectType(e)}>
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder={aspectType} />
@@ -123,7 +133,7 @@ const CurrentNode: FC<Props> = ({ currentNode }) => {
       {nodeRelations.length > 0 &&
         nodeRelations.map(nodeRelation => (
           <div key={nodeRelation.key}>
-            <p className="text-muted-foreground mb-2 text-sm">
+            <p className="mb-2 text-sm text-muted-foreground">
               {getReadableRelation(nodeRelation.key as RelationType)}
             </p>
             {nodeRelation.children?.map(c => (
