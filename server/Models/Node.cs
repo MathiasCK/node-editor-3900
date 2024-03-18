@@ -33,7 +33,7 @@ public class NodeData
     public string? TerminalOf { get; set; }
     public string? TransfersTo { get; set; }
     public string? TransferedBy { get; set; }
-    public List<Relation>? ConnectedTo { get; set; }
+    public string? ConnectedTo { get; set; }
     public string? ConnectedBy { get; set; }
     public string? DirectPartOf { get; set; }
     public List<Relation>? DirectParts { get; set; }

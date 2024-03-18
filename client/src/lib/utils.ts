@@ -156,6 +156,30 @@ export const checkConnection = (
     });
   }
 
+  if (
+    (isTerminal(params.sourceHandle as string) &&
+      isConnector(params.targetHandle as string)) ||
+    (isConnector(params.sourceHandle as string) &&
+      isTerminal(params.targetHandle as string))
+  ) {
+    lockConnection = true;
+    connectionType = EdgeType.Connected;
+
+    newNodeRelations.push({
+      nodeId: params.source as string,
+      relation: {
+        connectedTo: params.target as string,
+      },
+    });
+
+    newNodeRelations.push({
+      nodeId: params.target as string,
+      relation: {
+        connectedBy: params.source as string,
+      },
+    });
+  }
+
   // Only possible for block to block connections
   if (connectionType === EdgeType.Part && !lockConnection) {
     const sourceNode = nodes.find(node => node.id === params.source);
@@ -412,28 +436,13 @@ export const updateNodeRelations = async (
     if (!sourceNode || !targetNode) return;
 
     if (sourceNode.id !== nodeIdToDelete) {
-      const updatedConnectedTo = sourceNode.data.connectedTo.filter(
-        (node: { id: string }) => node.id !== currentEdge.target
-      );
-
-      sourceNode.data.connectedTo = updatedConnectedTo.length
-        ? updatedConnectedTo
-        : null;
-
-      const updatedChildren = sourceNode.data.children.filter(
-        (child: { id: string }) => child.id !== currentEdge.target
-      );
-
-      sourceNode.data.children = updatedChildren.length
-        ? updatedChildren
-        : null;
+      sourceNode.data.connectedTo = null;
 
       await updateNode(sourceNode.id, nodes, setNodes);
     }
 
     if (targetNode.id !== nodeIdToDelete) {
       targetNode.data.connectedBy = null;
-      targetNode.data.parent = 'void';
 
       await updateNode(targetNode.id, nodes, setNodes);
     }
