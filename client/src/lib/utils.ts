@@ -45,8 +45,11 @@ export const checkConnection = (
   ) {
     const terminal = nodes.find(t => t.id === params.target);
 
-    if (terminal?.data?.parent !== 'void') {
-      toast.error(`Terminal ${params.target} already has a parent`);
+    if (terminal?.data?.terminalOf) {
+      const block = nodes.find(b => b.id === terminal?.data?.terminalOf);
+      toast.error(
+        `Terminal ${terminal?.data?.customName ?? params.target} is already a terminal of ${block?.data?.customName ?? terminal?.data?.terminalOf}`
+      );
       return {
         canConnect: false,
       };
@@ -59,7 +62,6 @@ export const checkConnection = (
       nodeId: params.target as string,
       relation: {
         terminalOf: params.source as string,
-        parent: params.source as string,
       },
     });
 
@@ -67,9 +69,6 @@ export const checkConnection = (
       nodeId: params.source as string,
       relations: {
         terminals: {
-          id: params.target as string,
-        },
-        children: {
           id: params.target as string,
         },
       },
@@ -83,8 +82,11 @@ export const checkConnection = (
   ) {
     const terminal = nodes.find(t => t.id === params.source);
 
-    if (terminal?.data?.parent !== 'void') {
-      toast.error(`Terminal ${params.source} already has a parent`);
+    if (terminal?.data?.terminalOf) {
+      const block = nodes.find(b => b.id === terminal?.data?.terminalOf);
+      toast.error(
+        `Terminal ${terminal?.data?.customName ?? params.source} is already a terminal of ${block?.data?.customName ?? terminal?.data?.terminalOf}`
+      );
       return {
         canConnect: false,
       };
@@ -96,7 +98,6 @@ export const checkConnection = (
     newNodeRelations.push({
       nodeId: params.source as string,
       relation: {
-        parent: params.target as string,
         terminalOf: params.target as string,
       },
     });
@@ -105,9 +106,6 @@ export const checkConnection = (
       nodeId: params.target as string,
       relations: {
         terminals: {
-          id: params.source as string,
-        },
-        children: {
           id: params.source as string,
         },
       },
@@ -211,28 +209,6 @@ export const checkConnection = (
         fulfilledBy: {
           id: params.source as string,
         },
-      },
-    });
-  }
-
-  if (connectionType === EdgeType.Connected && !lockConnection) {
-    newNodeRelations.push({
-      nodeId: params.source as string,
-      relations: {
-        connectedTo: {
-          id: params.target as string,
-        },
-        children: {
-          id: params.target as string,
-        },
-      },
-    });
-
-    newNodeRelations.push({
-      nodeId: params.target as string,
-      relation: {
-        parent: params.source as string,
-        connectedBy: params.source as string,
       },
     });
   }
@@ -380,7 +356,6 @@ export const updateNodeRelations = async (
 
     if (terminal.id !== nodeIdToDelete) {
       terminal.data.terminalOf = null;
-      terminal.data.parent = 'void';
 
       await updateNode(terminal.id, nodes, setNodes);
     }
@@ -389,16 +364,14 @@ export const updateNodeRelations = async (
       const filteredTerminals = block.data.terminals.filter(
         (id: string) => id !== terminal.id
       );
-      const filteredChildren = block.data.children.filter(
-        (child: { id: string }) => child.id !== terminal.id
-      );
+
       block.data.terminals = filteredTerminals.length
         ? filteredTerminals
         : null;
-      block.data.children = filteredChildren.length ? filteredChildren : null;
-    }
 
-    await updateNode(block.id, nodes, setNodes);
+      await updateNode(block.id, nodes, setNodes);
+    }
+    return;
   }
 
   // Deleting a block -> terminal connection
@@ -413,7 +386,6 @@ export const updateNodeRelations = async (
 
     if (terminal.id !== nodeIdToDelete) {
       terminal.data.terminalOf = null;
-      terminal.data.parent = 'void';
 
       await updateNode(terminal.id, nodes, setNodes);
     }
@@ -422,16 +394,14 @@ export const updateNodeRelations = async (
       const filteredTerminals = block.data.terminals.filter(
         (id: string) => id !== terminal.id
       );
-      const filteredChildren = block.data.children.filter(
-        (child: { id: string }) => child.id !== terminal.id
-      );
+
       block.data.terminals = filteredTerminals.length
         ? filteredTerminals
         : null;
-      block.data.children = filteredChildren.length ? filteredChildren : null;
-    }
 
-    await updateNode(block.id, nodes, setNodes);
+      await updateNode(block.id, nodes, setNodes);
+    }
+    return;
   }
 
   if (
