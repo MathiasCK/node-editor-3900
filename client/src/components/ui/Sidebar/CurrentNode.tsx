@@ -68,7 +68,7 @@ const CurrentNode: FC<Props> = ({ currentNode }) => {
   };
 
   const handleDelete = async () => {
-    const deleted = deleteNode(
+    const deleted = await deleteNode(
       currentNode.id as string,
       nodes,
       setNodes,
