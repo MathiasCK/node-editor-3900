@@ -31,7 +31,7 @@ public class NodeData
     public List<Relation>? Children { get; set; }
     public List<Relation>? Terminals { get; set; }
     public string? TerminalOf { get; set; }
-    public List<Relation>? TransfersTo { get; set; }
+    public string? TransfersTo { get; set; }
     public string? TransferedBy { get; set; }
     public List<Relation>? ConnectedTo { get; set; }
     public string? ConnectedBy { get; set; }

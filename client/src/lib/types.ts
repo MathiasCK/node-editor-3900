@@ -46,9 +46,7 @@ export type NodeData = {
     id: string;
   }[];
   terminalOf?: string;
-  transfersTo?: {
-    id: string;
-  }[];
+  transfersTo?: string;
   transferedBy?: string;
   connectedTo?: {
     id: string;

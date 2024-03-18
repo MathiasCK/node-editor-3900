@@ -112,16 +112,27 @@ export const checkConnection = (
     });
   }
 
-  // Set transfersTo property for terminal
+  // Set transfersTo & transferedBy property for terminals
   if (
     isTerminal(params.sourceHandle as string) &&
     isTerminal(params.targetHandle as string)
   ) {
-    // Check if terminal is already connected to other terminals
     const targetTerminal = nodes.find(node => node.id === params.target);
+    const sourceTerminal = nodes.find(node => node.id === params.source);
 
-    if (targetTerminal?.data?.parent !== 'void') {
-      toast.error(`Terminal ${params.target} already has a parent`);
+    if (targetTerminal?.data.transferedBy) {
+      toast.error(
+        `Terminal ${targetTerminal?.data.customName ?? targetTerminal.id} is already being transferred by another terminal`
+      );
+      return {
+        canConnect: false,
+      };
+    }
+
+    if (sourceTerminal?.data.transfersTo) {
+      toast.error(
+        `Terminal ${sourceTerminal?.data.customName ?? sourceTerminal.id} is already transferring to another terminal`
+      );
       return {
         canConnect: false,
       };
@@ -132,13 +143,8 @@ export const checkConnection = (
 
     newNodeRelations.push({
       nodeId: params.source as string,
-      relations: {
-        transfersTo: {
-          id: params.target as string,
-        },
-        children: {
-          id: params.target as string,
-        },
+      relation: {
+        transfersTo: params.target as string,
       },
     });
 
@@ -146,7 +152,6 @@ export const checkConnection = (
       nodeId: params.target as string,
       relation: {
         transferedBy: params.source as string,
-        parent: params.source as string,
       },
     });
   }
@@ -326,17 +331,10 @@ export const updateNodeRelations = async (
 
     if (targetTerminal.id !== nodeIdToDelete) {
       targetTerminal.data.transferedBy = null;
-      targetTerminal.data.parent = 'void';
       await updateNode(targetTerminal.id, nodes, setNodes);
     }
 
     if (sourceTerminal.id !== nodeIdToDelete) {
-      const filteredChildren = sourceTerminal.data.children.filter(
-        (child: { id: string }) => child.id !== targetTerminal.id
-      );
-      sourceTerminal.data.children = filteredChildren.length
-        ? filteredChildren
-        : null;
       sourceTerminal.data.transfersTo = null;
       await updateNode(sourceTerminal.id, nodes, setNodes);
     }

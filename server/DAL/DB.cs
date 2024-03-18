@@ -33,12 +33,6 @@ public class DB : DbContext
                                 v => JsonSerializer.Deserialize<List<Relation>>(v, (JsonSerializerOptions)new JsonSerializerOptions()))
                             .HasColumnType("json");
 
-                        data.Property(nd => nd.TransfersTo)
-                            .HasConversion(
-                                v => JsonSerializer.Serialize(v, (JsonSerializerOptions)new JsonSerializerOptions()),
-                                v => JsonSerializer.Deserialize<List<Relation>>(v, (JsonSerializerOptions)new JsonSerializerOptions()))
-                            .HasColumnType("json");
-
                         data.Property(nd => nd.ConnectedTo).HasConversion(
                             v => JsonSerializer.Serialize(v, (JsonSerializerOptions)new JsonSerializerOptions()),
                             v => JsonSerializer.Deserialize<List<Relation>>(v, (JsonSerializerOptions)new JsonSerializerOptions()))
