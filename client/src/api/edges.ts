@@ -110,6 +110,8 @@ export const deleteEdge = async (
 
     setEdges(edges.filter(edge => edge.id !== edgeToDelete.id));
   } catch (error) {
+    console.error('Error updating edge', error);
+    toast.error(`Unexpected error: ${(error as Error).message}`);
   } finally {
     loadingToastId && toast.dismiss(loadingToastId);
     updateNodeRelations(edgeToDelete, nodes, setNodes, nodeToDeleteId);
