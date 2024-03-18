@@ -13,7 +13,7 @@ import { shallow } from 'zustand/shallow';
 import 'reactflow/dist/style.css';
 import { Block, Connector, Terminal, TextBox } from './components/Nodes';
 import { buttonVariants } from './lib/config';
-import { AspectType, NodeType } from './lib/types';
+import { AspectType, NodeRelation, NodeType } from './lib/types';
 import { addNode, checkConnection, handleNewNodeRelations } from './lib/utils';
 import { storeSelector, useConnection, useStore, useTheme } from './hooks';
 
@@ -94,7 +94,7 @@ export default function App() {
       },
     };
 
-    handleNewNodeRelations(newNodeRelations, nodes, setNodes);
+    handleNewNodeRelations(newNodeRelations as NodeRelation[], nodes, setNodes);
     createEdge(newEdge as Edge, edges, setEdges);
   };
 

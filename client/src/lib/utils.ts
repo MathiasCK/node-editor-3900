@@ -22,12 +22,12 @@ export const checkConnection = (
   nodes: Node[]
 ): {
   canConnect: boolean;
-  connectionType: EdgeType;
-  lockConnection: boolean;
-  newNodeRelations: NodeRelation[];
+  connectionType?: EdgeType;
+  lockConnection?: boolean;
+  newNodeRelations?: NodeRelation[];
 } => {
   const newNodeRelations: NodeRelation[] = [];
-  let canConnect = true;
+
   let connectionType = edgeType;
   let lockConnection = false;
 
@@ -35,9 +35,6 @@ export const checkConnection = (
     toast.error('Cannot connect node to itself');
     return {
       canConnect: false,
-      newNodeRelations: [],
-      connectionType: '' as EdgeType,
-      lockConnection: false,
     };
   }
 
@@ -52,9 +49,6 @@ export const checkConnection = (
       toast.error(`Terminal ${params.target} already has a parent`);
       return {
         canConnect: false,
-        newNodeRelations: [],
-        connectionType: '' as EdgeType,
-        lockConnection: false,
       };
     }
 
@@ -93,9 +87,6 @@ export const checkConnection = (
       toast.error(`Terminal ${params.source} already has a parent`);
       return {
         canConnect: false,
-        newNodeRelations: [],
-        connectionType: '' as EdgeType,
-        lockConnection: false,
       };
     }
 
@@ -139,9 +130,6 @@ export const checkConnection = (
       );
       return {
         canConnect: false,
-        newNodeRelations: [],
-        connectionType: '' as EdgeType,
-        lockConnection: false,
       };
     }
 
@@ -178,9 +166,6 @@ export const checkConnection = (
       toast.error(`Terminal ${params.target} already has a parent`);
       return {
         canConnect: false,
-        newNodeRelations: [],
-        connectionType: '' as EdgeType,
-        lockConnection: false,
       };
     }
 
@@ -252,7 +237,7 @@ export const checkConnection = (
     });
   }
 
-  return { canConnect, connectionType, lockConnection, newNodeRelations };
+  return { canConnect: true, connectionType, lockConnection, newNodeRelations };
 };
 
 export const handleNewNodeRelations = (
