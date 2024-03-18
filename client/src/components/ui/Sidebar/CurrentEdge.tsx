@@ -48,8 +48,7 @@ const CurrentEdge: FC<Props> = ({ currentEdge }) => {
       currentEdge.target,
       nodes,
       setNodes,
-      currentEdge.type as EdgeType,
-      connectionType as EdgeType
+      currentEdge.type as EdgeType
     );
 
     closeSidebar();
@@ -74,7 +73,7 @@ const CurrentEdge: FC<Props> = ({ currentEdge }) => {
           <Input
             disabled={true}
             value={displayName}
-            className="text-foreground border-none text-lg font-semibold"
+            className="border-none text-lg font-semibold text-foreground"
           />
         </SheetTitle>
         <SheetDescription>
@@ -87,7 +86,7 @@ const CurrentEdge: FC<Props> = ({ currentEdge }) => {
         </SheetDescription>
       </SheetHeader>
       <div>
-        <p className="text-muted-foreground mb-2 text-sm">Source node</p>
+        <p className="mb-2 text-sm text-muted-foreground">Source node</p>
         <Button
           variant="ghost"
           onClick={() =>
@@ -98,7 +97,7 @@ const CurrentEdge: FC<Props> = ({ currentEdge }) => {
         </Button>
       </div>
       <div>
-        <p className="text-muted-foreground mb-2 text-sm">Connection type</p>
+        <p className="mb-2 text-sm text-muted-foreground">Connection type</p>
         <Select
           disabled={currentEdge.data.lockConnection}
           value={connectionType}
@@ -110,7 +109,9 @@ const CurrentEdge: FC<Props> = ({ currentEdge }) => {
           <SelectContent>
             <SelectGroup>
               <SelectItem value={EdgeType.Part}>Part of</SelectItem>
-              <SelectItem value={EdgeType.Connected}>Connected to</SelectItem>
+              <SelectItem value={EdgeType.Connected} className="hidden">
+                Connected to
+              </SelectItem>
               <SelectItem value={EdgeType.Fulfilled}>Fulfilled by</SelectItem>
               <SelectItem className="hidden" value={EdgeType.Transfer}>
                 Transfer
@@ -120,7 +121,7 @@ const CurrentEdge: FC<Props> = ({ currentEdge }) => {
         </Select>
       </div>
       <div>
-        <p className="text-muted-foreground mb-2 text-sm">Target node</p>
+        <p className="mb-2 text-sm text-muted-foreground">Target node</p>
         <Button
           variant="ghost"
           onClick={() =>

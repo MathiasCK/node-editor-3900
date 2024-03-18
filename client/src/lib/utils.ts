@@ -590,17 +590,8 @@ export const updateNodeConnectionData = async (
   targetNodeId: string,
   nodes: Node[],
   setNodes: (nodes: Node[]) => void,
-  oldConnection: EdgeType,
-  newConnection: EdgeType
+  oldConnection: EdgeType
 ): Promise<boolean> => {
-  if (
-    oldConnection === EdgeType.Transfer ||
-    newConnection === EdgeType.Transfer
-  ) {
-    toast.error('Transfer connection cannot be updated. Delete & create new.');
-    return false;
-  }
-
   const targetNode = nodes.find(node => node.id === targetNodeId);
   const sourceNode = nodes.find(node => node.id === sourceNodeId);
 
@@ -612,77 +603,42 @@ export const updateNodeConnectionData = async (
   }
 
   if (oldConnection === EdgeType.Part) {
-    const filteredDirectPartOf = targetNode.data.directPartOf.filter(
-      (part: { id: string }) => part.id !== sourceNode.id
+    const filteredParts = targetNode.data.directParts.filter(
+      (part: { id: string }) => part.id !== sourceNodeId
     );
 
-    targetNode.data.directPartOf =
-      filteredDirectPartOf.length > 0 ? filteredDirectPartOf : null;
-
-    const filteredDirectParts = sourceNode.data.directParts.filter(
-      (part: { id: string }) => part.id !== targetNode.id
-    );
-
-    sourceNode.data.directParts =
-      filteredDirectParts.length > 0 ? filteredDirectParts : null;
-  } else if (oldConnection === EdgeType.Fulfilled) {
-    const filteredFulfills = targetNode.data.fulfills?.filter(
-      (node: CustomNodeProps) => node.id !== sourceNodeId
-    );
-    targetNode.data.fulfills =
-      filteredFulfills?.length > 0 ? filteredFulfills : null;
-
-    const filteredFulfilledBy = sourceNode.data.fulfilledBy?.filter(
-      (node: CustomNodeProps) => node.id !== targetNodeId
-    );
-
-    sourceNode.data.fulfilledBy =
-      filteredFulfilledBy?.length > 0 ? filteredFulfilledBy : null;
-  } else {
-    const filteredConnectedTo = sourceNode.data.connectedTo?.filter(
-      (node: CustomNodeProps) => node.id !== targetNodeId
-    );
-
-    sourceNode.data.connectedTo =
-      filteredConnectedTo?.length > 0 ? filteredConnectedTo : null;
-
-    const filteredConnectedBy = targetNode.data.connectedBy?.filter(
-      (node: CustomNodeProps) => node.id !== sourceNodeId
-    );
-
-    targetNode.data.connectedBy =
-      filteredConnectedBy?.length > 0 ? filteredConnectedBy : null;
-  }
-
-  if (newConnection === EdgeType.Fulfilled) {
-    targetNode.data.fulfills = [
-      ...(targetNode.data.fulfills ?? []),
-      { id: sourceNodeId },
+    targetNode.data.directParts =
+      filteredParts.length > 0 ? filteredParts : null;
+    targetNode.data.fulfilledBy = [
+      ...(targetNode.data.fulfilledBy ?? []),
+      {
+        id: sourceNodeId,
+      },
     ];
 
-    sourceNode.data.fulfilledBy = [
-      ...(sourceNode.data.fulfilledBy ?? []),
-      { id: targetNodeId },
-    ];
-  } else if (newConnection === EdgeType.Part) {
-    targetNode.data.directPartOf = [
-      ...(targetNode.data.directPartOf ?? []),
-      { id: sourceNodeId },
-    ];
-
-    sourceNode.data.directParts = [
-      ...(sourceNode.data.directParts ?? []),
-      { id: targetNodeId },
+    sourceNode.data.directPartOf = null;
+    sourceNode.data.fulfills = [
+      ...(sourceNode.data.fulfills ?? []),
+      {
+        id: targetNodeId,
+      },
     ];
   } else {
-    targetNode.data.connectedBy = [
-      ...(targetNode.data.connectedBy ?? []),
-      { id: sourceNodeId },
+    // oldConnection === EdgeType.Fulfilled
+    const filteredFullfills = targetNode.data.fulfilledBy.filter(
+      (node: { id: string }) => node.id !== sourceNodeId
+    );
+    targetNode.data.fulfilledBy =
+      filteredFullfills.length > 0 ? filteredFullfills : null;
+    targetNode.data.directParts = [
+      ...(targetNode.data.directParts ?? []),
+      {
+        id: sourceNodeId,
+      },
     ];
-    sourceNode.data.connectedTo = [
-      ...(sourceNode.data.connectedTo ?? []),
-      { id: targetNodeId },
-    ];
+
+    sourceNode.data.fulfills = null;
+    sourceNode.data.directPartOf = targetNodeId;
   }
 
   await updateNode(sourceNode.id, nodes, setNodes);
