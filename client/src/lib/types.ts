@@ -61,7 +61,9 @@ export type NodeData = {
   fulfills?: {
     id: string;
   }[];
-  fulfilledBy?: string;
+  fulfilledBy?: {
+    id: string;
+  }[];
   label: string;
   createdAt: number;
   updatedAt: number;

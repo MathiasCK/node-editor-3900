@@ -114,6 +114,46 @@ export const checkConnection = (
     });
   }
 
+  // Set transfersTo property for terminal
+  if (
+    isTerminal(params.sourceHandle as string) &&
+    isTerminal(params.targetHandle as string)
+  ) {
+    // Check if terminal is already connected to other terminals
+    const targetTerminal = nodes.find(node => node.id === params.target);
+
+    if (targetTerminal?.data?.parent !== 'void') {
+      toast.error(`Terminal ${params.target} already has a parent`);
+      return {
+        canConnect: false,
+      };
+    }
+
+    lockConnection = true;
+    connectionType = EdgeType.Transfer;
+
+    newNodeRelations.push({
+      nodeId: params.source as string,
+      relations: {
+        transfersTo: {
+          id: params.target as string,
+        },
+        children: {
+          id: params.target as string,
+        },
+      },
+    });
+
+    newNodeRelations.push({
+      nodeId: params.target as string,
+      relation: {
+        transferedBy: params.source as string,
+        parent: params.source as string,
+      },
+    });
+  }
+
+  // Only possible for block to block connections
   if (connectionType === EdgeType.Part && !lockConnection) {
     const sourceNode = nodes.find(node => node.id === params.source);
 
@@ -154,45 +194,7 @@ export const checkConnection = (
     });
   }
 
-  // Set transfersTo property for terminal
-  if (
-    isTerminal(params.sourceHandle as string) &&
-    isTerminal(params.targetHandle as string)
-  ) {
-    // Check if terminal is already connected to other terminals
-    const targetTerminal = nodes.find(node => node.id === params.target);
-
-    if (targetTerminal?.data?.parent !== 'void') {
-      toast.error(`Terminal ${params.target} already has a parent`);
-      return {
-        canConnect: false,
-      };
-    }
-
-    lockConnection = true;
-    connectionType = EdgeType.Transfer;
-
-    newNodeRelations.push({
-      nodeId: params.source as string,
-      relations: {
-        transfersTo: {
-          id: params.target as string,
-        },
-        children: {
-          id: params.target as string,
-        },
-      },
-    });
-
-    newNodeRelations.push({
-      nodeId: params.target as string,
-      relation: {
-        transferedBy: params.source as string,
-        parent: params.source as string,
-      },
-    });
-  }
-
+  // Only possible for block to block connections
   if (connectionType === EdgeType.Fulfilled && !lockConnection) {
     newNodeRelations.push({
       nodeId: params.source as string,
@@ -200,17 +202,15 @@ export const checkConnection = (
         fulfills: {
           id: params.target as string,
         },
-        children: {
-          id: params.target as string,
-        },
       },
     });
 
     newNodeRelations.push({
       nodeId: params.target as string,
-      relation: {
-        parent: params.source as string,
-        fulfilledBy: params.source as string,
+      relations: {
+        fulfilledBy: {
+          id: params.source as string,
+        },
       },
     });
   }
@@ -520,20 +520,17 @@ export const updateNodeRelations = async (
       sourceNode.data.fulfills =
         filteredFulfills.length === 0 ? null : filteredFulfills;
 
-      const filteredChildren = sourceNode.data.children.filter(
-        (child: { id: string }) => child.id !== currentEdge.target
-      );
-
-      sourceNode.data.children = filteredChildren.length
-        ? filteredChildren
-        : null;
-
       await updateNode(sourceNode.id, nodes, setNodes);
     }
 
     if (targetNode.id !== nodeIdToDelete) {
-      targetNode.data.fulfilledBy = null;
-      targetNode.data.parent = 'void';
+      const filteredFulfilledBy = targetNode.data.fulfilledBy.filter(
+        (node: { id: string }) => node.id !== currentEdge.source
+      );
+
+      targetNode.data.fulfilledBy =
+        filteredFulfilledBy.length === 0 ? null : filteredFulfilledBy;
+
       await updateNode(targetNode.id, nodes, setNodes);
     }
 

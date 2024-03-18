@@ -54,6 +54,11 @@ public class DB : DbContext
                             v => JsonSerializer.Deserialize<List<Relation>>(v, (JsonSerializerOptions)new JsonSerializerOptions()))
                             .HasColumnType("json");
 
+                        data.Property(nd => nd.FulfilledBy).HasConversion(
+                            v => JsonSerializer.Serialize(v, (JsonSerializerOptions)new JsonSerializerOptions()),
+                            v => JsonSerializer.Deserialize<List<Relation>>(v, (JsonSerializerOptions)new JsonSerializerOptions()))
+                            .HasColumnType("json");
+
                     });
         modelBuilder.Entity<Node>().HasKey(e => e.NodeId);
         modelBuilder.Entity<Node>().Property(e => e.NodeId).HasMaxLength(255);

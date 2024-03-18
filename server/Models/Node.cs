@@ -37,7 +37,7 @@ public class NodeData
     public string? ConnectedBy { get; set; }
     public string? DirectPartOf { get; set; }
     public List<Relation>? DirectParts { get; set; }
-    public string? FulfilledBy { get; set; }
+    public List<Relation>? FulfilledBy { get; set; }
     public List<Relation>? Fulfills { get; set; }
     public string? CustomName { get; set; }
     public required AspectType Aspect { get; set; }
