@@ -70,7 +70,7 @@ export default function App() {
       setNodes(nodes as Node[]);
       setEdges(edges as Edge[]);
     })();
-  }, []);
+  }, [setNodes, setEdges]);
 
   const createNewConnection = () => {
     if (!params) return;
