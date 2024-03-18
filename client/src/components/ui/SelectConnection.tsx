@@ -29,7 +29,7 @@ const SelectConnection: FC<Props> = ({
     <Dialog open={dialogOpen}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle className="text-muted-foreground text-center">
+          <DialogTitle className="text-center text-muted-foreground">
             Select connection type
           </DialogTitle>
         </DialogHeader>
@@ -69,7 +69,7 @@ const SelectConnection: FC<Props> = ({
             )}
             onClick={() => setEdgeType(EdgeType.Fulfilled)}
           >
-            Fulfills
+            Fulfilled by
           </button>
           <Button
             onClick={() => {
