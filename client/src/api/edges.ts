@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { EdgeType, EdgeWithEdgeId } from '@/lib/types';
 import { updateNodeRelations } from '@/lib/utils';
 import toast from 'react-hot-toast';
@@ -20,8 +21,7 @@ export const fetchEdges = async (): Promise<Edge[] | null> => {
 
     return edges;
   } catch (error) {
-    console.error('Error fetching edges', error);
-    toast.error(`Unexpected error: ${(error as Error).message}`);
+    console.error(`Error fetching edges: ${error}`);
     return null;
   }
 };
@@ -48,14 +48,12 @@ export const createEdge = async (
         errorBody || 'Error creating edge. Please try again.';
 
       toast.error(errorMessage);
-      loadingToastId && toast.dismiss(loadingToastId);
       return null;
     }
 
     const createdEdge = await response.json();
 
     toast.success('Edge created successfully!');
-    loadingToastId && toast.dismiss(loadingToastId);
 
     if (createdEdge) {
       createdEdge.id = createdEdge.id.toString();
@@ -65,9 +63,11 @@ export const createEdge = async (
 
     return createdEdge as Edge;
   } catch (error) {
-    console.error('Error creating edge', error);
-    toast.error(`Unexpected error: ${(error as Error).message}`);
+    toast.error(`Error creating edge: ${(error as Error).message}`);
+    console.error(`Error creating edge: ${error}`);
     return null;
+  } finally {
+    loadingToastId && toast.dismiss(loadingToastId);
   }
 };
 
@@ -78,14 +78,14 @@ export const deleteEdge = async (
   nodes: Node[],
   setNodes: (nodes: Node[]) => void,
   nodeToDeleteId?: string
-) => {
+): Promise<string | null> => {
   const edgeToDelete = edges.find(
     edge => edge.id === edgeIdToDelete
   ) as EdgeWithEdgeId;
 
   if (!edgeToDelete.edgeId) {
     toast.error(`Error deleting edge - ${edgeIdToDelete} not found`);
-    return;
+    return null;
   }
 
   const loadingToastId = toast.loading('Deleting edge...');
@@ -109,9 +109,12 @@ export const deleteEdge = async (
     toast.success('Edge deleted successfully!');
 
     setEdges(edges.filter(edge => edge.id !== edgeToDelete.id));
+
+    return edgeIdToDelete;
   } catch (error) {
-    console.error('Error updating edge', error);
-    toast.error(`Unexpected error: ${(error as Error).message}`);
+    toast.error(`Error deleting edge: ${(error as Error).message}`);
+    console.error(`Error deleting edge: ${error}`);
+    return null;
   } finally {
     loadingToastId && toast.dismiss(loadingToastId);
     updateNodeRelations(edgeToDelete, nodes, setNodes, nodeToDeleteId);
@@ -123,12 +126,12 @@ export const updateEdge = async (
   edges: Edge[],
   setEdges: (edges: Edge[]) => void,
   newConnection: EdgeType
-) => {
+): Promise<Edge | null> => {
   const edgeToUpdate = edges.find(edge => edge.id === edgeToUpdateId);
 
   if (!edgeToUpdate) {
     toast.error(`Error updating edge - ${edgeToUpdateId} not found`);
-    return;
+    return null;
   }
 
   const loadingToastId = toast.loading('Updating edge...');
@@ -171,8 +174,8 @@ export const updateEdge = async (
 
     return updatedEdge as Edge;
   } catch (error) {
-    console.error('Error updating edge', error);
-    toast.error(`Unexpected error: ${(error as Error).message}`);
+    toast.error(`Error updating edge: ${(error as Error).message}`);
+    console.error(`Error updating edge: ${error}`);
     return null;
   } finally {
     loadingToastId && toast.dismiss(loadingToastId);

@@ -37,21 +37,24 @@ const CurrentEdge: FC<Props> = ({ currentEdge }) => {
   const displayName = `Edge ${currentEdge.source} -> ${currentEdge.target}`;
 
   const handleConnectionTypeChange = async () => {
-    await updateEdge(
+    const edge = await updateEdge(
       currentEdge.id as string,
       edges,
       setEdges,
       connectionType as EdgeType
     );
-    await updateNodeConnectionData(
-      currentEdge.source,
-      currentEdge.target,
-      nodes,
-      setNodes,
-      currentEdge.type as EdgeType
-    );
 
-    closeSidebar();
+    if (edge) {
+      await updateNodeConnectionData(
+        currentEdge.source,
+        currentEdge.target,
+        nodes,
+        setNodes,
+        currentEdge.type as EdgeType
+      );
+
+      closeSidebar();
+    }
   };
 
   const handleDelete = async () => {

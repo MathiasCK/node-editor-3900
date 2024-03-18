@@ -72,7 +72,7 @@ export default function App() {
     })();
   }, [setNodes, setEdges]);
 
-  const createNewConnection = () => {
+  const createNewConnection = async () => {
     if (!params) return;
 
     const { connectionType, lockConnection, newNodeRelations } =
@@ -94,8 +94,15 @@ export default function App() {
       },
     };
 
-    handleNewNodeRelations(newNodeRelations as NodeRelation[], nodes, setNodes);
-    createEdge(newEdge as Edge, edges, setEdges);
+    const edge = await createEdge(newEdge as Edge, edges, setEdges);
+
+    if (edge) {
+      handleNewNodeRelations(
+        newNodeRelations as NodeRelation[],
+        nodes,
+        setNodes
+      );
+    }
   };
 
   const onConnect = useCallback(
