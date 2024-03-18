@@ -123,6 +123,49 @@ export const checkConnection = (
     });
   }
 
+  if (connectionType === EdgeType.Part && !lockConnection) {
+    const sourceNode = nodes.find(node => node.id === params.source);
+
+    if (
+      sourceNode?.data?.directPartOf &&
+      sourceNode?.data?.directPartOf !== ''
+    ) {
+      const partOfNode = nodes.find(
+        node => node.id === sourceNode?.data?.directPartOf
+      );
+
+      toast.error(
+        `${sourceNode.data.customName ?? sourceNode.id} is already part of ${partOfNode?.data?.customName ?? sourceNode?.data?.directPartOf}`
+      );
+      return {
+        canConnect: false,
+        newNodeRelations: [],
+        connectionType: '' as EdgeType,
+        lockConnection: false,
+      };
+    }
+
+    newNodeRelations.push({
+      nodeId: params.target as string,
+      relations: {
+        directParts: {
+          id: params.source as string,
+        },
+        children: {
+          id: params.source as string,
+        },
+      },
+    });
+
+    newNodeRelations.push({
+      nodeId: params.source as string,
+      relation: {
+        parent: params.target as string,
+        directPartOf: params.target as string,
+      },
+    });
+  }
+
   // Set transfersTo property for terminal
   if (
     isTerminal(params.sourceHandle as string) &&
@@ -165,18 +208,6 @@ export const checkConnection = (
     });
   }
 
-  const targetNode = nodes.find(node => node.id === params.target);
-
-  if (targetNode?.data?.parent !== 'void') {
-    toast.error(`Node ${params.target} already has a parent`);
-    return {
-      canConnect: false,
-      newNodeRelations: [],
-      connectionType: '' as EdgeType,
-      lockConnection: false,
-    };
-  }
-
   if (connectionType === EdgeType.Fulfilled && !lockConnection) {
     newNodeRelations.push({
       nodeId: params.source as string,
@@ -217,28 +248,6 @@ export const checkConnection = (
       relation: {
         parent: params.source as string,
         connectedBy: params.source as string,
-      },
-    });
-  }
-
-  if (connectionType === EdgeType.Part && !lockConnection) {
-    newNodeRelations.push({
-      nodeId: params.source as string,
-      relations: {
-        directParts: {
-          id: params.target as string,
-        },
-        children: {
-          id: params.target as string,
-        },
-      },
-    });
-
-    newNodeRelations.push({
-      nodeId: params.target as string,
-      relation: {
-        parent: params.source as string,
-        directPartOf: params.source as string,
       },
     });
   }
@@ -484,29 +493,29 @@ export const updateNodeRelations = async (
 
     if (!sourceNode || !targetNode) return;
 
-    if (sourceNode.id !== nodeIdToDelete) {
-      const filteredDirectParts = sourceNode.data.directParts.filter(
-        (part: { id: string }) => part.id !== currentEdge.target
+    if (targetNode.id !== nodeIdToDelete) {
+      const filteredDirectParts = targetNode.data.directParts.filter(
+        (part: { id: string }) => part.id !== currentEdge.source
       );
 
-      sourceNode.data.directParts =
+      targetNode.data.directParts =
         filteredDirectParts.length > 0 ? filteredDirectParts : null;
 
-      const filteredChildren = sourceNode.data.children.filter(
-        (child: { id: string }) => child.id !== currentEdge.target
+      const filteredChildren = targetNode.data.children.filter(
+        (child: { id: string }) => child.id !== currentEdge.source
       );
 
-      sourceNode.data.children = filteredChildren.length
+      targetNode.data.children = filteredChildren.length
         ? filteredChildren
         : null;
 
-      await updateNode(sourceNode.id, nodes, setNodes);
+      await updateNode(targetNode.id, nodes, setNodes);
     }
 
-    if (targetNode.id !== nodeIdToDelete) {
-      targetNode.data.directPartOf = null;
-      targetNode.data.parent = 'void';
-      await updateNode(targetNode.id, nodes, setNodes);
+    if (sourceNode.id !== nodeIdToDelete) {
+      sourceNode.data.directPartOf = null;
+      sourceNode.data.parent = 'void';
+      await updateNode(sourceNode.id, nodes, setNodes);
     }
 
     return;
@@ -726,7 +735,7 @@ export const updateNodeConnectionData = async (
 export const getReadableRelation = (type: RelationType): string | null => {
   switch (type) {
     case RelationType.DirectParts:
-      return 'Direct part to';
+      return 'Parts';
     case RelationType.ConnectedTo:
       return 'Connected to';
     case RelationType.ConnectedBy:
@@ -738,7 +747,7 @@ export const getReadableRelation = (type: RelationType): string | null => {
     case RelationType.TerminalOf:
       return 'Terminal of';
     case RelationType.DirectPartOf:
-      return 'Direct part of';
+      return 'Part of';
     case RelationType.TransfersTo:
       return 'Transfers to';
     case RelationType.TransferedBy:

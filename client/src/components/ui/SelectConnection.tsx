@@ -36,18 +36,6 @@ const SelectConnection: FC<Props> = ({
         <div className="flex h-full w-full flex-col items-center justify-center">
           <button
             className={cn(
-              `${buttonVariants.edge} border-green-400 text-green-400 hover:bg-green-400 `,
-              {
-                'border-transparent bg-green-400 text-white':
-                  edgeType === EdgeType.Part,
-              }
-            )}
-            onClick={() => setEdgeType(EdgeType.Part)}
-          >
-            Part of
-          </button>
-          <button
-            className={cn(
               `${buttonVariants.edge} border-blue-200 text-blue-200 hover:bg-blue-200 `,
               {
                 'border-transparent bg-blue-200 text-white':
@@ -58,7 +46,18 @@ const SelectConnection: FC<Props> = ({
           >
             Connected to
           </button>
-
+          <button
+            className={cn(
+              `${buttonVariants.edge} border-green-400 text-green-400 hover:bg-green-400 `,
+              {
+                'border-transparent bg-green-400 text-white':
+                  edgeType === EdgeType.Part,
+              }
+            )}
+            onClick={() => setEdgeType(EdgeType.Part)}
+          >
+            Part of
+          </button>
           <button
             className={cn(
               `${buttonVariants.edge} border-dotted border-amber-300 text-amber-300 hover:bg-amber-300`,
