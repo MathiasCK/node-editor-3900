@@ -1,21 +1,30 @@
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
 namespace server.Models;
 
-public class Node
+public class NodeDto
+{
+    public string NodeId { get; set; }
+    public string Id { get; set; }
+    public Position Position { get; set; }
+    public NodeType Type { get; set; }
+    public NodeData Data { get; set; }
+}
+
+public abstract class Node
 {
     [Key]
-    public string NodeId { get; set; }
-    public required string Id { get; set; }
-    public required NodeData Data { get; set; }
-    public required Position Position { get; set; }
-    public required NodeType Type { get; set; }
+    public string NodeId { get; set; } = Guid.NewGuid().ToString();
+    public string Id { get; set; }
+    public Position Position { get; set; }
+    public NodeType Type { get; set; }
 
-    public Node()
+    public Node(string id, Position position, NodeType type)
     {
-        NodeId = Guid.NewGuid().ToString();
+        this.Id = id;
+        this.Position = position;
+        this.Type = type;
     }
 }
 
@@ -25,25 +34,18 @@ public class Position
     public double Y { get; set; }
 }
 
+public class Relation
+{
+    public required string Id { get; set; }
+}
+
 public class NodeData
 {
-    public string Parent { get; set; } = "void";
-    public List<Relation>? Children { get; set; }
-    public List<Relation>? Terminals { get; set; }
-    public string? TerminalOf { get; set; }
-    public string? TransfersTo { get; set; }
-    public string? TransferedBy { get; set; }
-    public string? ConnectedTo { get; set; }
-    public string? ConnectedBy { get; set; }
-    public string? DirectPartOf { get; set; }
-    public List<Relation>? DirectParts { get; set; }
-    public List<Relation>? FulfilledBy { get; set; }
-    public List<Relation>? Fulfills { get; set; }
-    public string? CustomName { get; set; }
-    public required AspectType Aspect { get; set; }
-    public required string Label { get; set; }
-    public required long CreatedAt { get; set; }
-    public required long UpdatedAt { get; set; }
+    public string CustomName { get; set; } = string.Empty;
+    public AspectType Aspect { get; set; } = AspectType.Empty;
+    public string Label { get; set; } = string.Empty;
+    public long CreatedAt { get; set; } = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+    public long UpdatedAt { get; set; } = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 }
 
 [JsonConverter(typeof(AspectTypeConverter))]
@@ -61,9 +63,4 @@ public enum NodeType
     Block,
     Terminal,
     Connector,
-}
-
-public class Relation
-{
-    public required string Id { get; set; }
 }

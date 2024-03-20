@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using server.Models;
 using server.DAL;
-using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 
 namespace server.Controllers;
 
@@ -24,8 +24,51 @@ public class NodesController : Controller
     {
         try
         {
-            var nodes = await _db.Nodes.ToListAsync();
-            return Ok(nodes);
+            var blocks = await _db.Nodes
+                .OfType<Block>()
+                .Include(b => b.Data)
+                .AsNoTracking()
+                .Select(b => new NodeDto
+                {
+                    NodeId = b.NodeId,
+                    Id = b.Id,
+                    Position = b.Position,
+                    Type = b.Type,
+                    Data = b.Data
+                })
+                .ToListAsync();
+
+            var terminals = await _db.Nodes
+                .OfType<Terminal>()
+                .Include(t => t.Data)
+                .AsNoTracking()
+                .Select(t => new NodeDto
+                {
+                    NodeId = t.NodeId,
+                    Id = t.Id,
+                    Position = t.Position,
+                    Type = t.Type,
+                    Data = t.Data
+                })
+                .ToListAsync();
+
+            var connectors = await _db.Nodes
+                .OfType<Connector>()
+                .Include(c => c.Data)
+                .AsNoTracking()
+                .Select(c => new NodeDto
+                {
+                    NodeId = c.NodeId,
+                    Id = c.Id,
+                    Position = c.Position,
+                    Type = c.Type,
+                    Data = c.Data
+                })
+                .ToListAsync();
+
+            var allNodes = blocks.Concat(terminals).Concat(connectors).ToList();
+
+            return Ok(allNodes);
         }
         catch (DbUpdateException dbEx)
         {
@@ -66,12 +109,33 @@ public class NodesController : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateNode(Node node)
+    public async Task<IActionResult> CreateNode([FromBody] JsonElement data)
     {
-        if (node == null) return BadRequest("Node data is missing.");
+
+        if (data.ValueKind == JsonValueKind.Undefined)
+        {
+            return BadRequest("Node data is missing.");
+        }
 
         try
         {
+            var type = data.GetProperty("type").GetString();
+            var id = data.GetProperty("id").GetString();
+            var label = data.GetProperty("data").GetProperty("label").GetString();
+            var aspect = data.GetProperty("data").GetProperty("aspect").GetString();
+            var position = new Position
+            {
+                X = data.GetProperty("position").GetProperty("x").GetDouble(),
+                Y = data.GetProperty("position").GetProperty("y").GetDouble()
+            };
+
+            if (id == null || type == null || label == null || aspect == null)
+            {
+                return BadRequest("Node data is missing required fields.");
+            }
+
+            Node node = Utils.CreateNode(type, id, position, aspect, label);
+
             await _db.Nodes.AddAsync(node);
             await _db.SaveChangesAsync();
 
@@ -121,16 +185,103 @@ public class NodesController : Controller
     }
 
     [HttpPut]
-    public async Task<IActionResult> UpdateNode(Node node)
+    public async Task<IActionResult> UpdateNode([FromBody] JsonElement data)
     {
-        if (node == null) return BadRequest("Node data is missing.");
+        if (data.ValueKind == JsonValueKind.Undefined)
+        {
+            return BadRequest("Node data is missing.");
+        }
 
         try
         {
-            _db.Nodes.Update(node);
-            await _db.SaveChangesAsync();
+            var type = data.GetProperty("type").GetString();
+            var id = data.GetProperty("id").GetString();
+            var position = new Position
+            {
+                X = data.GetProperty("position").GetProperty("x").GetDouble(),
+                Y = data.GetProperty("position").GetProperty("y").GetDouble()
+            };
 
-            return CreatedAtAction(nameof(FetchNode), new { id = node.Id }, node);
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true,
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            };
+
+            switch (type)
+            {
+                case "block":
+                    var blockToUpdate = await _db.Nodes.OfType<Block>().Include(b => b.Data).FirstOrDefaultAsync(b => b.Id == id);
+
+
+                    if (blockToUpdate == null)
+                    {
+                        return NotFound("Block with id " + id + " does not exist.");
+                    }
+
+                    blockToUpdate.Position = position;
+
+                    var blockData = JsonSerializer.Deserialize<BlockData>(data.GetProperty("data").GetRawText(), options);
+
+                    if (blockData == null)
+                    {
+                        return BadRequest("Block data is missing required fields.");
+                    }
+
+                    blockToUpdate.Data = blockData;
+
+                    _db.Nodes.Update(blockToUpdate);
+                    await _db.SaveChangesAsync();
+
+                    return CreatedAtAction(nameof(FetchNode), new { id = blockToUpdate.Id }, blockToUpdate);
+                case "terminal":
+                    var terminalToUpdate = await _db.Nodes.OfType<Terminal>().Include(t => t.Data).FirstOrDefaultAsync(t => t.Id == id);
+
+                    if (terminalToUpdate == null)
+                    {
+                        return NotFound("Terminal with id " + id + " does not exist.");
+                    }
+
+
+                    var terminalData = JsonSerializer.Deserialize<TerminalData>(data.GetProperty("data").GetRawText(), options);
+
+                    if (terminalData == null)
+                    {
+                        return BadRequest("Terminal data is missing required fields.");
+                    }
+
+                    terminalToUpdate.Data = terminalData;
+                    terminalToUpdate.Position = position;
+
+                    _db.Nodes.Update(terminalToUpdate);
+                    await _db.SaveChangesAsync();
+
+                    return CreatedAtAction(nameof(FetchNode), new { id = terminalToUpdate.Id }, terminalToUpdate);
+                case "connector":
+                    var connectorToUpdate = await _db.Nodes.OfType<Connector>().Include(c => c.Data).FirstOrDefaultAsync(c => c.Id == id);
+
+                    if (connectorToUpdate == null)
+                    {
+                        return NotFound("Connector with id " + id + " does not exist.");
+                    }
+
+                    var connectorData = JsonSerializer.Deserialize<ConnectorData>(data.GetProperty("data").GetRawText(), options);
+
+                    if (connectorData == null)
+                    {
+                        return BadRequest("Connector data is missing required fields.");
+                    }
+
+                    connectorToUpdate.Data = connectorData;
+                    connectorToUpdate.Position = position;
+
+                    _db.Nodes.Update(connectorToUpdate);
+                    await _db.SaveChangesAsync();
+
+                    return CreatedAtAction(nameof(FetchNode), new { id = connectorToUpdate.Id }, connectorToUpdate);
+                default:
+                    return BadRequest("Node type is not recognized.");
+            }
         }
         catch (DbUpdateException dbEx)
         {
@@ -143,5 +294,6 @@ public class NodesController : Controller
             return StatusCode(500, "An unexpected error occurred.");
         }
     }
+
 
 }

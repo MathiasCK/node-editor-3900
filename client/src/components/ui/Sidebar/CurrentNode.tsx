@@ -131,29 +131,33 @@ const CurrentNode: FC<Props> = ({ currentNode }) => {
         </Select>
       </div>
       {nodeRelations.length > 0 &&
-        nodeRelations.map(nodeRelation => (
-          <div key={nodeRelation.key}>
-            <p className="mb-2 text-sm text-muted-foreground">
-              {getReadableRelation(nodeRelation.key as RelationType)}
-            </p>
-            {nodeRelation.children?.map(c => (
-              <Button
-                key={`${nodeRelation.key}_${c.id}_link_button`}
-                variant="ghost"
-                onClick={() =>
-                  displayNewNode(
-                    c.id as string,
-                    nodes,
-                    openSidebar,
-                    closeSidebar
-                  )
-                }
-              >
-                {c.id}
-              </Button>
-            ))}
-          </div>
-        ))}
+        nodeRelations.map(nodeRelation => {
+          if (nodeRelation.children?.length === 0) return null;
+
+          return (
+            <div key={nodeRelation.key}>
+              <p className="mb-2 text-sm text-muted-foreground">
+                {getReadableRelation(nodeRelation.key as RelationType)}
+              </p>
+              {nodeRelation.children?.map(c => (
+                <Button
+                  key={`${nodeRelation.key}_${c.id}_link_button`}
+                  variant="ghost"
+                  onClick={() =>
+                    displayNewNode(
+                      c.id as string,
+                      nodes,
+                      openSidebar,
+                      closeSidebar
+                    )
+                  }
+                >
+                  {c.id}
+                </Button>
+              ))}
+            </div>
+          );
+        })}
       <SheetFooter>
         {displayEdit && (
           <Button

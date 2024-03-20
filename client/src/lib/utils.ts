@@ -312,7 +312,6 @@ export const addNode = async (
           .reduce((max, obj) => Math.max(max, Number(obj.id) + 1), 0)
           .toString();
 
-  const currentDate = Date.now();
   const newNode: Node = {
     type,
     id,
@@ -324,8 +323,6 @@ export const addNode = async (
       aspect,
       label: `${type}_${id}`,
       type,
-      createdAt: currentDate,
-      updatedAt: currentDate,
     },
   };
 
