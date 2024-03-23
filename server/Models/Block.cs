@@ -17,6 +17,8 @@ public class BlockData : NodeData
     public List<Relation> FulfilledBy { get; set; } = new List<Relation>();
     public List<Relation> Fulfills { get; set; } = new List<Relation>();
     public List<Relation> DirectParts { get; set; } = new List<Relation>();
+    public List<Relation> ConnectedTo { get; set; } = new List<Relation>();
+    public List<Relation> ConnectedBy { get; set; } = new List<Relation>();
     public string DirectPartOf { get; set; } = string.Empty;
 }
 public class Block : Node

@@ -11,8 +11,8 @@ public class ConnectorDto
 
 public class ConnectorData : NodeData
 {
-  public string ConnectedTo { get; set; } = string.Empty;
-  public string ConnectedBy { get; set; } = string.Empty;
+    public List<Relation> ConnectedTo { get; set; } = new List<Relation>();
+    public List<Relation> ConnectedBy { get; set; } = new List<Relation>();
 }
 
 public class Connector : Node

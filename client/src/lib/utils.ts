@@ -112,6 +112,34 @@ export const checkConnection = (
     });
   }
 
+  if (
+    (isConnector(params.sourceHandle as string) &&
+      isBlock(params.targetHandle as string)) ||
+    (isBlock(params.sourceHandle as string) &&
+      isConnector(params.targetHandle as string))
+  ) {
+    lockConnection = true;
+    connectionType = EdgeType.Connected;
+
+    newNodeRelations.push({
+      nodeId: params.source as string,
+      relations: {
+        connectedTo: {
+          id: params.target as string,
+        },
+      },
+    });
+
+    newNodeRelations.push({
+      nodeId: params.target as string,
+      relations: {
+        connectedBy: {
+          id: params.source as string,
+        },
+      },
+    });
+  }
+
   // Set transfersTo & transferedBy property for terminals
   if (
     isTerminal(params.sourceHandle as string) &&
@@ -167,15 +195,19 @@ export const checkConnection = (
 
     newNodeRelations.push({
       nodeId: params.source as string,
-      relation: {
-        connectedTo: params.target as string,
+      relations: {
+        connectedTo: {
+          id: params.target as string,
+        },
       },
     });
 
     newNodeRelations.push({
       nodeId: params.target as string,
-      relation: {
-        connectedBy: params.source as string,
+      relations: {
+        connectedBy: {
+          id: params.source as string,
+        },
       },
     });
   }
@@ -433,13 +465,21 @@ export const updateNodeRelations = async (
     if (!sourceNode || !targetNode) return;
 
     if (sourceNode.id !== nodeIdToDelete) {
-      sourceNode.data.connectedTo = null;
+      const filteredConnectedTo = sourceNode.data.connectedTo.filter(
+        (conn: { id: string }) => conn.id !== targetNode.id
+      );
+      sourceNode.data.connectedTo =
+        filteredConnectedTo.length > 0 ? filteredConnectedTo : [];
 
       await updateNode(sourceNode.id, nodes, setNodes);
     }
 
     if (targetNode.id !== nodeIdToDelete) {
-      targetNode.data.connectedBy = null;
+      const filteredConnectedBy = targetNode.data.connectedBy.filter(
+        (conn: { id: string }) => conn.id !== sourceNode.id
+      );
+      targetNode.data.connectedBy =
+        filteredConnectedBy.length > 0 ? filteredConnectedBy : [];
 
       await updateNode(targetNode.id, nodes, setNodes);
     }

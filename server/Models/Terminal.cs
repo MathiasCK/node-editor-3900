@@ -12,8 +12,8 @@ public class TerminalDto
 public class TerminalData : NodeData
 {
   public string TerminalOf { get; set; } = string.Empty;
-  public string ConnectedTo { get; set; } = string.Empty;
-  public string ConnectedBy { get; set; } = string.Empty;
+  public List<Relation> ConnectedTo { get; set; } = new List<Relation>();
+  public List<Relation> ConnectedBy { get; set; } = new List<Relation>();
   public string TransfersTo { get; set; } = string.Empty;
   public string TransferedBy { get; set; } = string.Empty;
 }

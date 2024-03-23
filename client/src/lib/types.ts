@@ -48,8 +48,12 @@ export type NodeData = {
   terminalOf?: string;
   transfersTo?: string;
   transferedBy?: string;
-  connectedTo?: string;
-  connectedBy?: string;
+  connectedTo?: {
+    id: string;
+  }[];
+  connectedBy?: {
+    id: string;
+  }[];
   directParts?: {
     id: string;
   }[];
