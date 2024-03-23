@@ -1,5 +1,14 @@
 namespace server.Models;
 
+public class ConnectorDto
+{
+    public string NodeId { get; set; }
+    public string Id { get; set; }
+    public Position Position { get; set; }
+    public NodeType Type { get; set; }
+    public ConnectorData Data { get; set; }
+}
+
 public class ConnectorData : NodeData
 {
   public string ConnectedTo { get; set; } = string.Empty;

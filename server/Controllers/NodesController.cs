@@ -20,7 +20,7 @@ public class NodesController : Controller
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Node>>> FetchNodes()
+    public async Task<ActionResult<IEnumerable<object>>> FetchNodes()
     {
         try
         {
@@ -28,7 +28,7 @@ public class NodesController : Controller
                 .OfType<Block>()
                 .Include(b => b.Data)
                 .AsNoTracking()
-                .Select(b => new NodeDto
+                .Select(b => (object)new BlockDto
                 {
                     NodeId = b.NodeId,
                     Id = b.Id,
@@ -42,7 +42,7 @@ public class NodesController : Controller
                 .OfType<Terminal>()
                 .Include(t => t.Data)
                 .AsNoTracking()
-                .Select(t => new NodeDto
+                .Select(t => (object)new TerminalDto
                 {
                     NodeId = t.NodeId,
                     Id = t.Id,
@@ -56,7 +56,7 @@ public class NodesController : Controller
                 .OfType<Connector>()
                 .Include(c => c.Data)
                 .AsNoTracking()
-                .Select(c => new NodeDto
+                .Select(c => (object)new ConnectorDto
                 {
                     NodeId = c.NodeId,
                     Id = c.Id,
@@ -66,7 +66,10 @@ public class NodesController : Controller
                 })
                 .ToListAsync();
 
-            var allNodes = blocks.Concat(terminals).Concat(connectors).ToList();
+            var allNodes = new List<object>();
+            allNodes.AddRange(blocks);
+            allNodes.AddRange(terminals);
+            allNodes.AddRange(connectors);
 
             return Ok(allNodes);
         }
@@ -81,6 +84,7 @@ public class NodesController : Controller
             return StatusCode(500, "An unexpected error occurred.");
         }
     }
+
 
     [HttpGet("{id}")]
     public async Task<IActionResult> FetchNode(string id)
@@ -222,6 +226,9 @@ public class NodesController : Controller
                     blockToUpdate.Position = position;
 
                     var blockData = JsonSerializer.Deserialize<BlockData>(data.GetProperty("data").GetRawText(), options);
+
+                    Console.Write("BLOCKDATA1" + data.GetProperty("data").GetRawText());
+                    Console.Write("BLOCKDATA2" + blockData);
 
                     if (blockData == null)
                     {

@@ -1,9 +1,16 @@
 namespace server.Models;
 
+public class BlockDto
+{
+    public string NodeId { get; set; }
+    public string Id { get; set; }
+    public Position Position { get; set; }
+    public NodeType Type { get; set; }
+    public BlockData Data { get; set; }
+}
 
 public class BlockData : NodeData
 {
-
     public string Parent { get; set; } = "void";
     public List<Relation> Children { get; set; } = new List<Relation>();
     public List<Relation> Terminals { get; set; } = new List<Relation>();
