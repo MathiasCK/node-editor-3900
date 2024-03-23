@@ -27,7 +27,7 @@ import {
 } from './components/ui/styled';
 import { ThemeProvider } from 'styled-components';
 import { Sidebar, Settings, SelectConnection } from './components/ui';
-import { fetchNodes } from './api/nodes';
+import { fetchNodes, updateNode } from './api/nodes';
 import { createEdge, fetchEdges } from './api/edges';
 
 export default function App() {
@@ -135,6 +135,7 @@ export default function App() {
         onConnect={onConnect}
         nodeTypes={nodeTypes as unknown as NodeTypes}
         edgeTypes={edgeTypes as unknown as EdgeTypes}
+        onNodeDragStop={(_, node) => updateNode(node.id, nodes, setNodes)}
       >
         <Sidebar />
         <Settings />
