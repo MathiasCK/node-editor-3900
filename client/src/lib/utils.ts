@@ -406,19 +406,17 @@ export const updateNodeRelations = async (
     if (!terminal || !block) return;
 
     if (terminal.id !== nodeIdToDelete) {
-      terminal.data.terminalOf = null;
+      terminal.data.terminalOf = '';
 
       await updateNode(terminal.id, nodes, setNodes);
     }
 
     if (block.id !== nodeIdToDelete) {
       const filteredTerminals = block.data.terminals.filter(
-        (id: string) => id !== terminal.id
+        (t: { id: string }) => t.id !== terminal.id
       );
 
-      block.data.terminals = filteredTerminals.length
-        ? filteredTerminals
-        : null;
+      block.data.terminals = filteredTerminals.length ? filteredTerminals : [];
 
       await updateNode(block.id, nodes, setNodes);
     }
@@ -430,25 +428,22 @@ export const updateNodeRelations = async (
     isTerminal(currentEdge.targetHandle!) &&
     isBlock(currentEdge.sourceHandle!)
   ) {
-    const terminal = nodes.find(node => node.id === currentEdge.source);
-    const block = nodes.find(node => node.id === currentEdge.target);
+    const terminal = nodes.find(node => node.id === currentEdge.target);
+    const block = nodes.find(node => node.id === currentEdge.source);
 
     if (!terminal || !block) return;
 
     if (terminal.id !== nodeIdToDelete) {
-      terminal.data.terminalOf = null;
-
+      terminal.data.terminalOf = '';
       await updateNode(terminal.id, nodes, setNodes);
     }
 
     if (block.id !== nodeIdToDelete) {
       const filteredTerminals = block.data.terminals.filter(
-        (id: string) => id !== terminal.id
+        (t: { id: string }) => t.id !== terminal.id
       );
 
-      block.data.terminals = filteredTerminals.length
-        ? filteredTerminals
-        : null;
+      block.data.terminals = filteredTerminals.length ? filteredTerminals : [];
 
       await updateNode(block.id, nodes, setNodes);
     }
