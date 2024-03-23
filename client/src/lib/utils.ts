@@ -383,12 +383,12 @@ export const updateNodeRelations = async (
     if (!sourceTerminal || !targetTerminal) return;
 
     if (targetTerminal.id !== nodeIdToDelete) {
-      targetTerminal.data.transferedBy = null;
+      targetTerminal.data.transferedBy = '';
       await updateNode(targetTerminal.id, nodes, setNodes);
     }
 
     if (sourceTerminal.id !== nodeIdToDelete) {
-      sourceTerminal.data.transfersTo = null;
+      sourceTerminal.data.transfersTo = '';
       await updateNode(sourceTerminal.id, nodes, setNodes);
     }
 
@@ -493,7 +493,7 @@ export const updateNodeRelations = async (
       );
 
       targetNode.data.directParts =
-        filteredDirectParts.length > 0 ? filteredDirectParts : null;
+        filteredDirectParts.length > 0 ? filteredDirectParts : [];
 
       const filteredChildren = targetNode.data.children.filter(
         (child: { id: string }) => child.id !== currentEdge.source
@@ -501,13 +501,13 @@ export const updateNodeRelations = async (
 
       targetNode.data.children = filteredChildren.length
         ? filteredChildren
-        : null;
+        : [];
 
       await updateNode(targetNode.id, nodes, setNodes);
     }
 
     if (sourceNode.id !== nodeIdToDelete) {
-      sourceNode.data.directPartOf = null;
+      sourceNode.data.directPartOf = '';
       sourceNode.data.parent = 'void';
       await updateNode(sourceNode.id, nodes, setNodes);
     }
@@ -527,7 +527,7 @@ export const updateNodeRelations = async (
       );
 
       sourceNode.data.fulfills =
-        filteredFulfills.length === 0 ? null : filteredFulfills;
+        filteredFulfills.length > 0 ? filteredFulfills : [];
 
       await updateNode(sourceNode.id, nodes, setNodes);
     }
@@ -538,7 +538,7 @@ export const updateNodeRelations = async (
       );
 
       targetNode.data.fulfilledBy =
-        filteredFulfilledBy.length === 0 ? null : filteredFulfilledBy;
+        filteredFulfilledBy.length > 0 ? filteredFulfilledBy : [];
 
       await updateNode(targetNode.id, nodes, setNodes);
     }
@@ -639,8 +639,7 @@ export const updateNodeConnectionData = async (
       (part: { id: string }) => part.id !== sourceNodeId
     );
 
-    targetNode.data.directParts =
-      filteredParts.length > 0 ? filteredParts : null;
+    targetNode.data.directParts = filteredParts.length > 0 ? filteredParts : [];
     targetNode.data.fulfilledBy = [
       ...(targetNode.data.fulfilledBy ?? []),
       {
@@ -648,7 +647,7 @@ export const updateNodeConnectionData = async (
       },
     ];
 
-    sourceNode.data.directPartOf = null;
+    sourceNode.data.directPartOf = '';
     sourceNode.data.fulfills = [
       ...(sourceNode.data.fulfills ?? []),
       {
@@ -661,7 +660,7 @@ export const updateNodeConnectionData = async (
       (node: { id: string }) => node.id !== sourceNodeId
     );
     targetNode.data.fulfilledBy =
-      filteredFullfills.length > 0 ? filteredFullfills : null;
+      filteredFullfills.length > 0 ? filteredFullfills : [];
     targetNode.data.directParts = [
       ...(targetNode.data.directParts ?? []),
       {
@@ -669,7 +668,7 @@ export const updateNodeConnectionData = async (
       },
     ];
 
-    sourceNode.data.fulfills = null;
+    sourceNode.data.fulfills = '';
     sourceNode.data.directPartOf = targetNodeId;
   }
 
