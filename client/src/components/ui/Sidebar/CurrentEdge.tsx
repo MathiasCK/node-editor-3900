@@ -69,6 +69,18 @@ const CurrentEdge: FC<Props> = ({ currentEdge }) => {
     closeSidebar();
   };
 
+  const sourceNode = nodes.find(node => node.id === currentEdge.source);
+  const targetNode = nodes.find(node => node.id === currentEdge.target);
+
+  const sourceNodeLabel =
+    sourceNode?.data?.customName === ''
+      ? currentEdge.source
+      : sourceNode?.data?.customName;
+  const targetNodeLabel =
+    targetNode?.data?.customName === ''
+      ? currentEdge.target
+      : targetNode?.data?.customName;
+
   return (
     <SheetContent className="bg:background flex flex-col justify-between">
       <SheetHeader>
@@ -96,7 +108,7 @@ const CurrentEdge: FC<Props> = ({ currentEdge }) => {
             displayNewNode(currentEdge.source, nodes, openSidebar, closeSidebar)
           }
         >
-          {currentEdge.source}
+          {sourceNodeLabel}
         </Button>
       </div>
       <div>
@@ -131,7 +143,7 @@ const CurrentEdge: FC<Props> = ({ currentEdge }) => {
             displayNewNode(currentEdge.target, nodes, openSidebar, closeSidebar)
           }
         >
-          {currentEdge.target}
+          {targetNodeLabel}
         </Button>
       </div>
       <SheetFooter>

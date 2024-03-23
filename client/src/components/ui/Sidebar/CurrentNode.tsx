@@ -139,22 +139,28 @@ const CurrentNode: FC<Props> = ({ currentNode }) => {
               <p className="mb-2 text-sm text-muted-foreground">
                 {getReadableRelation(nodeRelation.key as RelationType)}
               </p>
-              {nodeRelation.children?.map(c => (
-                <Button
-                  key={`${nodeRelation.key}_${c.id}_link_button`}
-                  variant="ghost"
-                  onClick={() =>
-                    displayNewNode(
-                      c.id as string,
-                      nodes,
-                      openSidebar,
-                      closeSidebar
-                    )
-                  }
-                >
-                  {c.id}
-                </Button>
-              ))}
+              {nodeRelation.children?.map(c => {
+                const node = nodes.find(node => node.id === c.id);
+
+                return (
+                  <Button
+                    key={`${nodeRelation.key}_${c.id}_link_button`}
+                    variant="ghost"
+                    onClick={() =>
+                      displayNewNode(
+                        c.id as string,
+                        nodes,
+                        openSidebar,
+                        closeSidebar
+                      )
+                    }
+                  >
+                    {node?.data?.customName === ''
+                      ? c.id
+                      : node?.data.customName}
+                  </Button>
+                );
+              })}
             </div>
           );
         })}
