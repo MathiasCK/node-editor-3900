@@ -36,34 +36,24 @@ export enum RelationType {
 
 export type UpdateNode = { customName?: string; aspect?: AspectType };
 
+export type Relation = {
+  id: string;
+};
+
 export type NodeData = {
   aspect: AspectType;
   parent: 'void' | string;
-  children?: {
-    id: string;
-  }[];
-  terminals?: {
-    id: string;
-  }[];
+  children?: Relation[];
+  terminals?: Relation[];
   terminalOf?: string;
   transfersTo?: string;
   transferedBy?: string;
-  connectedTo?: {
-    id: string;
-  }[];
-  connectedBy?: {
-    id: string;
-  }[];
-  directParts?: {
-    id: string;
-  }[];
+  connectedTo?: Relation[];
+  connectedBy?: Relation[];
+  directParts?: Relation[];
   directPartOf?: string;
-  fulfills?: {
-    id: string;
-  }[];
-  fulfilledBy?: {
-    id: string;
-  }[];
+  fulfills?: Relation[];
+  fulfilledBy?: Relation[];
   label: string;
   createdAt: number;
   updatedAt: number;
