@@ -147,7 +147,7 @@ export const deleteNode = async (
   setNodes: (nodes: Node[]) => void,
   edges: Edge[],
   setEdges: (edges: Edge[]) => void
-): Promise<string | null> => {
+): Promise<string | null> => {  
   const nodeToDelete = nodes.find(
     node => node.id === nodeToDeleteId
   ) as NodeWithNodeId;
@@ -158,6 +158,18 @@ export const deleteNode = async (
   }
 
   const loadingToastId = toast.loading('Deleting node...');
+
+  const connectedEdges = getConnectedEdges([nodeToDelete], edges);
+  for (const edge of connectedEdges) {
+    await deleteEdge(
+      edge.id as string,
+      edges,
+      setEdges,
+      nodes,
+      setNodes,
+      nodeToDeleteId
+    );
+  }
 
   try {
     const response = await fetch(
@@ -176,9 +188,11 @@ export const deleteNode = async (
       return null;
     }
 
-    toast.success('Node deleted successfully!');
+    const data = await response.json();
+    setNodes(data);
 
-    setNodes(nodes.filter(node => node.id !== nodeToDelete.id));
+    toast.success('Node deleted successfully!');
+    
     return nodeToDelete.id;
   } catch (error) {
     toast.error(`Error deleting node: ${(error as Error).message}`);
@@ -186,17 +200,5 @@ export const deleteNode = async (
     return null;
   } finally {
     loadingToastId && toast.dismiss(loadingToastId);
-
-    const connectedEdges = getConnectedEdges([nodeToDelete], edges);
-    for (const edge of connectedEdges) {
-      await deleteEdge(
-        edge.id as string,
-        edges,
-        setEdges,
-        nodes,
-        setNodes,
-        nodeToDeleteId
-      );
-    }
   }
 };

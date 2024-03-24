@@ -158,7 +158,7 @@ public class NodesController : Controller
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteNode(string id)
+    public async Task<ActionResult<IEnumerable<object>>> DeleteNode(string id)
     {
         if (id == null) return BadRequest("Node id is missing.");
 
@@ -174,7 +174,7 @@ public class NodesController : Controller
             _db.Nodes.Remove(node);
             await _db.SaveChangesAsync();
 
-            return Ok(await _db.Nodes.ToListAsync());
+            return await FetchNodes();
         }
         catch (DbUpdateException dbEx)
         {
@@ -226,9 +226,6 @@ public class NodesController : Controller
                     blockToUpdate.Position = position;
 
                     var blockData = JsonSerializer.Deserialize<BlockData>(data.GetProperty("data").GetRawText(), options);
-
-                    Console.Write("BLOCKDATA1" + data.GetProperty("data").GetRawText());
-                    Console.Write("BLOCKDATA2" + blockData);
 
                     if (blockData == null)
                     {
