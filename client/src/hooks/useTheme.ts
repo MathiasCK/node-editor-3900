@@ -3,15 +3,14 @@ import { createJSONStorage, persist } from 'zustand/middleware';
 
 type ThemeData = {
   theme: 'light' | 'dark';
-  toggleTheme: () => void;
+  toggleTheme: (mode: 'light' | 'dark') => void;
 };
 
 const useTheme = create<ThemeData>()(
   persist(
     set => ({
       theme: 'light',
-      toggleTheme: () =>
-        set(state => ({ theme: state.theme === 'light' ? 'dark' : 'light' })),
+      toggleTheme: (theme: 'dark' | 'light') => set({ theme: theme }),
     }),
     {
       name: 'theme-storage',

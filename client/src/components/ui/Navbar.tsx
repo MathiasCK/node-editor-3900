@@ -10,10 +10,11 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from '@/components/ui/navigation-menu';
-import { AlignJustify } from 'lucide-react';
-import { storeSelector, useSettings, useStore, useTheme } from '@/hooks';
+
+import { storeSelector, useStore } from '@/hooks';
 import { AspectType, NavItem, NodeType } from '@/lib/types';
 import { shallow } from 'zustand/shallow';
+import ThemeToggle from './ThemeToggle';
 
 const navItems: NavItem[] = [
   {
@@ -115,49 +116,41 @@ const navItems: NavItem[] = [
 ];
 
 const Navbar = () => {
-  const { theme } = useTheme();
-  const { openSettings } = useSettings();
   const { nodes, setNodes } = useStore(storeSelector, shallow);
 
   return (
-    <NavigationMenu className="bg-white  dark:bg-background">
-      <NavigationMenuList>
-        <NavigationMenuItem className="p-5">
-          <AlignJustify
-            onClick={openSettings}
-            className={cn('h-10 w-10 cursor-pointer', {
-              'text-white': theme === 'dark',
-              'text-black': theme === 'light',
-            })}
-          />
-        </NavigationMenuItem>
-        {navItems.map(node => (
-          <NavigationMenuItem key={node.title}>
-            <NavigationMenuTrigger>{node.title}</NavigationMenuTrigger>
-            <NavigationMenuContent>
-              <h1 className="p-4 text-muted-foreground">{node.subtitle}</h1>
-              <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
-                {node.children.map(component => (
-                  <ListItem
-                    key={component.title}
-                    title={component.title}
-                    onClick={() =>
-                      addNode(
-                        node.title.toLowerCase() as AspectType,
-                        component.nodeType,
-                        nodes,
-                        setNodes
-                      )
-                    }
-                  >
-                    {component.description}
-                  </ListItem>
-                ))}
-              </ul>
-            </NavigationMenuContent>
-          </NavigationMenuItem>
-        ))}
-      </NavigationMenuList>
+    <NavigationMenu className="h-16 bg-white dark:bg-background">
+      <div className="flex w-full justify-between">
+        <NavigationMenuList>
+          {navItems.map(node => (
+            <NavigationMenuItem key={node.title}>
+              <NavigationMenuTrigger>{node.title}</NavigationMenuTrigger>
+              <NavigationMenuContent>
+                <h1 className="p-4 text-muted-foreground">{node.subtitle}</h1>
+                <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
+                  {node.children.map(component => (
+                    <ListItem
+                      key={component.title}
+                      title={component.title}
+                      onClick={() =>
+                        addNode(
+                          node.title.toLowerCase() as AspectType,
+                          component.nodeType,
+                          nodes,
+                          setNodes
+                        )
+                      }
+                    >
+                      {component.description}
+                    </ListItem>
+                  ))}
+                </ul>
+              </NavigationMenuContent>
+            </NavigationMenuItem>
+          ))}
+        </NavigationMenuList>
+        <ThemeToggle />
+      </div>
     </NavigationMenu>
   );
 };
