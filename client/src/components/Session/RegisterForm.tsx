@@ -2,6 +2,21 @@ import { useState, SyntheticEvent } from 'react';
 import { Navigate } from 'react-router-dom';
 
 const RegisterForm = () => {
+  const [usernameReg, setUsernameReg] = useState('');
+  const [passwordReg, setPasswordReg] = useState('');
+  const [navigate, setNavigate] = useState(false);
+
+  const register = () => {
+    Axios.post('http://localhost3001/register', {
+      username: usernameReg,
+      password: passwordReg,
+    }).then(response => {
+      console.log(response);
+      setNavigate(true);
+    });
+  };
+  /*
+const RegisterForm = () => {
   const [name, setName] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -23,7 +38,7 @@ const RegisterForm = () => {
     const submit = async (e: SyntheticEvent) => {
         e.preventDefault();
 
-        await fetch('http://localhost:8000/api/register', {
+        await fetch('http://localhost:8000/register', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({
