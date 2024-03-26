@@ -65,6 +65,7 @@ const CurrentNode: FC<Props> = ({ currentNode }) => {
 
     updateNode(currentNode.id, nodes, setNodes, newNodeData);
     handleEdit(false);
+    closeSidebar();
   };
 
   const handleDelete = async () => {
