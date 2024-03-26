@@ -27,7 +27,7 @@ const SidebarSettings = () => {
             checked={theme === 'dark'}
             id="dark-mode"
             onClick={() => {
-              toggleTheme();
+              toggleTheme(theme === 'dark' ? 'light' : 'dark');
             }}
           />
           <Label htmlFor="dark-mode" className="text-muted-foreground">
