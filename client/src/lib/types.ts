@@ -11,7 +11,6 @@ export enum NodeType {
   Block = 'block',
   Connector = 'connector',
   Terminal = 'terminal',
-  TextBox = 'textbox',
 }
 
 export enum EdgeType {

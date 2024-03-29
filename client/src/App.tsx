@@ -4,17 +4,15 @@ import {
   type Node,
   type Connection,
   Background,
-  Panel,
   EdgeTypes,
   NodeTypes,
 } from 'reactflow';
 import { shallow } from 'zustand/shallow';
 
 import 'reactflow/dist/style.css';
-import { Block, Connector, Terminal, TextBox } from './components/Nodes';
-import { buttonVariants } from './lib/config';
-import { AspectType, NodeRelation, NodeType } from './lib/types';
-import { addNode, checkConnection, handleNewNodeRelations } from './lib/utils';
+import { Block, Connector, Terminal } from './components/Nodes';
+import { NodeRelation } from './lib/types';
+import { checkConnection, handleNewNodeRelations } from './lib/utils';
 import { storeSelector, useConnection, useStore, useTheme } from './hooks';
 
 import { Connected, Fulfilled, Part, Transfer } from './components/Edges';
@@ -36,7 +34,6 @@ export default function App() {
       block: Block,
       connector: Connector,
       terminal: Terminal,
-      textbox: TextBox,
     }),
     []
   );
@@ -143,21 +140,6 @@ export default function App() {
           displayDialog={displayDialog}
           createNewConnection={createNewConnection}
         />
-        <Panel
-          position="top-right"
-          className="w-100 flex h-full flex-col justify-center"
-        >
-          <button
-            className={
-              theme === 'light' ? buttonVariants.button : buttonVariants.textbox
-            }
-            onClick={() =>
-              addNode('white' as AspectType, NodeType.TextBox, nodes, setNodes)
-            }
-          >
-            Add TextBox
-          </button>
-        </Panel>
         <ControlsStyled />
         <MiniMapStyled />
         <Background gap={12} size={1} />
