@@ -64,20 +64,20 @@ public class UsersController : Controller
     return Ok(user);
   }
   private string GenerateJwtToken(string Username)
+  {
+    var envKey = "vn6Kx+VuhLpeYe23epBjAsBjr9V6WXzjGhUP/vYWcRU=";
+
+    var secretKey = Encoding.UTF8.GetBytes(envKey);
+    var jwtTokenHandler = new JwtSecurityTokenHandler();
+
+    var tokenDescriptor = new SecurityTokenDescriptor
     {
-        var envKey = "vn6Kx+VuhLpeYe23epBjAsBjr9V6WXzjGhUP/vYWcRU=";
+      Subject = new ClaimsIdentity(new[] { new Claim(ClaimTypes.Name, Username.ToString()) }),
+      Expires = DateTime.UtcNow.AddHours(1),
+      SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(secretKey), SecurityAlgorithms.HmacSha256Signature)
+    };
 
-        var secretKey = Encoding.UTF8.GetBytes(envKey);
-        var jwtTokenHandler = new JwtSecurityTokenHandler();
-
-        var tokenDescriptor = new SecurityTokenDescriptor
-        {
-            Subject = new ClaimsIdentity(new[] { new Claim(ClaimTypes.Name, Username.ToString()) }),
-            Expires = DateTime.UtcNow.AddHours(1),
-            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(secretKey), SecurityAlgorithms.HmacSha256Signature)
-        };
-
-        return jwtTokenHandler.WriteToken(jwtTokenHandler.CreateToken(tokenDescriptor));
-    }
+    return jwtTokenHandler.WriteToken(jwtTokenHandler.CreateToken(tokenDescriptor));
+  }
 
 }
