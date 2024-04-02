@@ -702,3 +702,120 @@ export const getReadableRelation = (type: RelationType): string | null => {
       return null;
   }
 };
+
+export const downloadFile = (nodes: Node[]) => {
+  if (nodes.length === 0) {
+    toast.error('No nodes to download');
+    return;
+  }
+
+  const str = mapNodeRelationsToString(nodes);
+
+  const blob = new Blob([str], { type: 'text/plain' });
+
+  const url = window.URL.createObjectURL(blob);
+
+  const link = document.createElement('a');
+  link.href = url;
+  link.setAttribute('download', 'relations.txt');
+
+  document.body.appendChild(link);
+
+  link.click();
+
+  document.body.removeChild(link);
+  window.URL.revokeObjectURL(url);
+};
+
+export const getNodeRelationLabel = (node: Node): string =>
+  `${node.data.customName === '' ? `${capitalizeFirstLetter(node.type!)} ${node.id}` : node.data.customName}`;
+
+export const getReadableKey = (key: RelationKeys): string => {
+  switch (key) {
+    case 'connectedTo':
+      return 'is connected to';
+    case 'connectedBy':
+      return 'is connected by';
+    case 'directParts':
+      return 'has part';
+    case 'fulfilledBy':
+      return 'is fulfilled by';
+    case 'terminals':
+      return 'has terminal';
+    case 'terminalOf':
+      return 'is terminal of';
+    case 'directPartOf':
+      return 'is part of';
+    case 'transfersTo':
+      return 'is transferring to';
+    case 'transferedBy':
+      return 'is being transferred by';
+    case 'fulfills':
+      return 'fulfills';
+  }
+};
+
+export const mapNodeRelationsToString = (nodes: Node[]): string => {
+  const transformableKeys: RelationKeys[] = [
+    'connectedTo',
+    'connectedBy',
+    'directParts',
+    'fulfilledBy',
+    'terminals',
+    'terminalOf',
+    'directPartOf',
+    'transfersTo',
+    'transferedBy',
+    'fulfills',
+  ];
+
+  const relations = new Map<string, string[]>();
+
+  for (const node of nodes) {
+    const nodeLabel = getNodeRelationLabel(node);
+
+    relations.set(nodeLabel, []);
+
+    for (const key of transformableKeys) {
+      if (!node.data || !node.data[key] || node.data[key].length === 0)
+        continue;
+
+      if (
+        typeof node.data[key] === 'string' ||
+        typeof node.data[key] === 'number'
+      ) {
+        const node = nodes.find(node => node.id === node.data[key]);
+        if (node) {
+          relations
+            .get(nodeLabel)
+            ?.push(`${getReadableKey(key)} ${getNodeRelationLabel(node)}`);
+        }
+        continue;
+      }
+
+      for (const item of node.data[key]) {
+        const node = nodes.find(node => node.id === item.id);
+        if (node) {
+          relations
+            .get(nodeLabel)
+            ?.push(`${getReadableKey(key)} ${getNodeRelationLabel(node)}`);
+        }
+      }
+    }
+  }
+
+  let str =
+    'Fulfilledby - inverse of fulfills\nConnectedBy - inverse of connectedTo\nTransferedBy - inverse of transfersTo\nPartOf - inverse of directParts\nTerminalOf - inverse of terminals\n\n\n';
+
+  relations.forEach((value, key) => {
+    if (value.length === 0) return;
+
+    str += `${key}:\n`;
+    value.forEach(relation => {
+      str += `  ${relation}\n`;
+    });
+    str += '\n';
+  });
+
+  return str;
+};

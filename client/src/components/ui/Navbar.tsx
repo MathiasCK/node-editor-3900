@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { addNode, cn } from '@/lib/utils';
+import { addNode, cn, downloadFile } from '@/lib/utils';
 
 import {
   NavigationMenu,
@@ -15,6 +15,7 @@ import { storeSelector, useStore } from '@/hooks';
 import { AspectType, NavItem, NodeType } from '@/lib/types';
 import { shallow } from 'zustand/shallow';
 import ThemeToggle from './ThemeToggle';
+import { Download } from 'lucide-react';
 
 const navItems: NavItem[] = [
   {
@@ -117,7 +118,6 @@ const navItems: NavItem[] = [
 
 const Navbar = () => {
   const { nodes, setNodes } = useStore(storeSelector, shallow);
-
   return (
     <NavigationMenu className="h-16 bg-white dark:bg-background">
       <div className="flex w-full justify-between">
@@ -149,7 +149,13 @@ const Navbar = () => {
             </NavigationMenuItem>
           ))}
         </NavigationMenuList>
-        <ThemeToggle />
+        <div className="flex items-center justify-center ">
+          <Download
+            onClick={() => downloadFile(nodes)}
+            className="mr-2 hover:cursor-pointer"
+          />
+          <ThemeToggle />
+        </div>
       </div>
     </NavigationMenu>
   );
