@@ -24,7 +24,8 @@ public class DB : DbContext
         modelBuilder.Entity<Node>().HasKey(e => e.NodeId);
         modelBuilder.Entity<Node>().Property(e => e.NodeId).HasMaxLength(255);
 
-        modelBuilder.Entity<Terminal>().OwnsOne(t => t.Data, data => {
+        modelBuilder.Entity<Terminal>().OwnsOne(t => t.Data, data =>
+        {
             data.Property(nd => nd.ConnectedTo)
                 .HasConversion(
                     v => JsonSerializer.Serialize(v, new JsonSerializerOptions()),
@@ -37,7 +38,8 @@ public class DB : DbContext
                     v => JsonSerializer.Deserialize<List<Relation>>(v, new JsonSerializerOptions()))
                 .HasColumnType("json");
         });
-        modelBuilder.Entity<Connector>().OwnsOne(c => c.Data, data => {
+        modelBuilder.Entity<Connector>().OwnsOne(c => c.Data, data =>
+        {
             data.Property(nd => nd.ConnectedTo)
                 .HasConversion(
                     v => JsonSerializer.Serialize(v, new JsonSerializerOptions()),
@@ -100,4 +102,5 @@ public class DB : DbContext
 
     public DbSet<Node> Nodes { get; set; }
     public DbSet<Edge> Edges { get; set; }
+    public DbSet<User> Users { get; set; }
 }
