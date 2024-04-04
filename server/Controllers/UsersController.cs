@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using server.DAL;
 using server.Models;
 
@@ -17,15 +18,15 @@ public class UsersController : Controller
     _logger = logger;
   }
 
-  [HttpGet]
-  public string Test()
-  {
-    return "test";
-  }
+
   [HttpPost]
   public async Task<IActionResult> FetchUser(User user)
   {
-    throw new NotImplementedException();
+    var usr = await _db.Users.FirstOrDefaultAsync(u => u.Username == user.Username && u.Password == user.Password);
+    if (usr == null){
+      return NotFound("User not found");
+    }
+    return Ok(usr);
   }
 
   [Route("create")]
