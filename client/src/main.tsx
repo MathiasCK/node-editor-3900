@@ -11,7 +11,7 @@ import ProtectedRoute from './components/Session/ProtectedRoute';
 
  const router = createBrowserRouter([
 	{
-		path: "loginform",
+		path: "login",
 		element: <LoginForm />,
 	},
   {

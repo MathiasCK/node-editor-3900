@@ -29,22 +29,6 @@ import { fetchNodes, updateNode } from './api/nodes';
 import { createEdge, fetchEdges } from './api/edges';
 
 export default function App() {
-  //Function to fetch the name of the user when logged in
-  const [name, setName] = useState('');
-
-  useEffect(() => {
-    (async () => {
-      const response = await fetch('http://localhost:8000/api/user', {
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-      });
-
-      const content = await response.json();
-
-      setName(content.name);
-    })();
-  });
-  //----------------------------------------------------------------
 
   const nodeTypes = useMemo(
     () => ({
