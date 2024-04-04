@@ -156,7 +156,7 @@ const Navbar = () => {
             className="hover:cursor-pointer"
           />
           <ThemeToggle />
-          <LogOut onClick={logout} className="hover:cursor-pointer" />
+          <LogOut onClick={() => logout()} className="hover:cursor-pointer" />
         </div>
       </div>
     </NavigationMenu>
