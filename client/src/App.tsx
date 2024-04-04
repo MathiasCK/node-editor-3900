@@ -28,55 +28,6 @@ import { Sidebar, Settings, SelectConnection } from './components/ui';
 import { fetchNodes, updateNode } from './api/nodes';
 import { createEdge, fetchEdges } from './api/edges';
 
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import Home from './Pages/Home';
-import ProtectedRoutes from './components/Session/ProtectedRoute';
-
-const router = createBrowserRouter([
-  {
-    path: '/',
-    element: <Home />,
-  },
-  {
-    path: 'login',
-    element: (
-      <>
-        <h1>Please log in</h1>
-        <p>This is where you authenticate and get a session or jwt.</p>
-      </>
-    ),
-  },
-  {
-    element: <ProtectedRoutes />,
-    children: [
-      {
-        path: 'admin',
-        element: (
-          <>
-            <p>This is admin page.</p>
-          </>
-        ),
-      },
-      {
-        path: 'user',
-        element: (
-          <>
-            <p>This is user page.</p>
-          </>
-        ),
-      },
-      {
-        path: 'guest',
-        element: (
-          <>
-            <p>This is guest page.</p>
-          </>
-        ),
-      },
-    ],
-  },
-]);
-
 export default function App() {
   //Function to fetch the name of the user when logged in
   const [name, setName] = useState('');
@@ -210,7 +161,6 @@ export default function App() {
         <MiniMapStyled />
         <Background gap={12} size={1} />
       </ReactFlowStyled>
-      <RouterProvider router={router} />
     </ThemeProvider>
   );
 }
