@@ -4,7 +4,7 @@ import { logout, validateToken } from '@/api/user';
 import { Spinner } from '../ui';
 import { UserWithToken } from '@/lib/types';
 
-const ProtectedRoute = () => {
+const AdminRoute = () => {
   const { isPending, error, data } = useQuery({
     queryKey: ['tokenData'],
     queryFn: async () => {
@@ -15,12 +15,17 @@ const ProtectedRoute = () => {
 
   if (isPending) return <Spinner />;
 
-  if (error || !data || !(data as UserWithToken).token) {
-    const path = logout(true);
+  if (
+    error ||
+    !data ||
+    !(data as UserWithToken).token ||
+    (data as UserWithToken).user.username !== 'admin'
+  ) {
+    const path = logout();
     return <Navigate to={path} replace />;
   }
 
   return <Outlet />;
 };
 
-export default ProtectedRoute;
+export default AdminRoute;
