@@ -11,22 +11,16 @@ namespace server.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class UsersController : Controller
+public class UsersController(DB db, ILogger<UsersController> logger) : Controller
 {
-  private readonly DB _db;
-  private readonly ILogger<UsersController> _logger;
-
-  public UsersController(DB db, ILogger<UsersController> logger)
-  {
-    _db = db;
-    _logger = logger;
-  }
-
+  private readonly DB _db = db;
+  private readonly ILogger<UsersController> _logger = logger;
 
   [HttpPost("login")]
   public async Task<IActionResult> FetchUser(User user)
   {
     var usr = await _db.Users.FirstOrDefaultAsync(u => u.Username == user.Username);
+
     if (usr == null)
     {
       return NotFound("User not found");
@@ -41,11 +35,18 @@ public class UsersController : Controller
       return BadRequest("Passwords do not match");
     }
 
-    var token = GenerateJwtToken(usr.Username);
+    var token = GenerateJwtToken(usr);
 
-    return Ok(token);
+    return Ok(new
+    {
+      Token = token,
+      User = new
+      {
+        usr.Username,
+        usr.Id
+      }
+    });
   }
-
 
   [Route("create")]
   [HttpPost]
@@ -61,9 +62,19 @@ public class UsersController : Controller
     await _db.Users.AddAsync(user);
     await _db.SaveChangesAsync();
 
-    return Ok(user);
+    var token = GenerateJwtToken(user);
+
+    return Ok(new
+    {
+      Token = token,
+      User = new
+      {
+        user.Username,
+        user.Id
+      }
+    });
   }
-  private string GenerateJwtToken(string Username)
+  private static string GenerateJwtToken(User user)
   {
     var envKey = "vn6Kx+VuhLpeYe23epBjAsBjr9V6WXzjGhUP/vYWcRU=";
 
@@ -72,12 +83,20 @@ public class UsersController : Controller
 
     var tokenDescriptor = new SecurityTokenDescriptor
     {
-      Subject = new ClaimsIdentity(new[] { new Claim(ClaimTypes.Name, Username.ToString()) }),
-      Expires = DateTime.UtcNow.AddHours(1),
+      Subject = new ClaimsIdentity(new[]
+        {
+            new Claim(ClaimTypes.Name, user.Username),
+            new Claim("UserId", user.Id)
+        }),
+      Expires = DateTime.UtcNow.AddDays(7),
       SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(secretKey), SecurityAlgorithms.HmacSha256Signature)
     };
 
-    return jwtTokenHandler.WriteToken(jwtTokenHandler.CreateToken(tokenDescriptor));
+    var token = jwtTokenHandler.CreateToken(tokenDescriptor);
+    var tokenString = jwtTokenHandler.WriteToken(token);
+
+    return tokenString;
   }
+
 
 }

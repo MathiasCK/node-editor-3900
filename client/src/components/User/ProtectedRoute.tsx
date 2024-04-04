@@ -3,15 +3,15 @@ import { Navigate, Outlet } from 'react-router-dom';
 const ProtectedRoute = () => {
   const localStorageToken = localStorage.getItem('token');
 
-  // decode the jwt & see if its expired
-  // const decodedToken = localStorageToken
-  //   ? JSON.parse(atob(localStorageToken.split('.')[1]))
-  //   : null;
-  // const isExpired = decodedToken ? decodedToken.exp < Date.now() / 1000 : true;
+  const decodedToken = localStorageToken
+    ? JSON.parse(atob(localStorageToken.split('.')[1]))
+    : null;
 
-  // if token is expired, remove it
-  if (!localStorageToken) {
+  const isExpired = decodedToken ? decodedToken.exp < Date.now() / 1000 : true;
+
+  if (isExpired) {
     localStorage.removeItem('token');
+    localStorage.removeItem('user');
     return <Navigate to="/login" replace />;
   }
 

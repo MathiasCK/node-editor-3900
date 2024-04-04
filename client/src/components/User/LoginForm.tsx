@@ -56,21 +56,6 @@ const LoginForm = () => {
 
           <div className="mt-3 flex items-center justify-between">
             <div>
-              <input type="checkbox" />
-              <label className="text-black"> Remember me</label>
-            </div>
-          </div>
-
-          <div className="mt-3 flex items-center justify-between">
-            <div>
-              <a href="#" className="font-semibold text-indigo-800">
-                Forgot password?
-              </a>
-            </div>
-          </div>
-
-          <div className="mt-3 flex items-center justify-between">
-            <div>
               <p className="text-black">
                 Dont't have an account?{' '}
                 <a href="register" className="font-semibold text-indigo-800">
