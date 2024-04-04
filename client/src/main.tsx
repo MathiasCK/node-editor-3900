@@ -5,39 +5,38 @@ import './global.css';
 import { Toaster } from 'react-hot-toast';
 import { Navbar, Spinner } from './components/ui';
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
-import LoginForm from './components/Session/LoginForm';
-import RegisterForm from './components/Session/RegisterForm';
-import ProtectedRoute from './components/Session/ProtectedRoute';
+import { LoginForm, RegisterForm, ProtectedRoute } from './components/User';
 
- const router = createBrowserRouter([
-	{
-		path: "login",
-		element: <LoginForm />,
-	},
+const router = createBrowserRouter([
   {
-		path: "register",
-		element: <RegisterForm />,
-	},
+    path: 'login',
+    element: <LoginForm />,
+  },
+  {
+    path: 'register',
+    element: <RegisterForm />,
+  },
 
-  
-	{
-		element: <ProtectedRoute />,
-		children: [
-			{
-        path: "/",
-        element: <App />,
-	    },
-		],
-	}, 
+  {
+    element: <ProtectedRoute />,
+    children: [
+      {
+        path: '/',
+        element: (
+          <>
+            <Navbar />
+            <App />
+          </>
+        ),
+      },
+    ],
+  },
 ]);
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
-  
   <React.StrictMode>
-    
     <Toaster />
-    <Spinner size={40} />
-    <Navbar />
+    <Spinner />
     <main
       style={{ height: 'calc(100vh - 4rem)' }}
       className="h-screen w-screen"

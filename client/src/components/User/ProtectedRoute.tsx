@@ -12,7 +12,7 @@ const ProtectedRoute = () => {
   // if token is expired, remove it
   if (!localStorageToken) {
     localStorage.removeItem('token');
-    return <Navigate to="/loginform" replace />;
+    return <Navigate to="/login" replace />;
   }
 
   return <Outlet />;

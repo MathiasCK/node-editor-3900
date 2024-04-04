@@ -1,3 +1,4 @@
+import { register } from '@/api/user';
 import { useState, SyntheticEvent } from 'react';
 import { Navigate } from 'react-router-dom';
 
@@ -9,19 +10,7 @@ const RegisterForm = () => {
   const handleSubmit = async (e: SyntheticEvent) => {
     e.preventDefault();
 
-    const response = await fetch('http://localhost:5000/api/users/create', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        username,
-        password,
-      }),
-    });
-
-    const data = await response.text();
-    localStorage.setItem('token', data);
-    
-
+    await register(username, password);
     setNavigate(true);
   };
 

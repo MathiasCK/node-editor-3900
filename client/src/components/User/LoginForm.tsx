@@ -1,6 +1,6 @@
 import { Navigate } from 'react-router-dom';
 import { useState, SyntheticEvent } from 'react';
-
+import { login } from '@/api/user';
 
 const LoginForm = () => {
   const [username, setUsername] = useState('');
@@ -9,20 +9,7 @@ const LoginForm = () => {
 
   const handleSubmit = async (e: SyntheticEvent) => {
     e.preventDefault();
-
-    const response = await fetch('http://localhost:5000/api/users/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        username,
-        password,
-      }),
-    });
-
-    const data = await response.text();
-    localStorage.setItem('token', data);
-    
-
+    await login(username, password);
     setNavigate(true);
   };
 

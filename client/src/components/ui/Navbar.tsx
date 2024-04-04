@@ -15,7 +15,8 @@ import { storeSelector, useStore } from '@/hooks';
 import { AspectType, NavItem, NodeType } from '@/lib/types';
 import { shallow } from 'zustand/shallow';
 import ThemeToggle from './ThemeToggle';
-import { Download } from 'lucide-react';
+import { DownloadCloud, LogOut } from 'lucide-react';
+import { logout } from '@/api/user';
 
 const navItems: NavItem[] = [
   {
@@ -149,12 +150,13 @@ const Navbar = () => {
             </NavigationMenuItem>
           ))}
         </NavigationMenuList>
-        <div className="flex items-center justify-center ">
-          <Download
+        <div className="flex items-center justify-center gap-2">
+          <DownloadCloud
             onClick={() => downloadFile(nodes)}
-            className="mr-2 hover:cursor-pointer"
+            className="hover:cursor-pointer"
           />
           <ThemeToggle />
+          <LogOut onClick={logout} className="hover:cursor-pointer" />
         </div>
       </div>
     </NavigationMenu>
