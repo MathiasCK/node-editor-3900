@@ -29,6 +29,7 @@ import { fetchNodes, updateNode } from './api/nodes';
 import { createEdge, fetchEdges } from './api/edges';
 
 export default function App() {
+
   const nodeTypes = useMemo(
     () => ({
       block: Block,
