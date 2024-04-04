@@ -126,10 +126,12 @@ export type EdgeWithEdgeId = Edge & {
   edgeId: string;
 };
 
+export type User = {
+  id: string;
+  username: string;
+};
+
 export type UserWithToken = {
-  user: {
-    id: string;
-    username: string;
-  };
+  user: User;
   token: string;
 };

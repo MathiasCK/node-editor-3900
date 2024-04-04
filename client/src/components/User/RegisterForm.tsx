@@ -106,16 +106,6 @@ const RegisterForm = () => {
                 Submit
               </button>
             </div>
-            <div className="mt-3 flex items-center justify-between">
-              <div>
-                <p className="text-black">
-                  Already have an account?{' '}
-                  <a href="login" className="font-semibold text-indigo-800">
-                    Login
-                  </a>
-                </p>
-              </div>
-            </div>
           </form>
         </Form>
       </div>

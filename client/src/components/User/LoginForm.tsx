@@ -11,6 +11,9 @@ import {
   FormMessage,
 } from '../ui/form';
 import { Input } from '../ui/input';
+import toast from 'react-hot-toast';
+import { useEffect, useState } from 'react';
+import { Navigate } from 'react-router-dom';
 
 const formSchema = z.object({
   username: z.string().min(2, 'Username must contain at least 2 character(s)'),
@@ -18,6 +21,7 @@ const formSchema = z.object({
 });
 
 const LoginForm = () => {
+  const [navigate, setNavigate] = useState(false);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -26,8 +30,24 @@ const LoginForm = () => {
     },
   });
 
-  const handleSubmit = (values: z.infer<typeof formSchema>) =>
-    login(values.username, values.password);
+  const handleSubmit = async (values: z.infer<typeof formSchema>) => {
+    await login(values.username, values.password);
+    setNavigate(true);
+  };
+
+  const queryParams = new URLSearchParams(window.location.search);
+  const expired = queryParams.get('expired');
+
+  useEffect(() => {
+    if (expired) {
+      toast.error('Session expired. Please login again.');
+      window.location.href = '/login';
+    }
+  }, [expired]);
+
+  if (navigate) {
+    return <Navigate to="/" replace />;
+  }
 
   return (
     <div className="flex h-screen items-center justify-center bg-indigo-600">
@@ -71,17 +91,6 @@ const LoginForm = () => {
               >
                 Login
               </button>
-            </div>
-
-            <div className="mt-3 flex items-center justify-between">
-              <div>
-                <p className="text-black">
-                  Dont't have an account?{' '}
-                  <a href="register" className="font-semibold text-indigo-800">
-                    Register
-                  </a>
-                </p>
-              </div>
             </div>
           </form>
         </Form>
