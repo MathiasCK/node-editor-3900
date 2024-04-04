@@ -1,6 +1,6 @@
 import { Navigate, Outlet } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { logout, validateToken } from '@/api/user';
+import { logout, validateToken } from '@/api/auth';
 import { Spinner } from '../ui';
 import { UserWithToken } from '@/lib/types';
 

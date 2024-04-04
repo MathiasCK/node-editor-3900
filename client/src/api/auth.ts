@@ -7,7 +7,7 @@ export const login = async (
 ): Promise<UserWithToken | null> => {
   try {
     const response = await fetch(
-      `${import.meta.env.VITE_API_URL}/api/users/login`,
+      `${import.meta.env.VITE_API_URL}/api/auth/login`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -44,7 +44,7 @@ export const register = async (
 ): Promise<UserWithToken | null> => {
   try {
     const response = await fetch(
-      `${import.meta.env.VITE_API_URL}/api/users/register`,
+      `${import.meta.env.VITE_API_URL}/api/auth/register`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -89,7 +89,7 @@ export const validateToken = async (): Promise<boolean | UserWithToken> => {
 
   try {
     const response = await fetch(
-      `${import.meta.env.VITE_API_URL}/api/users/token`,
+      `${import.meta.env.VITE_API_URL}/api/auth/token`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

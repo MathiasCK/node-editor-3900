@@ -10,7 +10,7 @@ import {
   RegisterForm,
   ProtectedRoute,
   AdminRoute,
-} from './components/User';
+} from './components/auth';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 const router = createBrowserRouter([

@@ -1,4 +1,4 @@
-import { login } from '@/api/user';
+import { register } from '@/api/auth';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -11,43 +11,44 @@ import {
   FormMessage,
 } from '../ui/form';
 import { Input } from '../ui/input';
-import toast from 'react-hot-toast';
-import { useEffect, useState } from 'react';
-import { Navigate } from 'react-router-dom';
 
-const formSchema = z.object({
-  username: z.string().min(2, 'Username must contain at least 2 character(s)'),
-  password: z.string().min(2, 'Password must contain at least 2 character(s)'),
-});
+const formSchema = z
+  .object({
+    username: z
+      .string()
+      .min(2, 'Username must contain at least 2 character(s)')
+      .max(50, "Username can't be longer than 50 characters"),
+    password: z
+      .string()
+      .min(5, 'Password must contain at least 5 character(s)')
+      .max(50, "Password can't be longer than 50 characters"),
+    repeatPassword: z
+      .string()
+      .min(5, 'Password must contain at least 5 character(s)')
+      .max(50, "Password can't be longer than 50 characters"),
+  })
+  .superRefine((data, ctx) => {
+    if (data.password !== data.repeatPassword) {
+      ctx.addIssue({
+        path: ['repeatPassword'],
+        message: 'Passwords do not match',
+        code: 'custom',
+      });
+    }
+  });
 
-const LoginForm = () => {
-  const [navigate, setNavigate] = useState(false);
+const RegisterForm = () => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       username: '',
       password: '',
+      repeatPassword: '',
     },
   });
 
-  const handleSubmit = async (values: z.infer<typeof formSchema>) => {
-    await login(values.username, values.password);
-    setNavigate(true);
-  };
-
-  const queryParams = new URLSearchParams(window.location.search);
-  const expired = queryParams.get('expired');
-
-  useEffect(() => {
-    if (expired) {
-      toast.error('Session expired. Please login again.');
-      window.location.href = '/login';
-    }
-  }, [expired]);
-
-  if (navigate) {
-    return <Navigate to="/" replace />;
-  }
+  const handleSubmit = (values: z.infer<typeof formSchema>) =>
+    register(values.username, values.password);
 
   return (
     <div className="flex h-screen items-center justify-center bg-indigo-600">
@@ -55,7 +56,7 @@ const LoginForm = () => {
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)}>
             <h1 className="block text-center text-3xl font-bold text-black">
-              <i className="fa-solid fa-user"></i>Login
+              <i className="fa-solid fa-user"></i>Register
             </h1>
             <FormField
               control={form.control}
@@ -83,13 +84,26 @@ const LoginForm = () => {
                 </FormItem>
               )}
             />
+            <FormField
+              control={form.control}
+              name="repeatPassword"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Repeat password</FormLabel>
+                  <FormControl>
+                    <Input type="password" placeholder="password" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             <div className="mt-5">
               <button
                 type="submit"
                 className='font-semibold"><i class="fa-solid fa-right-to-bracket w-full rounded-md border-2 border-indigo-700 bg-indigo-700 py-1 text-white hover:bg-transparent hover:text-indigo-700'
               >
-                Login
+                Submit
               </button>
             </div>
           </form>
@@ -99,4 +113,4 @@ const LoginForm = () => {
   );
 };
 
-export default LoginForm;
+export default RegisterForm;

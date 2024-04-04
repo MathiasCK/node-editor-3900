@@ -11,10 +11,10 @@ namespace server.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class UsersController(DB db, ILogger<UsersController> logger) : Controller
+public class AuthController(DB db, ILogger<AuthController> logger) : Controller
 {
   private readonly DB _db = db;
-  private readonly ILogger<UsersController> _logger = logger;
+  private readonly ILogger<AuthController> _logger = logger;
 
   [HttpPost("login")]
   public async Task<IActionResult> Login(User user)
@@ -51,12 +51,12 @@ public class UsersController(DB db, ILogger<UsersController> logger) : Controlle
     }
     catch (DbUpdateException dbEx)
     {
-      _logger.LogError("[UsersController]: Database fetch failed: {Error}", dbEx.Message);
+      _logger.LogError("[AuthController]: Database fetch failed: {Error}", dbEx.Message);
       return StatusCode(500, "Failed login user due to database error.");
     }
     catch (Exception e)
     {
-      _logger.LogError("[UsersController]: Failed login user: {Error}", e.Message);
+      _logger.LogError("[AuthController]: Failed login user: {Error}", e.Message);
       return StatusCode(500, "An unexpected error occurred.");
     }
   }
@@ -98,25 +98,25 @@ public class UsersController(DB db, ILogger<UsersController> logger) : Controlle
     }
     catch (DbUpdateException dbEx)
     {
-      _logger.LogError("[UsersController]: Database fetch failed: {Error}", dbEx.Message);
+      _logger.LogError("[AuthController]: Database fetch failed: {Error}", dbEx.Message);
       return StatusCode(500, "Failed register user due to database error.");
     }
     catch (Exception e)
     {
-      _logger.LogError("[UsersController]: Failed register user: {Error}", e.Message);
+      _logger.LogError("[AuthController]: Failed register user: {Error}", e.Message);
       return StatusCode(500, "An unexpected error occurred.");
     }
   }
 
   [HttpPost("token")]
-  public Task<IActionResult> ValidateToken([FromBody] string token)
+  public Task<IActionResult> ValidateToken(Token token)
   {
     try
     {
       var jwtTokenHandler = new JwtSecurityTokenHandler();
       var key = Encoding.UTF8.GetBytes("vn6Kx+VuhLpeYe23epBjAsBjr9V6WXzjGhUP/vYWcRU=");
 
-      jwtTokenHandler.ValidateToken(token, new TokenValidationParameters
+      jwtTokenHandler.ValidateToken(token.token, new TokenValidationParameters
       {
         ValidateIssuerSigningKey = true,
         IssuerSigningKey = new SymmetricSecurityKey(key),
@@ -129,7 +129,7 @@ public class UsersController(DB db, ILogger<UsersController> logger) : Controlle
     }
     catch (Exception e)
     {
-      _logger.LogError("[UsersController]: Failed to validate token: {Error}", e.Message);
+      _logger.LogError("[AuthController]: Failed to validate token: {Error}", e.Message);
       return Task.FromResult<IActionResult>(StatusCode(500, "An unexpected error occurred."));
     }
   }

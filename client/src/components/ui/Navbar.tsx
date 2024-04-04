@@ -16,7 +16,7 @@ import { AspectType, NavItem, NodeType } from '@/lib/types';
 import { shallow } from 'zustand/shallow';
 import ThemeToggle from './ThemeToggle';
 import { DownloadCloud, LogOut } from 'lucide-react';
-import { logout } from '@/api/user';
+import { logout } from '@/api/auth';
 
 const navItems: NavItem[] = [
   {
