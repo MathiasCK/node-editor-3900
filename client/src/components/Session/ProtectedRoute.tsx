@@ -7,10 +7,10 @@ const ProtectedRoute = () => {
   const decodedToken = localStorageToken
     ? JSON.parse(atob(localStorageToken.split('.')[1]))
     : null;
-  const isExpired = decodedToken ? decodedToken.exp < Date.now() / 1000 : true;
+  // const isExpired = decodedToken ? decodedToken.exp < Date.now() / 1000 : true;
 
   // if token is expired, remove it
-  if (isExpired) {
+  if (!localStorageToken) {
     localStorage.removeItem('token');
     return <Navigate to="/loginform" replace />;
   }

@@ -21,13 +21,13 @@ import ProtectedRoute from './components/Session/ProtectedRoute';
 
   
 	{
-		//element: <ProtectedRoute />,
-		//children: [
-			//{
+		element: <ProtectedRoute />,
+		children: [
+			{
         path: "/",
         element: <App />,
-	    //},
-		//],
+	    },
+		],
 	}, 
 ]);
 

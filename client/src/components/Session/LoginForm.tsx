@@ -16,15 +16,18 @@ const LoginForm = () => {
   const handleSubmit = async (e: SyntheticEvent) => {
     e.preventDefault();
 
-    await fetch('http://localhost:8000/api/register', {
+    const response = await fetch('http://localhost:5000/api/users/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
       body: JSON.stringify({
         username,
         password,
       }),
     });
+
+    const data = await response.text();
+    localStorage.setItem('token', data);
+    
 
     setNavigate(true);
   };
