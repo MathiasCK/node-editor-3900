@@ -107,6 +107,32 @@ public class UsersController(DB db, ILogger<UsersController> logger) : Controlle
       return StatusCode(500, "An unexpected error occurred.");
     }
   }
+
+  [HttpPost("token")]
+  public Task<IActionResult> ValidateToken([FromBody] string token)
+  {
+    try
+    {
+      var jwtTokenHandler = new JwtSecurityTokenHandler();
+      var key = Encoding.UTF8.GetBytes("vn6Kx+VuhLpeYe23epBjAsBjr9V6WXzjGhUP/vYWcRU=");
+
+      jwtTokenHandler.ValidateToken(token, new TokenValidationParameters
+      {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(key),
+        ValidateIssuer = false,
+        ValidateAudience = false,
+        ClockSkew = TimeSpan.Zero
+      }, out SecurityToken validatedToken);
+
+      return Task.FromResult<IActionResult>(Ok());
+    }
+    catch (Exception e)
+    {
+      _logger.LogError("[UsersController]: Failed to validate token: {Error}", e.Message);
+      return Task.FromResult<IActionResult>(StatusCode(500, "An unexpected error occurred."));
+    }
+  }
   private static string GenerateJwtToken(User user)
   {
     var envKey = "vn6Kx+VuhLpeYe23epBjAsBjr9V6WXzjGhUP/vYWcRU=";

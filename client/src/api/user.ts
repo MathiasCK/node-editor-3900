@@ -31,7 +31,6 @@ export const login = async (
     localStorage.setItem('token', data.token);
     localStorage.setItem('user', JSON.stringify(data.user));
 
-    window.location.href = '/';
     return data;
   } catch (error) {
     toast.error('Error creating user. Please try again.');
@@ -77,8 +76,49 @@ export const register = async (
   }
 };
 
-export const logout = async () => {
+export const logout = (sessionExpired = false): string => {
   localStorage.removeItem('token');
   localStorage.removeItem('user');
-  window.location.reload();
+  return sessionExpired ? '/login?expired=true' : '/login';
+};
+
+export const validateToken = async (): Promise<boolean | UserWithToken> => {
+  const token = localStorage.getItem('token');
+
+  if (!token) return false;
+
+  try {
+    const response = await fetch(
+      `${import.meta.env.VITE_API_URL}/api/users/token`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          token,
+        }),
+      }
+    );
+
+    if (!response.ok) {
+      return false;
+    }
+
+    const decodedToken = token ? JSON.parse(atob(token.split('.')[1])) : null;
+
+    const isExpired = decodedToken
+      ? decodedToken.exp < Date.now() / 1000
+      : true;
+
+    if (isExpired) return false;
+
+    return {
+      token: token,
+      user: {
+        username: decodedToken.unique_name,
+        id: decodedToken.UserId,
+      },
+    };
+  } catch (error) {
+    return false;
+  }
 };
