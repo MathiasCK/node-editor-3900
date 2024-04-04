@@ -1,5 +1,3 @@
-using System;
-using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using server.DAL;
@@ -21,38 +19,37 @@ public class UsersController : Controller
   }
 
 
-  [HttpPost]
+  [HttpPost("login")]
   public async Task<IActionResult> FetchUser(User user)
   {
     var usr = await _db.Users.FirstOrDefaultAsync(u => u.Username == user.Username);
-    if (usr == null){
+    if (usr == null)
+    {
       return NotFound("User not found");
     }
 
-    byte[] salt = PasswordHasher.GenerateSalt();
-
-    Console.WriteLine("User: " + usr.Username);
-    Console.WriteLine("Password: " + usr.Password);
+    byte[] salt = Convert.FromBase64String(usr.Salt);
 
     var match = PasswordHasher.VerifyPassword(user.Password, salt, usr.Password);
 
-    if (match == false) {
+    if (!match)
+    {
       return BadRequest("Passwords do not match");
     }
 
     return Ok(usr);
   }
 
+
   [Route("create")]
   [HttpPost]
   public async Task<IActionResult> CreateUser(User user)
   {
-   
-   byte[] salt = PasswordHasher.GenerateSalt();
+    byte[] salt = PasswordHasher.GenerateSalt();
 
-    // Hash the password
     string hashedPassword = PasswordHasher.HashPassword(user.Password, salt);
 
+    user.Salt = Convert.ToBase64String(salt);
     user.Password = hashedPassword;
 
     await _db.Users.AddAsync(user);
@@ -60,5 +57,6 @@ public class UsersController : Controller
 
     return Ok(user);
   }
+
 
 }
