@@ -1,7 +1,11 @@
+using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using server.DAL;
 using server.Models;
+using System.IdentityModel.Tokens.Jwt;
+using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
 
 namespace server.Controllers;
 
@@ -37,7 +41,9 @@ public class UsersController : Controller
       return BadRequest("Passwords do not match");
     }
 
-    return Ok(usr);
+    var token = GenerateJwtToken(usr.Username);
+
+    return Ok(token);
   }
 
 
@@ -57,6 +63,21 @@ public class UsersController : Controller
 
     return Ok(user);
   }
+  private string GenerateJwtToken(string Username)
+    {
+        var envKey = "vn6Kx+VuhLpeYe23epBjAsBjr9V6WXzjGhUP/vYWcRU=";
 
+        var secretKey = Encoding.UTF8.GetBytes(envKey);
+        var jwtTokenHandler = new JwtSecurityTokenHandler();
+
+        var tokenDescriptor = new SecurityTokenDescriptor
+        {
+            Subject = new ClaimsIdentity(new[] { new Claim(ClaimTypes.Name, Username.ToString()) }),
+            Expires = DateTime.UtcNow.AddHours(1),
+            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(secretKey), SecurityAlgorithms.HmacSha256Signature)
+        };
+
+        return jwtTokenHandler.WriteToken(jwtTokenHandler.CreateToken(tokenDescriptor));
+    }
 
 }
