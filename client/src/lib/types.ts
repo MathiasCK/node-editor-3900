@@ -125,3 +125,11 @@ export type NodeWithNodeId = Node & {
 export type EdgeWithEdgeId = Edge & {
   edgeId: string;
 };
+
+export type UserWithToken = {
+  user: {
+    id: string;
+    username: string;
+  };
+  token: string;
+};

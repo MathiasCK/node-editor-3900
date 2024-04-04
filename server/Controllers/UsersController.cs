@@ -17,62 +17,95 @@ public class UsersController(DB db, ILogger<UsersController> logger) : Controlle
   private readonly ILogger<UsersController> _logger = logger;
 
   [HttpPost("login")]
-  public async Task<IActionResult> FetchUser(User user)
+  public async Task<IActionResult> Login(User user)
   {
-    var usr = await _db.Users.FirstOrDefaultAsync(u => u.Username == user.Username);
-
-    if (usr == null)
+    try
     {
-      return NotFound("User not found");
-    }
+      var usr = await _db.Users.FirstOrDefaultAsync(u => u.Username == user.Username);
 
-    byte[] salt = Convert.FromBase64String(usr.Salt);
-
-    var match = PasswordHasher.VerifyPassword(user.Password, salt, usr.Password);
-
-    if (!match)
-    {
-      return BadRequest("Passwords do not match");
-    }
-
-    var token = GenerateJwtToken(usr);
-
-    return Ok(new
-    {
-      Token = token,
-      User = new
+      if (usr == null)
       {
-        usr.Username,
-        usr.Id
+        return NotFound("User not found");
       }
-    });
+
+      byte[] salt = Convert.FromBase64String(usr.Salt);
+
+      var match = PasswordHasher.VerifyPassword(user.Password, salt, usr.Password);
+
+      if (!match)
+      {
+        return BadRequest("Invalid credentials");
+      }
+
+      var token = GenerateJwtToken(usr);
+
+      return Ok(new
+      {
+        Token = token,
+        User = new
+        {
+          usr.Username,
+          usr.Id
+        }
+      });
+    }
+    catch (DbUpdateException dbEx)
+    {
+      _logger.LogError("[UsersController]: Database fetch failed: {Error}", dbEx.Message);
+      return StatusCode(500, "Failed login user due to database error.");
+    }
+    catch (Exception e)
+    {
+      _logger.LogError("[UsersController]: Failed login user: {Error}", e.Message);
+      return StatusCode(500, "An unexpected error occurred.");
+    }
   }
 
-  [Route("create")]
+  [Route("register")]
   [HttpPost]
-  public async Task<IActionResult> CreateUser(User user)
+  public async Task<IActionResult> Register(User user)
   {
-    byte[] salt = PasswordHasher.GenerateSalt();
-
-    string hashedPassword = PasswordHasher.HashPassword(user.Password, salt);
-
-    user.Salt = Convert.ToBase64String(salt);
-    user.Password = hashedPassword;
-
-    await _db.Users.AddAsync(user);
-    await _db.SaveChangesAsync();
-
-    var token = GenerateJwtToken(user);
-
-    return Ok(new
+    try
     {
-      Token = token,
-      User = new
+      var existingUser = await _db.Users.FirstOrDefaultAsync(u => u.Username == user.Username);
+
+      if (existingUser != null)
       {
-        user.Username,
-        user.Id
+        return BadRequest("User with username " + user.Username + " already exists");
       }
-    });
+
+      byte[] salt = PasswordHasher.GenerateSalt();
+
+      string hashedPassword = PasswordHasher.HashPassword(user.Password, salt);
+
+      user.Salt = Convert.ToBase64String(salt);
+      user.Password = hashedPassword;
+
+      await _db.Users.AddAsync(user);
+      await _db.SaveChangesAsync();
+
+      var token = GenerateJwtToken(user);
+
+      return Ok(new
+      {
+        Token = token,
+        User = new
+        {
+          user.Username,
+          user.Id
+        }
+      });
+    }
+    catch (DbUpdateException dbEx)
+    {
+      _logger.LogError("[UsersController]: Database fetch failed: {Error}", dbEx.Message);
+      return StatusCode(500, "Failed register user due to database error.");
+    }
+    catch (Exception e)
+    {
+      _logger.LogError("[UsersController]: Failed register user: {Error}", e.Message);
+      return StatusCode(500, "An unexpected error occurred.");
+    }
   }
   private static string GenerateJwtToken(User user)
   {
@@ -97,6 +130,5 @@ public class UsersController(DB db, ILogger<UsersController> logger) : Controlle
 
     return tokenString;
   }
-
 
 }
