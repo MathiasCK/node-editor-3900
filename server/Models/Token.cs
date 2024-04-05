@@ -1,6 +1,6 @@
 namespace server.Models;
 
-public class Token
+public class TokenData
 {
-  public string token { get; set; } = string.Empty;
+  public string Token { get; set; } = string.Empty;
 }

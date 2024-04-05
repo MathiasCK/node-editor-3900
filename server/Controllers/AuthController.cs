@@ -1,20 +1,17 @@
-using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using server.DAL;
 using server.Models;
-using System.IdentityModel.Tokens.Jwt;
-using Microsoft.IdentityModel.Tokens;
-using System.Security.Claims;
 
 namespace server.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class AuthController(DB db, ILogger<AuthController> logger) : Controller
+public class AuthController(DB db, ILogger<AuthController> logger, IConfiguration configuration) : Controller
 {
   private readonly DB _db = db;
   private readonly ILogger<AuthController> _logger = logger;
+  private readonly IConfiguration _configuration = configuration;
 
   [HttpPost("login")]
   public async Task<IActionResult> Login(User user)
@@ -37,16 +34,11 @@ public class AuthController(DB db, ILogger<AuthController> logger) : Controller
         return BadRequest("Invalid credentials");
       }
 
-      var token = GenerateJwtToken(usr);
+      var token = JWT.GenerateJwtToken(user, _configuration);
 
       return Ok(new
       {
         Token = token,
-        User = new
-        {
-          usr.Username,
-          usr.Id
-        }
       });
     }
     catch (DbUpdateException dbEx)
@@ -84,16 +76,11 @@ public class AuthController(DB db, ILogger<AuthController> logger) : Controller
       await _db.Users.AddAsync(user);
       await _db.SaveChangesAsync();
 
-      var token = GenerateJwtToken(user);
+      var token = JWT.GenerateJwtToken(user, _configuration);
 
       return Ok(new
       {
         Token = token,
-        User = new
-        {
-          user.Username,
-          user.Id
-        }
       });
     }
     catch (DbUpdateException dbEx)
@@ -109,21 +96,11 @@ public class AuthController(DB db, ILogger<AuthController> logger) : Controller
   }
 
   [HttpPost("token")]
-  public Task<IActionResult> ValidateToken(Token token)
+  public Task<IActionResult> ValidateToken(TokenData token)
   {
     try
     {
-      var jwtTokenHandler = new JwtSecurityTokenHandler();
-      var key = Encoding.UTF8.GetBytes("vn6Kx+VuhLpeYe23epBjAsBjr9V6WXzjGhUP/vYWcRU=");
-
-      jwtTokenHandler.ValidateToken(token.token, new TokenValidationParameters
-      {
-        ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(key),
-        ValidateIssuer = false,
-        ValidateAudience = false,
-        ClockSkew = TimeSpan.Zero
-      }, out SecurityToken validatedToken);
+      JWT.ValidateToken(token.Token, _configuration);
 
       return Task.FromResult<IActionResult>(Ok());
     }
@@ -132,29 +109,6 @@ public class AuthController(DB db, ILogger<AuthController> logger) : Controller
       _logger.LogError("[AuthController]: Failed to validate token: {Error}", e.Message);
       return Task.FromResult<IActionResult>(StatusCode(500, "An unexpected error occurred."));
     }
-  }
-  private static string GenerateJwtToken(User user)
-  {
-    var envKey = "vn6Kx+VuhLpeYe23epBjAsBjr9V6WXzjGhUP/vYWcRU=";
-
-    var secretKey = Encoding.UTF8.GetBytes(envKey);
-    var jwtTokenHandler = new JwtSecurityTokenHandler();
-
-    var tokenDescriptor = new SecurityTokenDescriptor
-    {
-      Subject = new ClaimsIdentity(new[]
-        {
-            new Claim(ClaimTypes.Name, user.Username),
-            new Claim("UserId", user.Id)
-        }),
-      Expires = DateTime.UtcNow.AddDays(7),
-      SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(secretKey), SecurityAlgorithms.HmacSha256Signature)
-    };
-
-    var token = jwtTokenHandler.CreateToken(tokenDescriptor);
-    var tokenString = jwtTokenHandler.WriteToken(token);
-
-    return tokenString;
   }
 
 }
