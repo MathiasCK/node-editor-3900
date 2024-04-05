@@ -3,7 +3,8 @@ import toast from 'react-hot-toast';
 
 export const login = async (
   username: string,
-  password: string
+  password: string,
+  setNavigate: (navigate: boolean) => void
 ): Promise<UserWithToken | null> => {
   try {
     const response = await fetch(
@@ -29,8 +30,7 @@ export const login = async (
     const data = (await response.json()) as UserWithToken;
 
     localStorage.setItem('token', data.token);
-    localStorage.setItem('user', JSON.stringify(data.user));
-
+    setNavigate(true);
     return data;
   } catch (error) {
     toast.error('Error creating user. Please try again.');
@@ -66,7 +66,6 @@ export const register = async (
     const data = (await response.json()) as UserWithToken;
 
     localStorage.setItem('token', data.token);
-    localStorage.setItem('user', JSON.stringify(data.user));
 
     window.location.href = '/';
     return data;

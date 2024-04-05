@@ -30,10 +30,8 @@ const LoginForm = () => {
     },
   });
 
-  const handleSubmit = async (values: z.infer<typeof formSchema>) => {
-    await login(values.username, values.password);
-    setNavigate(true);
-  };
+  const handleSubmit = (values: z.infer<typeof formSchema>) =>
+    login(values.username, values.password, setNavigate);
 
   const queryParams = new URLSearchParams(window.location.search);
   const expired = queryParams.get('expired');
