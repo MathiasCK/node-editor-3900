@@ -12,8 +12,8 @@ import {
 } from '../ui/form';
 import { Input } from '../ui/input';
 import toast from 'react-hot-toast';
-import { useEffect, useState } from 'react';
-import { Navigate } from 'react-router-dom';
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const formSchema = z.object({
   username: z.string().min(2, 'Username must contain at least 2 character(s)'),
@@ -21,7 +21,7 @@ const formSchema = z.object({
 });
 
 const LoginForm = () => {
-  const [navigate, setNavigate] = useState(false);
+  const navigate = useNavigate();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -31,7 +31,7 @@ const LoginForm = () => {
   });
 
   const handleSubmit = (values: z.infer<typeof formSchema>) =>
-    login(values.username, values.password, setNavigate);
+    login(values.username, values.password, navigate);
 
   const queryParams = new URLSearchParams(window.location.search);
   const expired = queryParams.get('expired');
@@ -39,13 +39,9 @@ const LoginForm = () => {
   useEffect(() => {
     if (expired) {
       toast.error('Session expired. Please login again.');
-      window.location.href = '/login';
+      navigate('/login');
     }
-  }, [expired]);
-
-  if (navigate) {
-    return <Navigate to="/" replace />;
-  }
+  }, [expired, navigate]);
 
   return (
     <div className="flex h-screen items-center justify-center bg-indigo-600">

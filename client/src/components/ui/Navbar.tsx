@@ -17,6 +17,7 @@ import { shallow } from 'zustand/shallow';
 import ThemeToggle from './ThemeToggle';
 import { DownloadCloud, LogOut } from 'lucide-react';
 import { logout } from '@/api/auth';
+import { useNavigate } from 'react-router-dom';
 
 const navItems: NavItem[] = [
   {
@@ -119,6 +120,7 @@ const navItems: NavItem[] = [
 
 const Navbar = () => {
   const { nodes, setNodes } = useStore(storeSelector, shallow);
+  const navigate = useNavigate();
   return (
     <NavigationMenu className="h-16 bg-white dark:bg-background">
       <div className="flex w-full justify-between">
@@ -156,7 +158,13 @@ const Navbar = () => {
             className="hover:cursor-pointer"
           />
           <ThemeToggle />
-          <LogOut onClick={() => logout()} className="hover:cursor-pointer" />
+          <LogOut
+            onClick={() => {
+              const path = logout();
+              navigate(path, { replace: true });
+            }}
+            className="hover:cursor-pointer"
+          />
         </div>
       </div>
     </NavigationMenu>

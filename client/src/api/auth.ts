@@ -1,10 +1,11 @@
 import { UserWithToken } from '@/lib/types';
 import toast from 'react-hot-toast';
+import { NavigateFunction } from 'react-router-dom';
 
 export const login = async (
   username: string,
   password: string,
-  setNavigate: (navigate: boolean) => void
+  navigate: NavigateFunction
 ): Promise<UserWithToken | null> => {
   try {
     const response = await fetch(
@@ -30,7 +31,7 @@ export const login = async (
     const data = (await response.json()) as UserWithToken;
 
     localStorage.setItem('token', data.token);
-    setNavigate(true);
+    navigate('/');
     return data;
   } catch (error) {
     toast.error('Error creating user. Please try again.');
@@ -40,7 +41,8 @@ export const login = async (
 
 export const register = async (
   username: string,
-  password: string
+  password: string,
+  navigate: NavigateFunction
 ): Promise<UserWithToken | null> => {
   try {
     const response = await fetch(
@@ -67,7 +69,7 @@ export const register = async (
 
     localStorage.setItem('token', data.token);
 
-    window.location.href = '/';
+    navigate('/');
     return data;
   } catch (error) {
     toast.error('Error creating user. Please try again.');

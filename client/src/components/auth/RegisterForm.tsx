@@ -11,6 +11,7 @@ import {
   FormMessage,
 } from '../ui/form';
 import { Input } from '../ui/input';
+import { useNavigate } from 'react-router-dom';
 
 const formSchema = z
   .object({
@@ -38,6 +39,7 @@ const formSchema = z
   });
 
 const RegisterForm = () => {
+  const navigate = useNavigate();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -48,7 +50,7 @@ const RegisterForm = () => {
   });
 
   const handleSubmit = (values: z.infer<typeof formSchema>) =>
-    register(values.username, values.password);
+    register(values.username, values.password, navigate);
 
   return (
     <div className="flex h-screen items-center justify-center bg-indigo-600">
