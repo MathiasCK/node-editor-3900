@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { addNode, cn, downloadFile } from '@/lib/utils';
+import { addNode, cn } from '@/lib/utils';
 
 import {
   NavigationMenu,
@@ -14,10 +14,7 @@ import {
 import { storeSelector, useStore } from '@/hooks';
 import { AspectType, NavItem, NodeType } from '@/lib/types';
 import { shallow } from 'zustand/shallow';
-import ThemeToggle from './ThemeToggle';
-import { DownloadCloud, LogOut } from 'lucide-react';
-import { logout } from '@/api/auth';
-import { useNavigate } from 'react-router-dom';
+import { ThemeToggle, DownloadNodes, Logout } from './_components';
 
 const navItems: NavItem[] = [
   {
@@ -27,13 +24,13 @@ const navItems: NavItem[] = [
       {
         title: 'Block',
         description:
-          'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quibusdam, laboriosam!',
+          'Any entity at any abstraction level. Abstraction mechanism',
         nodeType: NodeType.Block,
       },
       {
         title: 'Connector',
         description:
-          'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quibusdam, laboriosam!',
+          'Block connection. Abstracted block with infinitesimal boundary',
         nodeType: NodeType.Connector,
       },
       {
@@ -51,19 +48,18 @@ const navItems: NavItem[] = [
       {
         title: 'Block',
         description:
-          'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quibusdam, laboriosam!',
+          'Any entity at any abstraction level. Abstraction mechanism',
         nodeType: NodeType.Block,
       },
       {
         title: 'Connector',
         description:
-          'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quibusdam, laboriosam!',
+          'Block connection. Abstracted block with infinitesimal boundary',
         nodeType: NodeType.Connector,
       },
       {
         title: 'Terminal',
-        description:
-          'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quibusdam, laboriosam!',
+        description: 'Block port. Point where medium passes the block boundary',
         nodeType: NodeType.Terminal,
       },
     ],
@@ -75,19 +71,18 @@ const navItems: NavItem[] = [
       {
         title: 'Block',
         description:
-          'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quibusdam, laboriosam!',
+          'Any entity at any abstraction level. Abstraction mechanism',
         nodeType: NodeType.Block,
       },
       {
         title: 'Connector',
         description:
-          'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quibusdam, laboriosam!',
+          'Block connection. Abstracted block with infinitesimal boundary',
         nodeType: NodeType.Connector,
       },
       {
         title: 'Terminal',
-        description:
-          'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quibusdam, laboriosam!',
+        description: 'Block port. Point where medium passes the block boundary',
         nodeType: NodeType.Terminal,
       },
     ],
@@ -105,13 +100,12 @@ const navItems: NavItem[] = [
       {
         title: 'Connector',
         description:
-          'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quibusdam, laboriosam!',
+          'Block connection. Abstracted block with infinitesimal boundary',
         nodeType: NodeType.Connector,
       },
       {
         title: 'Terminal',
-        description:
-          'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quibusdam, laboriosam!',
+        description: 'Block port. Point where medium passes the block boundary',
         nodeType: NodeType.Terminal,
       },
     ],
@@ -120,9 +114,8 @@ const navItems: NavItem[] = [
 
 const Navbar = () => {
   const { nodes, setNodes } = useStore(storeSelector, shallow);
-  const navigate = useNavigate();
   return (
-    <NavigationMenu className="h-16 bg-white dark:bg-background">
+    <NavigationMenu className="dark:bg-navbar-dark h-12 bg-white">
       <div className="flex w-full justify-between">
         <NavigationMenuList>
           {navItems.map(node => (
@@ -152,19 +145,10 @@ const Navbar = () => {
             </NavigationMenuItem>
           ))}
         </NavigationMenuList>
-        <div className="flex items-center justify-center gap-2">
-          <DownloadCloud
-            onClick={() => downloadFile(nodes)}
-            className="hover:cursor-pointer"
-          />
+        <div className="flex items-center justify-center">
+          <DownloadNodes />
           <ThemeToggle />
-          <LogOut
-            onClick={() => {
-              const path = logout();
-              navigate(path, { replace: true });
-            }}
-            className="hover:cursor-pointer"
-          />
+          <Logout />
         </div>
       </div>
     </NavigationMenu>
