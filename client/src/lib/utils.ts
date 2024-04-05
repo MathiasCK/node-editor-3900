@@ -11,8 +11,10 @@ import {
   RelationKeys,
   RelationKeysWithChildren,
   RelationType,
+  User,
 } from './types';
 import { createNode, updateNode } from '@/api/nodes';
+import { logout } from '@/api/auth';
 
 export const cn = (...inputs: ClassValue[]) => twMerge(clsx(inputs));
 
@@ -818,4 +820,38 @@ export const mapNodeRelationsToString = (nodes: Node[]): string => {
   });
 
   return str;
+};
+
+export const fetchCurrentUser = (): User => {
+  try {
+    const token = localStorage.getItem('token-storage');
+
+    if (!token) {
+      throw new Error('No token found');
+    }
+
+    const parsed = JSON.parse(token);
+
+    const decodedToken = token
+      ? JSON.parse(atob(parsed.state.token.split('.')[1]))
+      : null;
+
+    if (
+      !decodedToken ||
+      !decodedToken.UserId ||
+      !decodedToken.unique_name ||
+      decodedToken.UserId === '' ||
+      decodedToken.unique_name === ''
+    ) {
+      throw new Error('Invalid user');
+    }
+
+    return {
+      id: decodedToken.UserId,
+      username: decodedToken.unique_name,
+    };
+  } catch (e) {
+    logout(true);
+    throw e;
+  }
 };
