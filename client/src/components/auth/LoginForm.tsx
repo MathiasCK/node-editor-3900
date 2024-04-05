@@ -15,6 +15,8 @@ import toast from 'react-hot-toast';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToken } from '@/hooks';
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
+import { Button } from '../ui/button';
 
 const formSchema = z.object({
   username: z.string().min(2, 'Username must contain at least 2 character(s)'),
@@ -49,52 +51,52 @@ const LoginForm = () => {
   }, [expired, navigate]);
 
   return (
-    <div className="flex h-screen items-center justify-center bg-indigo-600">
-      <div className="w-96 rounded-md bg-white p-6 shadow-lg">
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)}>
-            <h1 className="block text-center text-3xl font-bold text-black">
-              <i className="fa-solid fa-user"></i>Login
-            </h1>
-            <FormField
-              control={form.control}
-              name="username"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Username</FormLabel>
-                  <FormControl>
-                    <Input placeholder="username" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Password</FormLabel>
-                  <FormControl>
-                    <Input type="password" placeholder="password" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <div className="mt-5">
-              <button
-                type="submit"
-                className='font-semibold"><i class="fa-solid fa-right-to-bracket w-full rounded-md border-2 border-indigo-700 bg-indigo-700 py-1 text-white hover:bg-transparent hover:text-indigo-700'
-              >
-                Login
-              </button>
-            </div>
-          </form>
-        </Form>
-      </div>
-    </div>
+    <section className="dark flex h-screen w-screen items-center justify-center bg-black">
+      <Card className="w-[350px]">
+        <CardHeader>
+          <CardTitle>Login</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(handleSubmit)}>
+              <FormField
+                control={form.control}
+                name="username"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Username</FormLabel>
+                    <FormControl>
+                      <Input placeholder="username" {...field} />
+                    </FormControl>
+                    <FormMessage className="text-red-500" />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Password</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="password"
+                        placeholder="password"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage className="text-red-500" />
+                  </FormItem>
+                )}
+              />
+              <div className="mt-6 flex justify-center">
+                <Button type="submit">Login</Button>
+              </div>
+            </form>
+          </Form>
+        </CardContent>
+      </Card>
+    </section>
   );
 };
 
