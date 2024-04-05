@@ -40,6 +40,8 @@ public class NodeData
     public string Label { get; set; } = string.Empty;
     public long CreatedAt { get; set; } = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
     public long UpdatedAt { get; set; } = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+    public string CreatedBy { get; set; } = string.Empty;
+
 }
 
 [JsonConverter(typeof(AspectTypeConverter))]

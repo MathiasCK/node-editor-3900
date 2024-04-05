@@ -1,13 +1,15 @@
 /* eslint-disable no-console */
-
 import toast from 'react-hot-toast';
 import { getConnectedEdges, type Node, type Edge } from 'reactflow';
 import { NodeWithNodeId, type UpdateNode } from '@/lib/types';
 import { deleteEdge } from './edges';
+import { fetchCurrentUser } from '@/lib/utils';
 
-export const fetchNodes = async (): Promise<Node[] | null> => {
+export const fetchNodes = async (username: string): Promise<Node[] | null> => {
   try {
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/nodes`);
+    const response = await fetch(
+      `${import.meta.env.VITE_API_URL}/api/nodes/${username}/all`
+    );
 
     if (!response.ok) {
       const errorBody = await response.text();
@@ -147,7 +149,7 @@ export const deleteNode = async (
   setNodes: (nodes: Node[]) => void,
   edges: Edge[],
   setEdges: (edges: Edge[]) => void
-): Promise<string | null> => {  
+): Promise<string | null> => {
   const nodeToDelete = nodes.find(
     node => node.id === nodeToDeleteId
   ) as NodeWithNodeId;
@@ -156,6 +158,8 @@ export const deleteNode = async (
     toast.error(`Error deleting node - ${nodeToDeleteId} not found`);
     return null;
   }
+
+  const currentUser = fetchCurrentUser();
 
   const loadingToastId = toast.loading('Deleting node...');
 
@@ -188,11 +192,8 @@ export const deleteNode = async (
       return null;
     }
 
-    const data = await response.json();
-    setNodes(data);
-
     toast.success('Node deleted successfully!');
-    
+
     return nodeToDelete.id;
   } catch (error) {
     toast.error(`Error deleting node: ${(error as Error).message}`);
@@ -200,5 +201,9 @@ export const deleteNode = async (
     return null;
   } finally {
     loadingToastId && toast.dismiss(loadingToastId);
+    const nodes = await fetchNodes(currentUser.username);
+    if (nodes) {
+      setNodes(nodes);
+    }
   }
 };

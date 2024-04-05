@@ -337,6 +337,8 @@ export const addNode = async (
   nodes: Node[],
   setNodes: (nodes: Node[]) => void
 ) => {
+  const user = fetchCurrentUser();
+
   const id =
     nodes.length === 0
       ? '0'
@@ -355,6 +357,7 @@ export const addNode = async (
       aspect,
       label: `${type}_${id}`,
       type,
+      createdBy: user.username,
     },
   };
 

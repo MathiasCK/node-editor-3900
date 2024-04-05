@@ -1,12 +1,14 @@
 /* eslint-disable no-console */
 import { EdgeType, EdgeWithEdgeId } from '@/lib/types';
-import { updateNodeRelations } from '@/lib/utils';
+import { fetchCurrentUser, updateNodeRelations } from '@/lib/utils';
 import toast from 'react-hot-toast';
 import { type Edge, type Node } from 'reactflow';
 
-export const fetchEdges = async (): Promise<Edge[] | null> => {
+export const fetchEdges = async (username: string): Promise<Edge[] | null> => {
   try {
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/edges`);
+    const response = await fetch(
+      `${import.meta.env.VITE_API_URL}/api/edges/${username}/all`
+    );
 
     if (!response.ok) {
       const errorBody = await response.text();
@@ -79,6 +81,7 @@ export const deleteEdge = async (
   setNodes: (nodes: Node[]) => void,
   nodeToDeleteId?: string
 ): Promise<string | null> => {
+  const currentUser = fetchCurrentUser();
   const edgeToDelete = edges.find(
     edge => edge.id === edgeIdToDelete
   ) as EdgeWithEdgeId;
@@ -108,7 +111,11 @@ export const deleteEdge = async (
 
     toast.success('Edge deleted successfully!');
 
-    setEdges(edges.filter(edge => edge.id !== edgeToDelete.id));
+    const edges = await fetchEdges(currentUser.username);
+
+    if (edges) {
+      setEdges(edges);
+    }
 
     return edgeIdToDelete;
   } catch (error) {

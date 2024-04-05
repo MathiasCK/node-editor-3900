@@ -57,6 +57,7 @@ export type NodeData = {
   createdAt: number;
   updatedAt: number;
   customName?: string;
+  createdBy: string;
 };
 
 export type EdgeData = {
@@ -66,6 +67,7 @@ export type EdgeData = {
   createdAt: number;
   updatedAt: number;
   customName?: string;
+  createdBy: string;
 };
 
 export type CustomEdgeProps = Omit<EdgeProps, 'data'> &

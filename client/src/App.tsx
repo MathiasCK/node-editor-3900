@@ -12,7 +12,11 @@ import { shallow } from 'zustand/shallow';
 import 'reactflow/dist/style.css';
 import { Block, Connector, Terminal } from './components/Nodes';
 import { NodeRelation } from './lib/types';
-import { checkConnection, handleNewNodeRelations } from './lib/utils';
+import {
+  checkConnection,
+  fetchCurrentUser,
+  handleNewNodeRelations,
+} from './lib/utils';
 import { storeSelector, useConnection, useStore, useTheme } from './hooks';
 
 import { Connected, Fulfilled, Part, Transfer } from './components/Edges';
@@ -29,7 +33,6 @@ import { fetchNodes, updateNode } from './api/nodes';
 import { createEdge, fetchEdges } from './api/edges';
 
 export default function App() {
-
   const nodeTypes = useMemo(
     () => ({
       block: Block,
@@ -62,9 +65,10 @@ export default function App() {
   }, [theme]);
 
   useEffect(() => {
+    const user = fetchCurrentUser();
     (async () => {
-      const edges = (await fetchEdges()) ?? [];
-      const nodes = (await fetchNodes()) ?? [];
+      const edges = (await fetchEdges(user.username)) ?? [];
+      const nodes = (await fetchNodes(user.username)) ?? [];
       setNodes(nodes as Node[]);
       setEdges(edges as Edge[]);
     })();
@@ -78,6 +82,7 @@ export default function App() {
 
     const currentDate = Date.now();
     const id = edges.length.toString();
+    const user = fetchCurrentUser();
 
     const newEdge = {
       ...params,
@@ -89,6 +94,7 @@ export default function App() {
         lockConnection,
         createdAt: currentDate,
         updatedAt: currentDate,
+        createdBy: user.username,
       },
     };
 

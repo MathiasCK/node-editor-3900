@@ -12,12 +12,13 @@ public class EdgesController(DB db, ILogger<EdgesController> logger) : Controlle
     private readonly DB _db = db;
     private readonly ILogger<EdgesController> _logger = logger;
 
-    [HttpGet]
-    public async Task<ActionResult<IEnumerable<Edge>>> FetchEdges()
+    [HttpGet("{id}/all")]
+    public async Task<ActionResult<IEnumerable<Edge>>> FetchEdges(string id)
     {
         try
         {
-            var edges = await _db.Edges.ToListAsync();
+            var edges = await _db.Edges.Include(b => b.Data)
+                .Where(b => b.Data.CreatedBy == id).ToListAsync();
             return Ok(edges);
         }
         catch (DbUpdateException dbEx)
@@ -99,7 +100,7 @@ public class EdgesController(DB db, ILogger<EdgesController> logger) : Controlle
             _db.Edges.Remove(edge);
             await _db.SaveChangesAsync();
 
-            return Ok(await _db.Edges.ToListAsync());
+            return Ok("Edge with id " + id + " has been deleted.");
         }
         catch (DbUpdateException dbEx)
         {

@@ -13,14 +13,15 @@ public class NodesController(DB db, ILogger<NodesController> logger) : Controlle
     private readonly DB _db = db;
     private readonly ILogger<NodesController> _logger = logger;
 
-    [HttpGet]
-    public async Task<ActionResult<IEnumerable<object>>> FetchNodes()
+    [HttpGet("{id}/all")]
+    public async Task<ActionResult<IEnumerable<object>>> FetchNodes(string id)
     {
         try
         {
             var blocks = await _db.Nodes
                 .OfType<Block>()
                 .Include(b => b.Data)
+                .Where(b => b.Data.CreatedBy == id)
                 .AsNoTracking()
                 .Select(b => (object)new BlockDto
                 {
@@ -35,6 +36,7 @@ public class NodesController(DB db, ILogger<NodesController> logger) : Controlle
             var terminals = await _db.Nodes
                 .OfType<Terminal>()
                 .Include(t => t.Data)
+                .Where(b => b.Data.CreatedBy == id)
                 .AsNoTracking()
                 .Select(t => (object)new TerminalDto
                 {
@@ -49,6 +51,7 @@ public class NodesController(DB db, ILogger<NodesController> logger) : Controlle
             var connectors = await _db.Nodes
                 .OfType<Connector>()
                 .Include(c => c.Data)
+                .Where(b => b.Data.CreatedBy == id)
                 .AsNoTracking()
                 .Select(c => (object)new ConnectorDto
                 {
@@ -78,7 +81,6 @@ public class NodesController(DB db, ILogger<NodesController> logger) : Controlle
             return StatusCode(500, "An unexpected error occurred.");
         }
     }
-
 
     [HttpGet("{id}")]
     public async Task<IActionResult> FetchNode(string id)
@@ -121,18 +123,19 @@ public class NodesController(DB db, ILogger<NodesController> logger) : Controlle
             var id = data.GetProperty("id").GetString();
             var label = data.GetProperty("data").GetProperty("label").GetString();
             var aspect = data.GetProperty("data").GetProperty("aspect").GetString();
+            var createdBy = data.GetProperty("data").GetProperty("createdBy").GetString();
             var position = new Position
             {
                 X = data.GetProperty("position").GetProperty("x").GetDouble(),
                 Y = data.GetProperty("position").GetProperty("y").GetDouble()
             };
 
-            if (id == null || type == null || label == null || aspect == null)
+            if (id == null || type == null || label == null || aspect == null || createdBy == null || position == null)
             {
                 return BadRequest("Node data is missing required fields.");
             }
 
-            Node node = Utils.CreateNode(type, id, position, aspect, label);
+            Node node = Utils.CreateNode(type, id, position, aspect, label, createdBy);
 
             await _db.Nodes.AddAsync(node);
             await _db.SaveChangesAsync();
@@ -168,7 +171,7 @@ public class NodesController(DB db, ILogger<NodesController> logger) : Controlle
             _db.Nodes.Remove(node);
             await _db.SaveChangesAsync();
 
-            return await FetchNodes();
+            return Ok("Node with id " + id + " has been deleted.");
         }
         catch (DbUpdateException dbEx)
         {

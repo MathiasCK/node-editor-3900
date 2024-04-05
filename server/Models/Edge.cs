@@ -29,6 +29,7 @@ public class EdgeData
     public required long UpdatedAt { get; set; }
     public required bool LockConnection { get; set; }
     public required string Label { get; set; }
+    public required string CreatedBy { get; set; }
 }
 
 [JsonConverter(typeof(EdgeTypeConverter))]
