@@ -14,6 +14,7 @@ import { Input } from '../ui/input';
 import toast from 'react-hot-toast';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useToken } from '@/hooks';
 
 const formSchema = z.object({
   username: z.string().min(2, 'Username must contain at least 2 character(s)'),
@@ -21,7 +22,9 @@ const formSchema = z.object({
 });
 
 const LoginForm = () => {
+  const { setToken } = useToken();
   const navigate = useNavigate();
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -30,8 +33,10 @@ const LoginForm = () => {
     },
   });
 
-  const handleSubmit = (values: z.infer<typeof formSchema>) =>
-    login(values.username, values.password, navigate);
+  const handleSubmit = async (values: z.infer<typeof formSchema>) =>
+    await login(values.username, values.password, setToken, () => {
+      navigate('/');
+    });
 
   const queryParams = new URLSearchParams(window.location.search);
   const expired = queryParams.get('expired');

@@ -1,11 +1,11 @@
 import { UserWithToken } from '@/lib/types';
 import toast from 'react-hot-toast';
-import { NavigateFunction } from 'react-router-dom';
 
 export const login = async (
   username: string,
   password: string,
-  navigate: NavigateFunction
+  setToken: (token: string) => void,
+  onLoginSuccess: () => void
 ): Promise<UserWithToken | null> => {
   try {
     const response = await fetch(
@@ -30,8 +30,9 @@ export const login = async (
 
     const data = (await response.json()) as UserWithToken;
 
-    localStorage.setItem('token', data.token);
-    navigate('/');
+    setToken(data.token);
+
+    onLoginSuccess();
     return data;
   } catch (error) {
     toast.error('Error creating user. Please try again.');
@@ -42,7 +43,8 @@ export const login = async (
 export const register = async (
   username: string,
   password: string,
-  navigate: NavigateFunction
+  setToken: (token: string) => void,
+  onLoginSuccess: () => void
 ): Promise<UserWithToken | null> => {
   try {
     const response = await fetch(
@@ -67,9 +69,10 @@ export const register = async (
 
     const data = (await response.json()) as UserWithToken;
 
-    localStorage.setItem('token', data.token);
+    setToken(data.token);
 
-    navigate('/');
+    onLoginSuccess();
+
     return data;
   } catch (error) {
     toast.error('Error creating user. Please try again.');
@@ -78,14 +81,13 @@ export const register = async (
 };
 
 export const logout = (sessionExpired = false): string => {
-  localStorage.removeItem('token');
-  localStorage.removeItem('user');
+  localStorage.removeItem('token-storage');
   return sessionExpired ? '/login?expired=true' : '/login';
 };
 
-export const validateToken = async (): Promise<boolean | UserWithToken> => {
-  const token = localStorage.getItem('token');
-
+export const validateToken = async (
+  token: string | undefined
+): Promise<boolean | UserWithToken> => {
   if (!token) return false;
 
   try {

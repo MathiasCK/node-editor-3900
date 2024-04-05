@@ -4,13 +4,15 @@ import { logout, validateToken } from '@/api/auth';
 import { Spinner } from '../ui';
 import { UserWithToken } from '@/lib/types';
 import toast from 'react-hot-toast';
+import { useToken } from '@/hooks';
 
 const AdminRoute = () => {
+  const { token } = useToken();
   const { isPending, error, data } = useQuery({
     queryKey: ['tokenData'],
     queryFn: async () => {
-      const token = await validateToken();
-      return token;
+      const validToken = await validateToken(token);
+      return validToken;
     },
   });
 
