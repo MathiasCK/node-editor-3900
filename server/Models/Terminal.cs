@@ -2,11 +2,11 @@ namespace server.Models;
 
 public class TerminalDto
 {
-    public string NodeId { get; set; }
-    public string Id { get; set; }
-    public Position Position { get; set; }
-    public NodeType Type { get; set; }
-    public TerminalData Data { get; set; }
+  public string NodeId { get; set; }
+  public string Id { get; set; }
+  public Position Position { get; set; }
+  public NodeType Type { get; set; }
+  public TerminalData Data { get; set; }
 }
 
 public class TerminalData : NodeData

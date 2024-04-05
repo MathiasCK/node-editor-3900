@@ -8,16 +8,10 @@ namespace server.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class NodesController : Controller
+public class NodesController(DB db, ILogger<NodesController> logger) : Controller
 {
-    private readonly DB _db;
-    private readonly ILogger<NodesController> _logger;
-
-    public NodesController(DB db, ILogger<NodesController> logger)
-    {
-        _db = db;
-        _logger = logger;
-    }
+    private readonly DB _db = db;
+    private readonly ILogger<NodesController> _logger = logger;
 
     [HttpGet]
     public async Task<ActionResult<IEnumerable<object>>> FetchNodes()

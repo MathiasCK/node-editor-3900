@@ -1,7 +1,8 @@
-using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using server.Models;
+
+namespace server.DAL;
 
 public class NodeTypeConverter : JsonConverter<NodeType>
 {

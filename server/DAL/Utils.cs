@@ -1,5 +1,7 @@
 using server.Models;
 
+namespace server.DAL;
+
 public class Utils
 {
   public static Node CreateNode(string type, string id, Position position, string aspect, string label)

@@ -1,23 +1,16 @@
 using Microsoft.AspNetCore.Mvc;
 using server.Models;
 using server.DAL;
-using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 
 namespace server.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class EdgesController : Controller
+public class EdgesController(DB db, ILogger<EdgesController> logger) : Controller
 {
-    private readonly DB _db;
-    private readonly ILogger<EdgesController> _logger;
-
-    public EdgesController(DB db, ILogger<EdgesController> logger)
-    {
-        _db = db;
-        _logger = logger;
-    }
+    private readonly DB _db = db;
+    private readonly ILogger<EdgesController> _logger = logger;
 
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Edge>>> FetchEdges()
