@@ -22,7 +22,7 @@ export const login = async (
 
     if (!response.ok) {
       const errorBody = await response.text();
-      const errorMessage = errorBody || 'Error user edge. Please try again.';
+      const errorMessage = errorBody || 'Error logging in. Please try again.';
 
       toast.error(errorMessage);
       return null;
@@ -35,8 +35,8 @@ export const login = async (
     onLoginSuccess();
     return data;
   } catch (error) {
-    toast.error('Error creating user. Please try again.');
-    throw new Error(`Error creating user: ${error}`);
+    toast.error('Error logging in. Please try again.');
+    throw new Error(`Error logging in: ${error}`);
   }
 };
 
@@ -61,7 +61,8 @@ export const register = async (
 
     if (!response.ok) {
       const errorBody = await response.text();
-      const errorMessage = errorBody || 'Error user edge. Please try again.';
+      const errorMessage =
+        errorBody || 'Error registering user. Please try again.';
 
       toast.error(errorMessage);
       return null;
@@ -75,8 +76,8 @@ export const register = async (
 
     return data;
   } catch (error) {
-    toast.error('Error creating user. Please try again.');
-    throw new Error(`Error creating user: ${error}`);
+    toast.error('Error registering user. Please try again.');
+    throw new Error(`Error registering user: ${error}`);
   }
 };
 
