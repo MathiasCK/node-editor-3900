@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { addNode, cn } from '@/lib/utils';
+import { addNode, cn, fetchCurrentUser } from '@/lib/utils';
 
 import {
   NavigationMenu,
@@ -14,7 +14,7 @@ import {
 import { storeSelector, useStore } from '@/hooks';
 import { AspectType, NavItem, NodeType } from '@/lib/types';
 import { shallow } from 'zustand/shallow';
-import { ThemeToggle, DownloadNodes, Logout } from './_components';
+import { ThemeToggle, DownloadNodes, Logout, Register } from './_components';
 
 const navItems: NavItem[] = [
   {
@@ -114,6 +114,8 @@ const navItems: NavItem[] = [
 
 const Navbar = () => {
   const { nodes, setNodes } = useStore(storeSelector, shallow);
+  const user = fetchCurrentUser();
+
   return (
     <NavigationMenu className="dark:bg-navbar-dark h-12 bg-white">
       <div className="flex w-full justify-between">
@@ -146,6 +148,7 @@ const Navbar = () => {
           ))}
         </NavigationMenuList>
         <div className="flex items-center justify-center">
+          {user.username === 'admin' && <Register />}
           <DownloadNodes />
           <ThemeToggle />
           <Logout />

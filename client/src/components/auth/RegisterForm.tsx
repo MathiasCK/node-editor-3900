@@ -1,4 +1,5 @@
 import { register } from '@/api/auth';
+import { motion } from 'framer-motion';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -12,9 +13,17 @@ import {
 } from '../ui/form';
 import { Input } from '../ui/input';
 import { useNavigate } from 'react-router-dom';
-import { useToken } from '@/hooks';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '../ui/card';
 import { Button } from '../ui/button';
+import { pageTransition, pageVariants } from '@/lib/animations';
+import { useState } from 'react';
+import toast from 'react-hot-toast';
 
 const formSchema = z
   .object({
@@ -42,7 +51,7 @@ const formSchema = z
   });
 
 const RegisterForm = () => {
-  const { setToken } = useToken();
+  const [isExiting, setIsExiting] = useState<boolean>(false);
   const navigate = useNavigate();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -54,16 +63,32 @@ const RegisterForm = () => {
     },
   });
 
-  const handleSubmit = (values: z.infer<typeof formSchema>) =>
-    register(values.username, values.password, setToken, () => {
-      navigate('/');
-    });
+  const navigateHome = () => {
+    setIsExiting(true);
+
+    setTimeout(() => navigate('/'), 500);
+  };
+
+  const handleSubmit = async (values: z.infer<typeof formSchema>) => {
+    const registered = await register(values.username, values.password);
+
+    if (registered) {
+      toast.success(`User ${values.username} registered successfully`);
+      form.reset();
+    }
+  };
 
   return (
-    <section className="dark flex h-screen w-screen items-center justify-center bg-black">
+    <motion.section
+      initial="initial"
+      animate={isExiting ? 'out' : 'in'}
+      variants={pageVariants}
+      transition={pageTransition}
+      className="dark flex h-screen w-screen items-center justify-center bg-black"
+    >
       <Card className="w-[350px]">
         <CardHeader>
-          <CardTitle>Register</CardTitle>
+          <CardTitle>Register a new user</CardTitle>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -77,7 +102,7 @@ const RegisterForm = () => {
                     <FormControl>
                       <Input placeholder="username" {...field} />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className="text-red-500" />
                   </FormItem>
                 )}
               />
@@ -94,7 +119,7 @@ const RegisterForm = () => {
                         {...field}
                       />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className="text-red-500" />
                   </FormItem>
                 )}
               />
@@ -111,7 +136,7 @@ const RegisterForm = () => {
                         {...field}
                       />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className="text-red-500" />
                   </FormItem>
                 )}
               />
@@ -121,8 +146,17 @@ const RegisterForm = () => {
             </form>
           </Form>
         </CardContent>
+        <CardFooter>
+          <Button
+            className="text-muted-foreground"
+            variant="link"
+            onClick={navigateHome}
+          >
+            Back home?
+          </Button>
+        </CardFooter>
       </Card>
-    </section>
+    </motion.section>
   );
 };
 

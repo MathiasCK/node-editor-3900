@@ -1,12 +1,14 @@
 import { Navigate, Outlet } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { logout, validateToken } from '@/api/auth';
-import { Spinner } from '../ui';
+
 import { UserWithToken } from '@/lib/types';
 import { useToken } from '@/hooks';
+import { Spinner } from '../ui';
 
 const ProtectedRoute = () => {
   const { token } = useToken();
+
   const { isPending, error, data } = useQuery({
     queryKey: ['tokenData'],
     queryFn: async () => {
@@ -15,7 +17,9 @@ const ProtectedRoute = () => {
     },
   });
 
-  if (isPending) return <Spinner />;
+  if (isPending) {
+    return <Spinner />;
+  }
 
   if (error || !data || !(data as UserWithToken).token) {
     const path = logout(true);

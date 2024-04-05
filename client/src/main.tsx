@@ -1,9 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import { AnimatePresence } from 'framer-motion';
 import App from './App';
 import './global.css';
 import { Toaster } from 'react-hot-toast';
-import { Navbar, Spinner } from './components/ui';
+import { Navbar } from './components/ui';
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 import {
   LoginForm,
@@ -49,12 +50,13 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
       <Toaster />
-      <Spinner />
       <main
         style={{ height: 'calc(100vh - 4rem)' }}
         className="h-screen w-screen"
       >
-        <RouterProvider router={router} />
+        <AnimatePresence mode="wait">
+          <RouterProvider router={router} />
+        </AnimatePresence>
       </main>
     </QueryClientProvider>
   </React.StrictMode>

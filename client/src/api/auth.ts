@@ -4,9 +4,8 @@ import toast from 'react-hot-toast';
 export const login = async (
   username: string,
   password: string,
-  setToken: (token: string) => void,
-  onLoginSuccess: () => void
-): Promise<UserWithToken | null> => {
+  setToken: (token: string) => void
+): Promise<boolean> => {
   try {
     const response = await fetch(
       `${import.meta.env.VITE_API_URL}/api/auth/login`,
@@ -25,15 +24,14 @@ export const login = async (
       const errorMessage = errorBody || 'Error logging in. Please try again.';
 
       toast.error(errorMessage);
-      return null;
+      return false;
     }
 
     const data = (await response.json()) as UserWithToken;
 
     setToken(data.token);
 
-    onLoginSuccess();
-    return data;
+    return true;
   } catch (error) {
     toast.error('Error logging in. Please try again.');
     throw new Error(`Error logging in: ${error}`);
@@ -42,10 +40,8 @@ export const login = async (
 
 export const register = async (
   username: string,
-  password: string,
-  setToken: (token: string) => void,
-  onLoginSuccess: () => void
-): Promise<UserWithToken | null> => {
+  password: string
+): Promise<boolean> => {
   try {
     const response = await fetch(
       `${import.meta.env.VITE_API_URL}/api/auth/register`,
@@ -65,16 +61,9 @@ export const register = async (
         errorBody || 'Error registering user. Please try again.';
 
       toast.error(errorMessage);
-      return null;
+      return false;
     }
-
-    const data = (await response.json()) as UserWithToken;
-
-    setToken(data.token);
-
-    onLoginSuccess();
-
-    return data;
+    return true;
   } catch (error) {
     toast.error('Error registering user. Please try again.');
     throw new Error(`Error registering user: ${error}`);
