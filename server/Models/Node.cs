@@ -6,27 +6,20 @@ namespace server.Models;
 
 public class NodeDto
 {
-    public string NodeId { get; set; }
-    public string Id { get; set; }
-    public Position Position { get; set; }
+    public required string NodeId { get; set; }
+    public required string Id { get; set; }
+    public required Position Position { get; set; }
     public NodeType Type { get; set; }
-    public NodeData Data { get; set; }
+    public required NodeData Data { get; set; }
 }
 
-public abstract class Node
+public abstract class Node(string id, Position position, NodeType type)
 {
     [Key]
     public string NodeId { get; set; } = Guid.NewGuid().ToString();
-    public string Id { get; set; }
-    public Position Position { get; set; }
-    public NodeType Type { get; set; }
-
-    public Node(string id, Position position, NodeType type)
-    {
-        this.Id = id;
-        this.Position = position;
-        this.Type = type;
-    }
+    public string Id { get; set; } = id;
+    public Position Position { get; set; } = position;
+    public NodeType Type { get; set; } = type;
 }
 
 public class Position
