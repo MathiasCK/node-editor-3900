@@ -11,7 +11,7 @@ import {
   NavigationMenuTrigger,
 } from '@/components/ui/navigation-menu';
 
-import { storeSelector, useStore } from '@/hooks';
+import { storeSelector, useStore, useTheme } from '@/hooks';
 import { AspectType, NavItem, NodeType } from '@/lib/types';
 import { shallow } from 'zustand/shallow';
 import { ThemeToggle, DownloadNodes, Logout, Register } from './_components';
@@ -115,38 +115,42 @@ const navItems: NavItem[] = [
 const Navbar = () => {
   const { nodes, setNodes } = useStore(storeSelector, shallow);
   const { user } = getSessionDetails();
+  const { theme } = useTheme();
 
   return (
     <NavigationMenu className="h-12 bg-white dark:bg-navbar-dark">
-      <div className="flex w-full justify-between">
-        <NavigationMenuList>
-          {navItems.map(node => (
-            <NavigationMenuItem key={node.title}>
-              <NavigationMenuTrigger>{node.title}</NavigationMenuTrigger>
-              <NavigationMenuContent>
-                <h1 className="p-4 text-muted-foreground">{node.subtitle}</h1>
-                <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
-                  {node.children.map(component => (
-                    <ListItem
-                      key={component.title}
-                      title={component.title}
-                      onClick={() =>
-                        addNode(
-                          node.title.toLowerCase() as AspectType,
-                          component.nodeType,
-                          nodes,
-                          setNodes
-                        )
-                      }
-                    >
-                      {component.description}
-                    </ListItem>
-                  ))}
-                </ul>
-              </NavigationMenuContent>
-            </NavigationMenuItem>
-          ))}
-        </NavigationMenuList>
+      <div className="flex w-full items-center justify-between border-b">
+        <div className="flex items-center ">
+          <img src={`/logo-${theme}.png`} alt="Logo" className="h-14 p-4" />
+          <NavigationMenuList>
+            {navItems.map(node => (
+              <NavigationMenuItem key={node.title}>
+                <NavigationMenuTrigger>{node.title}</NavigationMenuTrigger>
+                <NavigationMenuContent>
+                  <h1 className="p-4 text-muted-foreground">{node.subtitle}</h1>
+                  <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
+                    {node.children.map(component => (
+                      <ListItem
+                        key={component.title}
+                        title={component.title}
+                        onClick={() =>
+                          addNode(
+                            node.title.toLowerCase() as AspectType,
+                            component.nodeType,
+                            nodes,
+                            setNodes
+                          )
+                        }
+                      >
+                        {component.description}
+                      </ListItem>
+                    ))}
+                  </ul>
+                </NavigationMenuContent>
+              </NavigationMenuItem>
+            ))}
+          </NavigationMenuList>
+        </div>
         <div className="flex items-center justify-center">
           {user.role === 'admin' && <Register />}
           <DownloadNodes />
