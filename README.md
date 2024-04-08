@@ -67,3 +67,12 @@ The server will be accessible at [http://localhost:5000](http://localhost:5000),
    ```
 
 The server will be accessible at [http://localhost:5000](http://localhost:5000), and the client will be running on [http://localhost:3000](http://localhost:3000).
+
+### Logging In 🔑
+
+- **Default Credentials**:
+
+  - **Username**: `admin`
+  - **Password**: `admin`
+
+
