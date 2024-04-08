@@ -72,6 +72,7 @@ public class AuthController(DB db, ILogger<AuthController> logger, IConfiguratio
 
       user.Salt = Convert.ToBase64String(salt);
       user.Password = hashedPassword;
+      user.Role = user.Role == UserRole.Admin ? UserRole.Admin : UserRole.User;
 
       await _db.Users.AddAsync(user);
       await _db.SaveChangesAsync();
