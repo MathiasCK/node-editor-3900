@@ -1,5 +1,6 @@
 import { EdgeType, EdgeWithEdgeId } from '@/lib/types';
 import { getSessionDetails, updateNodeRelations } from '@/lib/utils';
+import { actions } from '@/pages/state';
 import toast from 'react-hot-toast';
 import { type Edge, type Node } from 'reactflow';
 
@@ -17,7 +18,7 @@ export const fetchEdges = async (): Promise<Edge[] | null> => {
   );
 
   if (response.status === 401) {
-    window.dispatchEvent(new CustomEvent('unauthorized'));
+    actions.logout('UNAHTORIZED');
     return null;
   }
 
@@ -50,7 +51,7 @@ export const createEdge = async (
     });
 
     if (response.status === 401) {
-      window.dispatchEvent(new CustomEvent('unauthorized'));
+      actions.logout('UNAHTORIZED');
       return null;
     }
 
@@ -110,7 +111,7 @@ export const deleteEdge = async (
     );
 
     if (response.status === 401) {
-      window.dispatchEvent(new CustomEvent('unauthorized'));
+      actions.logout('UNAHTORIZED');
       return null;
     }
 
@@ -167,7 +168,7 @@ export const updateEdge = async (
     });
 
     if (response.status === 401) {
-      window.dispatchEvent(new CustomEvent('unauthorized'));
+      actions.logout('UNAHTORIZED');
       return null;
     }
 

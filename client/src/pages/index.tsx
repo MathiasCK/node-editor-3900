@@ -3,9 +3,9 @@ import { AppPage } from '@/lib/types';
 import Login from './Login';
 import Home from './Home';
 import Register from './Register';
-import { useCallback, useEffect } from 'react';
-import { useTheme, useToken } from '@/hooks';
-import { actions, state } from './state';
+import { useEffect } from 'react';
+import { useTheme } from '@/hooks';
+import { state } from './state';
 import { useSnapshot } from 'valtio';
 
 const routeConfig = {
@@ -16,24 +16,13 @@ const routeConfig = {
 
 const Pages: React.FC = () => {
   const snap = useSnapshot(state);
-  const { removeToken } = useToken();
-  const { theme } = useTheme();
 
-  const handleUnathorized = useCallback(() => {
-    actions.logout('UNAHTORIZED');
-  }, []);
+  const { theme } = useTheme();
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', theme === 'dark');
   }, [theme]);
 
-  useEffect(() => {
-    window.addEventListener('unauthorized', handleUnathorized);
-
-    return () => {
-      window.removeEventListener('unauthorized', handleUnathorized);
-    };
-  }, [handleUnathorized, removeToken]);
   return (
     <>
       {Object.entries(routeConfig).map(([page, Component]) => (

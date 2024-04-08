@@ -3,6 +3,7 @@ import { getConnectedEdges, type Node, type Edge } from 'reactflow';
 import { NodeWithNodeId, type UpdateNode } from '@/lib/types';
 import { deleteEdge } from './edges';
 import { getSessionDetails } from '@/lib/utils';
+import { actions } from '@/pages/state';
 
 export const fetchNodes = async (): Promise<Node[] | null> => {
   const session = getSessionDetails();
@@ -16,7 +17,7 @@ export const fetchNodes = async (): Promise<Node[] | null> => {
   );
 
   if (response.status === 401) {
-    window.dispatchEvent(new CustomEvent('unauthorized'));
+    actions.logout('UNAHTORIZED');
     return null;
   }
 
@@ -50,7 +51,7 @@ export const createNode = async (
     });
 
     if (response.status === 401) {
-      window.dispatchEvent(new CustomEvent('unauthorized'));
+      actions.logout('UNAHTORIZED');
       return null;
     }
 
@@ -115,7 +116,7 @@ export const updateNode = async (
     });
 
     if (response.status === 401) {
-      window.dispatchEvent(new CustomEvent('unauthorized'));
+      actions.logout('UNAHTORIZED');
       return null;
     }
 
@@ -195,7 +196,7 @@ export const deleteNode = async (
     );
 
     if (response.status === 401) {
-      window.dispatchEvent(new CustomEvent('unauthorized'));
+      actions.logout('UNAHTORIZED');
       return null;
     }
 
