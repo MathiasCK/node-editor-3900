@@ -59,58 +59,60 @@ const LoginForm = () => {
   }, [expired, navigate]);
 
   return (
-    <motion.section
-      initial="initial"
-      animate={isExiting ? 'out' : 'in'}
-      variants={pageVariants}
-      transition={pageTransition}
-      className="dark flex h-screen w-screen items-center justify-center bg-black"
-    >
-      <Card className="w-[350px]">
-        <CardHeader>
-          <CardTitle>Login</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(handleSubmit)}>
-              <FormField
-                control={form.control}
-                name="username"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Username</FormLabel>
-                    <FormControl>
-                      <Input placeholder="username" {...field} />
-                    </FormControl>
-                    <FormMessage className="text-red-500" />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Password</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="password"
-                        placeholder="password"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage className="text-red-500" />
-                  </FormItem>
-                )}
-              />
-              <div className="mt-6 flex justify-center">
-                <Button type="submit">Login</Button>
-              </div>
-            </form>
-          </Form>
-        </CardContent>
-      </Card>
-    </motion.section>
+    <div className="h-screen w-screen bg-black">
+      <motion.section
+        initial="initial"
+        animate={isExiting ? 'out' : 'in'}
+        variants={pageVariants}
+        transition={pageTransition}
+        className="dark flex h-screen w-screen items-center justify-center bg-black"
+      >
+        <Card className="w-[350px]">
+          <CardHeader>
+            <CardTitle>Login</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(handleSubmit)}>
+                <FormField
+                  control={form.control}
+                  name="username"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Username</FormLabel>
+                      <FormControl>
+                        <Input placeholder="username" {...field} />
+                      </FormControl>
+                      <FormMessage className="text-red-500" />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Password</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="password"
+                          placeholder="password"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage className="text-red-500" />
+                    </FormItem>
+                  )}
+                />
+                <div className="mt-6 flex justify-center">
+                  <Button type="submit">Login</Button>
+                </div>
+              </form>
+            </Form>
+          </CardContent>
+        </Card>
+      </motion.section>
+    </div>
   );
 };
 
