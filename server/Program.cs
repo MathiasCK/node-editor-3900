@@ -26,6 +26,17 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateAudience = false,
             ClockSkew = TimeSpan.Zero
         };
+        options.Events = new JwtBearerEvents
+        {
+            OnChallenge = context =>
+            {
+                context.Response.StatusCode = 401;
+                context.Response.ContentType = "application/json";
+                context.Response.WriteAsync("{\"error\":\"Unauthorized\", \"detail\":\"Access is denied due to invalid credentials.\"}");
+                context.HandleResponse();
+                return Task.CompletedTask;
+            }
+        };
     });
 
 var clientUrl = builder.Configuration["ClientUrl"] ?? throw new ArgumentNullException("ClientUrl is not set in appsettings.json");
@@ -56,10 +67,10 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseCors("AllowViteApp");
+
 app.UseAuthentication();
 app.UseAuthorization();
-
-app.UseCors("AllowViteApp");
 
 app.MapControllerRoute(
     name: "default",
