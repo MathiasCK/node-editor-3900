@@ -131,6 +131,7 @@ export type EdgeWithEdgeId = Edge & {
 export type User = {
   id: string;
   username: string;
+  role: 'admin' | 'user';
 };
 
 export type UserWithToken = {

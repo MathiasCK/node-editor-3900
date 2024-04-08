@@ -19,8 +19,9 @@ public class JWT
     {
       Subject = new ClaimsIdentity(new[]
         {
-            new Claim(ClaimTypes.Name, user.Username),
-            new Claim("UserId", user.Id)
+            new Claim("username", user.Username),
+            new Claim("id", user.Id),
+            new Claim("role", user.Role == UserRole.Admin ? "admin" : "user")
         }),
       Expires = DateTime.UtcNow.AddDays(7),
       SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(secretKey), SecurityAlgorithms.HmacSha256Signature)

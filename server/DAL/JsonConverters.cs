@@ -89,3 +89,27 @@ public class NodeTypeConverter : JsonConverter<NodeType>
   }
 }
 
+public class UserRoleConverter : JsonConverter<UserRole>
+{
+  public override UserRole Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+  {
+    var value = reader.GetString() ?? throw new JsonException("Null, is not a valid UserRole.");
+    return value.ToLower() switch
+    {
+      "user" => UserRole.User,
+      "admin" => UserRole.Admin,
+      _ => throw new JsonException($"Value '{value}' is not recognized as a valid UserRole.")
+    };
+  }
+
+  public override void Write(Utf8JsonWriter writer, UserRole value, JsonSerializerOptions options)
+  {
+    var stringValue = value switch
+    {
+      UserRole.Admin => "admin",
+      UserRole.User => "user",
+      _ => throw new JsonException($"'{value}' is not a valid UserRole value.")
+    };
+    writer.WriteStringValue(stringValue);
+  }
+}
