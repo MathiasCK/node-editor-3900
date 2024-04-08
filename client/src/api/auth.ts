@@ -77,8 +77,8 @@ export const logout = (sessionExpired = false): string => {
 
 export const validateToken = async (
   token: string | undefined
-): Promise<boolean | UserWithToken> => {
-  if (!token) return false;
+): Promise<boolean | null | UserWithToken> => {
+  if (!token) return null;
 
   try {
     const response = await fetch(

@@ -10,18 +10,20 @@ const ProtectedRoute = () => {
   const { token } = useToken();
 
   const { isPending, error, data } = useQuery({
-    queryKey: ['tokenData'],
-    queryFn: async () => {
-      const validToken = await validateToken(token);
-      return validToken;
-    },
+    queryKey: ['tokenData', token],
+    queryFn: () => validateToken(token),
   });
 
   if (isPending) {
     return <Spinner />;
   }
 
-  if (error || !data || !(data as UserWithToken).token) {
+  if (data == null) {
+    const path = logout();
+    return <Navigate to={path} replace />;
+  }
+
+  if (error || data === false || !(data as UserWithToken).token) {
     const path = logout(true);
     return <Navigate to={path} replace />;
   }
