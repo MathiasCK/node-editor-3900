@@ -3,11 +3,13 @@ using server.Models;
 using server.DAL;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
+using Microsoft.AspNetCore.Authorization;
 
 namespace server.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class NodesController(DB db, ILogger<NodesController> logger) : Controller
 {
     private readonly DB _db = db;

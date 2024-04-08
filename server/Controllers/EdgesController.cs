@@ -2,11 +2,13 @@ using Microsoft.AspNetCore.Mvc;
 using server.Models;
 using server.DAL;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace server.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class EdgesController(DB db, ILogger<EdgesController> logger) : Controller
 {
     private readonly DB _db = db;
