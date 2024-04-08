@@ -109,6 +109,7 @@ export const validateToken = async (
       user: {
         username: decodedToken.unique_name,
         id: decodedToken.UserId,
+        role: decodedToken.role,
       },
     };
   } catch (error) {

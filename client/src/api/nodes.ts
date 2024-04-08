@@ -1,32 +1,34 @@
-/* eslint-disable no-console */
 import toast from 'react-hot-toast';
 import { getConnectedEdges, type Node, type Edge } from 'reactflow';
 import { NodeWithNodeId, type UpdateNode } from '@/lib/types';
 import { deleteEdge } from './edges';
-import { fetchCurrentUser } from '@/lib/utils';
+import { getSessionDetails } from '@/lib/utils';
 
-export const fetchNodes = async (username: string): Promise<Node[] | null> => {
-  try {
-    const response = await fetch(
-      `${import.meta.env.VITE_API_URL}/api/nodes/${username}/all`
-    );
-
-    if (!response.ok) {
-      const errorBody = await response.text();
-      const errorMessage =
-        errorBody || 'Error fetching nodes. Please try again.';
-
-      toast.error(errorMessage);
-      return null;
+export const fetchNodes = async (): Promise<Node[] | null> => {
+  const { token, user } = getSessionDetails();
+  const response = await fetch(
+    `${import.meta.env.VITE_API_URL}/api/nodes/${user.username}/all`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     }
+  );
 
-    const nodes = await response.json();
-
-    return nodes;
-  } catch (error) {
-    console.error('Error fetching nodes', error);
+  if (response.status === 401) {
+    window.dispatchEvent(new CustomEvent('unauthorized'));
     return null;
   }
+
+  if (!response.ok) {
+    const status = response.status;
+    toast.error(`Error fetching nodes - Status: ${status}`);
+    return null;
+  }
+
+  const nodes = await response.json();
+
+  return nodes;
 };
 
 export const createNode = async (
@@ -34,6 +36,7 @@ export const createNode = async (
   nodes: Node[],
   setNodes: (nodes: Node[]) => void
 ): Promise<Node | null> => {
+  const { token } = getSessionDetails();
   const loadingToastId = toast.loading('Creating node...');
 
   try {
@@ -41,16 +44,19 @@ export const createNode = async (
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(node),
     });
 
-    if (!response.ok) {
-      const errorBody = await response.text();
-      const errorMessage =
-        errorBody || 'Error creating node. Please try again.';
+    if (response.status === 401) {
+      window.dispatchEvent(new CustomEvent('unauthorized'));
+      return null;
+    }
 
-      toast.error(errorMessage);
+    if (!response.ok) {
+      const status = response.status;
+      toast.success(`Error creating node - Status: ${status}`);
       return null;
     }
 
@@ -66,8 +72,7 @@ export const createNode = async (
     return createdNode as Node;
   } catch (error) {
     toast.error(`Error creating node: ${(error as Error).message}`);
-    console.error(`Error creating node: ${error}`);
-    return null;
+    throw error;
   } finally {
     loadingToastId && toast.dismiss(loadingToastId);
   }
@@ -97,22 +102,26 @@ export const updateNode = async (
       nodeToUpdate.data[key] = newNodeData[key];
     });
   }
+  const { token } = getSessionDetails();
 
   try {
     const response = await fetch(`${import.meta.env.VITE_API_URL}/api/nodes`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(nodeToUpdate),
     });
 
-    if (!response.ok) {
-      const errorBody = await response.text();
-      const errorMessage =
-        errorBody || 'Error updating node. Please try again.';
-      toast.error(errorMessage);
+    if (response.status === 401) {
+      window.dispatchEvent(new CustomEvent('unauthorized'));
+      return null;
+    }
 
+    if (!response.ok) {
+      const status = response.status;
+      toast.success(`Error updating node - Status: ${status}`);
       return null;
     }
 
@@ -136,8 +145,7 @@ export const updateNode = async (
     return updatedNode as Node;
   } catch (error) {
     toast.error(`Error updating node: ${(error as Error).message}`);
-    console.error(`Error updating node: ${error}`);
-    return null;
+    throw error;
   } finally {
     loadingToastId && toast.dismiss(loadingToastId);
   }
@@ -150,6 +158,8 @@ export const deleteNode = async (
   edges: Edge[],
   setEdges: (edges: Edge[]) => void
 ): Promise<string | null> => {
+  const { token } = getSessionDetails();
+
   const nodeToDelete = nodes.find(
     node => node.id === nodeToDeleteId
   ) as NodeWithNodeId;
@@ -158,8 +168,6 @@ export const deleteNode = async (
     toast.error(`Error deleting node - ${nodeToDeleteId} not found`);
     return null;
   }
-
-  const currentUser = fetchCurrentUser();
 
   const loadingToastId = toast.loading('Deleting node...');
 
@@ -180,15 +188,20 @@ export const deleteNode = async (
       `${import.meta.env.VITE_API_URL}/api/nodes/${nodeToDelete.nodeId}`,
       {
         method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       }
     );
 
-    if (!response.ok) {
-      const errorBody = await response.text();
-      const errorMessage =
-        errorBody || 'Error deleting node. Please try again.';
+    if (response.status === 401) {
+      window.dispatchEvent(new CustomEvent('unauthorized'));
+      return null;
+    }
 
-      toast.success(errorMessage);
+    if (!response.ok) {
+      const status = response.status;
+      toast.success(`Error deleting node - Status: ${status}`);
       return null;
     }
 
@@ -197,11 +210,10 @@ export const deleteNode = async (
     return nodeToDelete.id;
   } catch (error) {
     toast.error(`Error deleting node: ${(error as Error).message}`);
-    console.error(`Error deleting node: ${error}`);
-    return null;
+    throw error;
   } finally {
     loadingToastId && toast.dismiss(loadingToastId);
-    const nodes = await fetchNodes(currentUser.username);
+    const nodes = await fetchNodes();
     if (nodes) {
       setNodes(nodes);
     }

@@ -15,7 +15,7 @@ import { Block, Connector, Terminal } from './components/Nodes';
 import { NodeRelation } from './lib/types';
 import {
   checkConnection,
-  fetchCurrentUser,
+  getSessionDetails,
   handleNewNodeRelations,
 } from './lib/utils';
 import { storeSelector, useConnection, useStore, useTheme } from './hooks';
@@ -58,6 +58,8 @@ export default function App() {
   const [params, setParams] = useState<Edge | Connection | null>();
   const [displayDialog, setDisplayDialog] = useState<boolean>(true);
 
+  const { user } = getSessionDetails();
+
   const { nodes, setNodes, onNodesChange, edges, setEdges, onEdgesChange } =
     useStore(storeSelector, shallow);
 
@@ -66,10 +68,9 @@ export default function App() {
   }, [theme]);
 
   useEffect(() => {
-    const user = fetchCurrentUser();
     (async () => {
-      const edges = (await fetchEdges(user.username)) ?? [];
-      const nodes = (await fetchNodes(user.username)) ?? [];
+      const edges = (await fetchEdges()) ?? [];
+      const nodes = (await fetchNodes()) ?? [];
       setNodes(nodes as Node[]);
       setEdges(edges as Edge[]);
     })();
@@ -83,7 +84,6 @@ export default function App() {
 
     const currentDate = Date.now();
     const id = edges.length.toString();
-    const user = fetchCurrentUser();
 
     const newEdge = {
       ...params,

@@ -12,6 +12,7 @@ import {
   RelationKeysWithChildren,
   RelationType,
   User,
+  UserWithToken,
 } from './types';
 import { createNode, updateNode } from '@/api/nodes';
 import { logout } from '@/api/auth';
@@ -337,7 +338,7 @@ export const addNode = async (
   nodes: Node[],
   setNodes: (nodes: Node[]) => void
 ) => {
-  const user = fetchCurrentUser();
+  const { user } = getSessionDetails();
 
   const id =
     nodes.length === 0
@@ -825,36 +826,50 @@ export const mapNodeRelationsToString = (nodes: Node[]): string => {
   return str;
 };
 
-export const fetchCurrentUser = (): User => {
+export const fetchCurrentUser = (token: string | undefined): User => {
   try {
-    const token = localStorage.getItem('token-storage');
-
     if (!token) {
       throw new Error('No token found');
     }
 
-    const parsed = JSON.parse(token);
-
-    const decodedToken = token
-      ? JSON.parse(atob(parsed.state.token.split('.')[1]))
-      : null;
+    const decodedToken = JSON.parse(atob(token.split('.')[1]));
 
     if (
       !decodedToken ||
-      !decodedToken.UserId ||
-      !decodedToken.unique_name ||
-      decodedToken.UserId === '' ||
-      decodedToken.unique_name === ''
+      !decodedToken.id ||
+      !decodedToken.username ||
+      decodedToken.id === '' ||
+      decodedToken.username === '' ||
+      !decodedToken.role ||
+      decodedToken.role === ''
     ) {
       throw new Error('Invalid user');
     }
 
     return {
-      id: decodedToken.UserId,
-      username: decodedToken.unique_name,
+      id: decodedToken.id,
+      username: decodedToken.username,
+      role: decodedToken.role,
     };
   } catch (e) {
     logout(true);
     throw e;
   }
+};
+
+export const getSessionDetails = (): UserWithToken => {
+  const tokenStorage = localStorage.getItem('token-storage');
+
+  if (!tokenStorage) {
+    logout(true);
+    throw new Error('No token found');
+  }
+
+  const parsed = JSON.parse(tokenStorage);
+
+  const token = parsed?.state?.token ?? undefined;
+  return {
+    token,
+    user: fetchCurrentUser(token),
+  };
 };

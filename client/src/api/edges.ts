@@ -1,31 +1,35 @@
-/* eslint-disable no-console */
 import { EdgeType, EdgeWithEdgeId } from '@/lib/types';
-import { fetchCurrentUser, updateNodeRelations } from '@/lib/utils';
+import { getSessionDetails, updateNodeRelations } from '@/lib/utils';
 import toast from 'react-hot-toast';
 import { type Edge, type Node } from 'reactflow';
 
-export const fetchEdges = async (username: string): Promise<Edge[] | null> => {
-  try {
-    const response = await fetch(
-      `${import.meta.env.VITE_API_URL}/api/edges/${username}/all`
-    );
+export const fetchEdges = async (): Promise<Edge[] | null> => {
+  const { token, user } = getSessionDetails();
 
-    if (!response.ok) {
-      const errorBody = await response.text();
-      const errorMessage =
-        errorBody || 'Error fetching edges. Please try again.';
-
-      toast.error(errorMessage);
-      return null;
+  const response = await fetch(
+    `${import.meta.env.VITE_API_URL}/api/edges/${user.username}/all`,
+    {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
     }
+  );
 
-    const edges = await response.json();
-
-    return edges;
-  } catch (error) {
-    console.error(`Error fetching edges: ${error}`);
+  if (response.status === 401) {
+    window.dispatchEvent(new CustomEvent('unauthorized'));
     return null;
   }
+
+  if (!response.ok) {
+    const status = response.status;
+    toast.error(`Error fetching edges - Status: ${status}`);
+    return null;
+  }
+
+  const edges = await response.json();
+
+  return edges;
 };
 
 export const createEdge = async (
@@ -34,22 +38,25 @@ export const createEdge = async (
   setEdges: (edges: Edge[]) => void
 ): Promise<Edge | null> => {
   const loadingToastId = toast.loading('Creating edge...');
-
+  const { token } = getSessionDetails();
   try {
     const response = await fetch(`${import.meta.env.VITE_API_URL}/api/edges`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(edge),
     });
 
-    if (!response.ok) {
-      const errorBody = await response.text();
-      const errorMessage =
-        errorBody || 'Error creating edge. Please try again.';
+    if (response.status === 401) {
+      window.dispatchEvent(new CustomEvent('unauthorized'));
+      return null;
+    }
 
-      toast.error(errorMessage);
+    if (!response.ok) {
+      const status = response.status;
+      toast.error(`Error creating edge - Status: ${status}`);
       return null;
     }
 
@@ -66,8 +73,7 @@ export const createEdge = async (
     return createdEdge as Edge;
   } catch (error) {
     toast.error(`Error creating edge: ${(error as Error).message}`);
-    console.error(`Error creating edge: ${error}`);
-    return null;
+    throw error;
   } finally {
     loadingToastId && toast.dismiss(loadingToastId);
   }
@@ -81,7 +87,6 @@ export const deleteEdge = async (
   setNodes: (nodes: Node[]) => void,
   nodeToDeleteId?: string
 ): Promise<string | null> => {
-  const currentUser = fetchCurrentUser();
   const edgeToDelete = edges.find(
     edge => edge.id === edgeIdToDelete
   ) as EdgeWithEdgeId;
@@ -92,26 +97,32 @@ export const deleteEdge = async (
   }
 
   const loadingToastId = toast.loading('Deleting edge...');
+  const { token } = getSessionDetails();
   try {
     const response = await fetch(
       `${import.meta.env.VITE_API_URL}/api/edges/${edgeToDelete.edgeId}`,
       {
         method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       }
     );
 
-    if (!response.ok) {
-      const errorBody = await response.text();
-      const errorMessage =
-        errorBody || 'Error deleting edge. Please try again.';
+    if (response.status === 401) {
+      window.dispatchEvent(new CustomEvent('unauthorized'));
+      return null;
+    }
 
-      toast.success(errorMessage);
+    if (!response.ok) {
+      const status = response.status;
+      toast.error(`Error deleting edge - Status: ${status}`);
       return null;
     }
 
     toast.success('Edge deleted successfully!');
 
-    const edges = await fetchEdges(currentUser.username);
+    const edges = await fetchEdges();
 
     if (edges) {
       setEdges(edges);
@@ -120,8 +131,7 @@ export const deleteEdge = async (
     return edgeIdToDelete;
   } catch (error) {
     toast.error(`Error deleting edge: ${(error as Error).message}`);
-    console.error(`Error deleting edge: ${error}`);
-    return null;
+    throw error;
   } finally {
     loadingToastId && toast.dismiss(loadingToastId);
     updateNodeRelations(edgeToDelete, nodes, setNodes, nodeToDeleteId);
@@ -145,22 +155,25 @@ export const updateEdge = async (
 
   edgeToUpdate.type = newConnection;
 
+  const { token } = getSessionDetails();
   try {
     const response = await fetch(`${import.meta.env.VITE_API_URL}/api/edges`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(edgeToUpdate),
     });
 
-    if (!response.ok) {
-      const errorBody = await response.text();
-      const errorMessage =
-        errorBody || 'Error updating edge. Please try again.';
+    if (response.status === 401) {
+      window.dispatchEvent(new CustomEvent('unauthorized'));
+      return null;
+    }
 
-      toast.error(errorMessage);
-      loadingToastId && toast.dismiss(loadingToastId);
+    if (!response.ok) {
+      const status = response.status;
+      toast.error(`Error updating edge - Status: ${status}`);
       return null;
     }
 
@@ -182,8 +195,7 @@ export const updateEdge = async (
     return updatedEdge as Edge;
   } catch (error) {
     toast.error(`Error updating edge: ${(error as Error).message}`);
-    console.error(`Error updating edge: ${error}`);
-    return null;
+    throw error;
   } finally {
     loadingToastId && toast.dismiss(loadingToastId);
   }

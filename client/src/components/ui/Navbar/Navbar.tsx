@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { addNode, cn, fetchCurrentUser } from '@/lib/utils';
+import { addNode, cn, getSessionDetails } from '@/lib/utils';
 
 import {
   NavigationMenu,
@@ -114,10 +114,10 @@ const navItems: NavItem[] = [
 
 const Navbar = () => {
   const { nodes, setNodes } = useStore(storeSelector, shallow);
-  const user = fetchCurrentUser();
+  const { user } = getSessionDetails();
 
   return (
-    <NavigationMenu className="dark:bg-navbar-dark h-12 bg-white">
+    <NavigationMenu className="h-12 bg-white dark:bg-navbar-dark">
       <div className="flex w-full justify-between">
         <NavigationMenuList>
           {navItems.map(node => (
@@ -148,7 +148,7 @@ const Navbar = () => {
           ))}
         </NavigationMenuList>
         <div className="flex items-center justify-center">
-          {user.username === 'admin' && <Register />}
+          {user.role === 'admin' && <Register />}
           <DownloadNodes />
           <ThemeToggle />
           <Logout />
