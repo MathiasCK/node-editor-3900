@@ -734,28 +734,28 @@ export const downloadFile = (nodes: Node[]) => {
 };
 
 export const getNodeRelationLabel = (node: Node): string =>
-  `${node.data.customName === '' ? `${capitalizeFirstLetter(node.type!)} ${node.id}` : node.data.customName}`;
+  `${node.data.customName === '' ? `${capitalizeFirstLetter(node.type!)}_${node.id}` : node.data.customName.replace(' ', '_')}`;
 
 export const getReadableKey = (key: RelationKeys): string => {
   switch (key) {
     case 'connectedTo':
-      return 'is connected to';
+      return 'connected_to';
     case 'connectedBy':
-      return 'is connected by';
+      return 'connected_by';
     case 'directParts':
-      return 'has part';
+      return 'has_part';
     case 'fulfilledBy':
-      return 'is fulfilled by';
+      return 'fulfilled_by';
     case 'terminals':
-      return 'has terminal';
+      return 'has_terminal';
     case 'terminalOf':
-      return 'is terminal of';
+      return 'terminal_of';
     case 'directPartOf':
-      return 'is part of';
+      return 'part_of';
     case 'transfersTo':
-      return 'is transferring to';
+      return 'transferring_to';
     case 'transferedBy':
-      return 'is being transferred by';
+      return 'being transferred_by';
     case 'fulfills':
       return 'fulfills';
   }
