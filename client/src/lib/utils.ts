@@ -261,7 +261,7 @@ export const checkConnection = (
     newNodeRelations.push({
       nodeId: params.source as string,
       relations: {
-        fulfills: {
+        fulfilledBy: {
           id: params.target as string,
         },
       },
@@ -270,7 +270,7 @@ export const checkConnection = (
     newNodeRelations.push({
       nodeId: params.target as string,
       relations: {
-        fulfilledBy: {
+        fulfills: {
           id: params.source as string,
         },
       },
@@ -525,26 +525,26 @@ export const updateNodeRelations = async (
 
     if (!sourceNode || !targetNode) return;
 
-    if (sourceNode.id !== nodeIdToDelete) {
-      const filteredFulfills = sourceNode.data.fulfills.filter(
-        (node: { id: string }) => node.id !== currentEdge.target
-      );
-
-      sourceNode.data.fulfills =
-        filteredFulfills.length > 0 ? filteredFulfills : [];
-
-      await updateNode(sourceNode.id, nodes, setNodes);
-    }
-
     if (targetNode.id !== nodeIdToDelete) {
-      const filteredFulfilledBy = targetNode.data.fulfilledBy.filter(
+      const filteredFulfills = targetNode.data.fulfills.filter(
         (node: { id: string }) => node.id !== currentEdge.source
       );
 
-      targetNode.data.fulfilledBy =
-        filteredFulfilledBy.length > 0 ? filteredFulfilledBy : [];
+      targetNode.data.fulfills =
+        filteredFulfills.length > 0 ? filteredFulfills : [];
 
       await updateNode(targetNode.id, nodes, setNodes);
+    }
+
+    if (sourceNode.id !== nodeIdToDelete) {
+      const filteredFulfilledBy = sourceNode.data.fulfilledBy.filter(
+        (node: { id: string }) => node.id !== currentEdge.target
+      );
+
+      sourceNode.data.fulfilledBy =
+        filteredFulfilledBy.length > 0 ? filteredFulfilledBy : [];
+
+      await updateNode(sourceNode.id, nodes, setNodes);
     }
 
     return;
@@ -644,36 +644,43 @@ export const updateNodeConnectionData = async (
     );
 
     targetNode.data.directParts = filteredParts.length > 0 ? filteredParts : [];
-    targetNode.data.fulfilledBy = [
-      ...(targetNode.data.fulfilledBy ?? []),
-      {
-        id: sourceNodeId,
-      },
-    ];
-
     sourceNode.data.directPartOf = '';
-    sourceNode.data.fulfills = [
-      ...(sourceNode.data.fulfills ?? []),
+
+    sourceNode.data.fulfilledBy = [
+      ...(sourceNode.data.fulfilledBy ?? []),
       {
         id: targetNodeId,
       },
     ];
+
+    targetNode.data.fulfills = [
+      ...(targetNode.data.fulfills ?? []),
+      {
+        id: sourceNodeId,
+      },
+    ];
   } else {
     // oldConnection === EdgeType.Fulfilled
-    const filteredFullfills = targetNode.data.fulfilledBy.filter(
+    const filteredFulfilledBy = sourceNode.data.fulfilledBy.filter(
+      (node: { id: string }) => node.id !== targetNodeId
+    );
+
+    sourceNode.data.fulfilledBy =
+      filteredFulfilledBy.length > 0 ? filteredFulfilledBy : [];
+    sourceNode.data.directPartOf = targetNodeId;
+
+    const filteredFulfills = targetNode.data.fulfills.filter(
       (node: { id: string }) => node.id !== sourceNodeId
     );
-    targetNode.data.fulfilledBy =
-      filteredFullfills.length > 0 ? filteredFullfills : [];
+
+    targetNode.data.fulfills =
+      filteredFulfills.length > 0 ? filteredFulfills : [];
     targetNode.data.directParts = [
       ...(targetNode.data.directParts ?? []),
       {
         id: sourceNodeId,
       },
     ];
-
-    sourceNode.data.fulfills = '';
-    sourceNode.data.directPartOf = targetNodeId;
   }
 
   await updateNode(sourceNode.id, nodes, setNodes);
