@@ -1,5 +1,11 @@
 import type { Edge, EdgeProps, Node, NodeProps } from 'reactflow';
 
+export enum AppPage {
+  Home = 'home',
+  Login = 'login',
+  Register = 'register',
+}
+
 export enum AspectType {
   Function = 'function',
   Product = 'product',

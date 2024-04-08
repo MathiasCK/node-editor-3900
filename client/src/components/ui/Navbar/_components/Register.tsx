@@ -6,10 +6,11 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '../../tooltip';
-import { useNavigate } from 'react-router-dom';
+
+import { AppPage } from '@/lib/types';
+import { actions } from '@/pages/state';
 
 const Register = () => {
-  const navigate = useNavigate();
   return (
     <TooltipProvider>
       <Tooltip>
@@ -20,7 +21,7 @@ const Register = () => {
             size="icon"
           >
             <UserPlus
-              onClick={() => navigate('/register')}
+              onClick={() => actions.setCurrentPage(AppPage.Register)}
               className="size-5 hover:cursor-pointer"
             />
             <span className="sr-only">Register</span>

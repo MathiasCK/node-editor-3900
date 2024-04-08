@@ -1,5 +1,4 @@
 import { register } from '@/api/auth';
-import { motion } from 'framer-motion';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -10,20 +9,19 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '../ui/form';
-import { Input } from '../ui/input';
-import { useNavigate } from 'react-router-dom';
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
 import {
   Card,
   CardContent,
   CardFooter,
   CardHeader,
   CardTitle,
-} from '../ui/card';
-import { Button } from '../ui/button';
-import { pageTransition, pageVariants } from '@/lib/animations';
-import { useState } from 'react';
+} from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import toast from 'react-hot-toast';
+import { AppPage } from '@/lib/types';
+import { actions } from './state';
 
 const formSchema = z
   .object({
@@ -50,10 +48,7 @@ const formSchema = z
     }
   });
 
-const RegisterForm = () => {
-  const [isExiting, setIsExiting] = useState<boolean>(false);
-  const navigate = useNavigate();
-
+const Register = () => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -62,12 +57,6 @@ const RegisterForm = () => {
       repeatPassword: '',
     },
   });
-
-  const navigateHome = () => {
-    setIsExiting(true);
-
-    setTimeout(() => navigate('/'), 500);
-  };
 
   const handleSubmit = async (values: z.infer<typeof formSchema>) => {
     const registered = await register(values.username, values.password);
@@ -79,14 +68,8 @@ const RegisterForm = () => {
   };
 
   return (
-    <motion.section
-      initial="initial"
-      animate={isExiting ? 'out' : 'in'}
-      variants={pageVariants}
-      transition={pageTransition}
-      className="dark flex h-screen w-screen items-center justify-center bg-black"
-    >
-      <Card className="w-[350px]">
+    <section className="flex h-screen w-screen items-center justify-center">
+      <Card className="w-[350px] bg-white dark:bg-black">
         <CardHeader>
           <CardTitle>Register a new user</CardTitle>
         </CardHeader>
@@ -150,14 +133,14 @@ const RegisterForm = () => {
           <Button
             className="text-muted-foreground"
             variant="link"
-            onClick={navigateHome}
+            onClick={() => actions.setCurrentPage(AppPage.Home)}
           >
             Back home?
           </Button>
         </CardFooter>
       </Card>
-    </motion.section>
+    </section>
   );
 };
 
-export default RegisterForm;
+export default Register;

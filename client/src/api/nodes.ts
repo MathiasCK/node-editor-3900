@@ -5,12 +5,12 @@ import { deleteEdge } from './edges';
 import { getSessionDetails } from '@/lib/utils';
 
 export const fetchNodes = async (): Promise<Node[] | null> => {
-  const { token, user } = getSessionDetails();
+  const session = getSessionDetails();
   const response = await fetch(
-    `${import.meta.env.VITE_API_URL}/api/nodes/${user.username}/all`,
+    `${import.meta.env.VITE_API_URL}/api/nodes/${session?.user.username}/all`,
     {
       headers: {
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${session?.token}`,
       },
     }
   );
@@ -36,7 +36,7 @@ export const createNode = async (
   nodes: Node[],
   setNodes: (nodes: Node[]) => void
 ): Promise<Node | null> => {
-  const { token } = getSessionDetails();
+  const session = getSessionDetails();
   const loadingToastId = toast.loading('Creating node...');
 
   try {
@@ -44,7 +44,7 @@ export const createNode = async (
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${session?.token}`,
       },
       body: JSON.stringify(node),
     });
@@ -102,14 +102,14 @@ export const updateNode = async (
       nodeToUpdate.data[key] = newNodeData[key];
     });
   }
-  const { token } = getSessionDetails();
+  const session = getSessionDetails();
 
   try {
     const response = await fetch(`${import.meta.env.VITE_API_URL}/api/nodes`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${session?.token}`,
       },
       body: JSON.stringify(nodeToUpdate),
     });
@@ -158,7 +158,7 @@ export const deleteNode = async (
   edges: Edge[],
   setEdges: (edges: Edge[]) => void
 ): Promise<string | null> => {
-  const { token } = getSessionDetails();
+  const session = getSessionDetails();
 
   const nodeToDelete = nodes.find(
     node => node.id === nodeToDeleteId
@@ -189,7 +189,7 @@ export const deleteNode = async (
       {
         method: 'DELETE',
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${session?.token}`,
         },
       }
     );

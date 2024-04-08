@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { addNode, cn, getSessionDetails } from '@/lib/utils';
+import { addNode, cn, fetchCurrentUser } from '@/lib/utils';
 
 import {
   NavigationMenu,
@@ -11,10 +11,12 @@ import {
   NavigationMenuTrigger,
 } from '@/components/ui/navigation-menu';
 
-import { storeSelector, useStore, useTheme } from '@/hooks';
-import { AspectType, NavItem, NodeType } from '@/lib/types';
+import { storeSelector, useStore, useTheme, useToken } from '@/hooks';
+import { AppPage, AspectType, NavItem, NodeType } from '@/lib/types';
 import { shallow } from 'zustand/shallow';
 import { ThemeToggle, DownloadNodes, Logout, Register } from './_components';
+import { actions, state } from '@/pages/state';
+import { useSnapshot } from 'valtio';
 
 const navItems: NavItem[] = [
   {
@@ -113,49 +115,63 @@ const navItems: NavItem[] = [
 ];
 
 const Navbar = () => {
+  const snap = useSnapshot(state);
   const { nodes, setNodes } = useStore(storeSelector, shallow);
-  const { user } = getSessionDetails();
+  const { token } = useToken();
+
+  const user = fetchCurrentUser(token);
   const { theme } = useTheme();
 
   return (
-    <NavigationMenu className="h-12 bg-white dark:bg-navbar-dark">
-      <div className="flex w-full items-center justify-between border-b">
+    <NavigationMenu className="fixed h-12 border-b bg-white dark:bg-navbar-dark">
+      <div className="flex w-full items-center justify-between ">
         <div className="flex items-center ">
-          <img src={`/logo-${theme}.png`} alt="Logo" className="h-14 p-4" />
-          <NavigationMenuList>
-            {navItems.map(node => (
-              <NavigationMenuItem key={node.title}>
-                <NavigationMenuTrigger>{node.title}</NavigationMenuTrigger>
-                <NavigationMenuContent>
-                  <h1 className="p-4 text-muted-foreground">{node.subtitle}</h1>
-                  <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
-                    {node.children.map(component => (
-                      <ListItem
-                        key={component.title}
-                        title={component.title}
-                        onClick={() =>
-                          addNode(
-                            node.title.toLowerCase() as AspectType,
-                            component.nodeType,
-                            nodes,
-                            setNodes
-                          )
-                        }
-                      >
-                        {component.description}
-                      </ListItem>
-                    ))}
-                  </ul>
-                </NavigationMenuContent>
-              </NavigationMenuItem>
-            ))}
-          </NavigationMenuList>
+          <span
+            className="cursor-pointer"
+            onClick={() => actions.setCurrentPage(AppPage.Home)}
+          >
+            <img src={`/logo-${theme}.png`} alt="Logo" className="h-14 p-4" />
+          </span>
+          {snap.currentPage === AppPage.Home && (
+            <NavigationMenuList>
+              {navItems.map(node => (
+                <NavigationMenuItem key={node.title}>
+                  <NavigationMenuTrigger>{node.title}</NavigationMenuTrigger>
+                  <NavigationMenuContent>
+                    <h1 className="p-4 text-muted-foreground">
+                      {node.subtitle}
+                    </h1>
+                    <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
+                      {node.children.map(component => (
+                        <ListItem
+                          key={component.title}
+                          title={component.title}
+                          onClick={() =>
+                            addNode(
+                              node.title.toLowerCase() as AspectType,
+                              component.nodeType,
+                              nodes,
+                              setNodes
+                            )
+                          }
+                        >
+                          {component.description}
+                        </ListItem>
+                      ))}
+                    </ul>
+                  </NavigationMenuContent>
+                </NavigationMenuItem>
+              ))}
+            </NavigationMenuList>
+          )}
         </div>
         <div className="flex items-center justify-center">
-          {user.role === 'admin' && <Register />}
-          <DownloadNodes />
+          {snap.currentPage !== AppPage.Login && user?.username === 'admin' && (
+            <Register />
+          )}
+          {snap.currentPage !== AppPage.Login && <DownloadNodes />}
           <ThemeToggle />
-          <Logout />
+          {snap.currentPage !== AppPage.Login && <Logout />}
         </div>
       </div>
     </NavigationMenu>

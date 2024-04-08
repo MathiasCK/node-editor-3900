@@ -4,14 +4,14 @@ import toast from 'react-hot-toast';
 import { type Edge, type Node } from 'reactflow';
 
 export const fetchEdges = async (): Promise<Edge[] | null> => {
-  const { token, user } = getSessionDetails();
+  const session = getSessionDetails();
 
   const response = await fetch(
-    `${import.meta.env.VITE_API_URL}/api/edges/${user.username}/all`,
+    `${import.meta.env.VITE_API_URL}/api/edges/${session?.user.username}/all`,
     {
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${session?.token}`,
       },
     }
   );
@@ -38,13 +38,13 @@ export const createEdge = async (
   setEdges: (edges: Edge[]) => void
 ): Promise<Edge | null> => {
   const loadingToastId = toast.loading('Creating edge...');
-  const { token } = getSessionDetails();
+  const session = getSessionDetails();
   try {
     const response = await fetch(`${import.meta.env.VITE_API_URL}/api/edges`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${session?.token}`,
       },
       body: JSON.stringify(edge),
     });
@@ -97,14 +97,14 @@ export const deleteEdge = async (
   }
 
   const loadingToastId = toast.loading('Deleting edge...');
-  const { token } = getSessionDetails();
+  const session = getSessionDetails();
   try {
     const response = await fetch(
       `${import.meta.env.VITE_API_URL}/api/edges/${edgeToDelete.edgeId}`,
       {
         method: 'DELETE',
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${session?.token}`,
         },
       }
     );
@@ -155,13 +155,13 @@ export const updateEdge = async (
 
   edgeToUpdate.type = newConnection;
 
-  const { token } = getSessionDetails();
+  const session = getSessionDetails();
   try {
     const response = await fetch(`${import.meta.env.VITE_API_URL}/api/edges`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${session?.token}`,
       },
       body: JSON.stringify(edgeToUpdate),
     });

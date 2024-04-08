@@ -1,4 +1,5 @@
 import { UserWithToken } from '@/lib/types';
+import { actions } from '@/pages/state';
 import toast from 'react-hot-toast';
 
 export const login = async (
@@ -70,11 +71,6 @@ export const register = async (
   }
 };
 
-export const logout = (sessionExpired = false): string => {
-  localStorage.removeItem('token-storage');
-  return sessionExpired ? '/login?expired=true' : '/login';
-};
-
 export const validateToken = async (
   token: string | undefined
 ): Promise<boolean | null | UserWithToken> => {
@@ -102,7 +98,10 @@ export const validateToken = async (
       ? decodedToken.exp < Date.now() / 1000
       : true;
 
-    if (isExpired) return false;
+    if (isExpired) {
+      actions.logout('EXPIRED');
+      return false;
+    }
 
     return {
       token: token,

@@ -15,7 +15,7 @@ import {
   UserWithToken,
 } from './types';
 import { createNode, updateNode } from '@/api/nodes';
-import { logout } from '@/api/auth';
+import { actions } from '@/pages/state';
 
 export const cn = (...inputs: ClassValue[]) => twMerge(clsx(inputs));
 
@@ -338,7 +338,7 @@ export const addNode = async (
   nodes: Node[],
   setNodes: (nodes: Node[]) => void
 ) => {
-  const { user } = getSessionDetails();
+  const session = getSessionDetails();
 
   const id =
     nodes.length === 0
@@ -358,7 +358,7 @@ export const addNode = async (
       aspect,
       label: `${type}_${id}`,
       type,
-      createdBy: user.username,
+      createdBy: session?.user.username,
     },
   };
 
@@ -833,7 +833,10 @@ export const mapNodeRelationsToString = (nodes: Node[]): string => {
   return str;
 };
 
-export const fetchCurrentUser = (token: string | undefined): User => {
+export const fetchCurrentUser = (
+  token: string | undefined,
+  shouldLogout = false
+): User | null => {
   try {
     if (!token) {
       throw new Error('No token found');
@@ -859,17 +862,20 @@ export const fetchCurrentUser = (token: string | undefined): User => {
       role: decodedToken.role,
     };
   } catch (e) {
-    logout(true);
-    throw e;
+    if (shouldLogout) {
+      actions.logout();
+      throw e;
+    }
+    return null;
   }
 };
 
-export const getSessionDetails = (): UserWithToken => {
+export const getSessionDetails = (): UserWithToken | null => {
   const tokenStorage = localStorage.getItem('token-storage');
 
   if (!tokenStorage) {
-    logout(true);
-    throw new Error('No token found');
+    actions.logout();
+    return null;
   }
 
   const parsed = JSON.parse(tokenStorage);
@@ -877,6 +883,6 @@ export const getSessionDetails = (): UserWithToken => {
   const token = parsed?.state?.token ?? undefined;
   return {
     token,
-    user: fetchCurrentUser(token),
+    user: fetchCurrentUser(token) as User,
   };
 };

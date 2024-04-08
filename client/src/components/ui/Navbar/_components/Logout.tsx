@@ -1,7 +1,5 @@
 import { LogOut } from 'lucide-react';
 import { Button } from '../../button';
-import { logout } from '@/api/auth';
-import { useNavigate } from 'react-router-dom';
 import {
   Tooltip,
   TooltipContent,
@@ -20,8 +18,9 @@ import {
   AlertDialogTrigger,
 } from '../../alert-dialog';
 
+import { actions } from '@/pages/state';
+
 const LogoutConfirm = () => {
-  const navigate = useNavigate();
   return (
     <AlertDialog>
       <AlertDialogTrigger>
@@ -43,12 +42,7 @@ const LogoutConfirm = () => {
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction
-            onClick={() => {
-              const path = logout();
-              navigate(path, { replace: true });
-            }}
-          >
+          <AlertDialogAction onClick={() => actions.logout()}>
             Continue
           </AlertDialogAction>
         </AlertDialogFooter>
