@@ -1,9 +1,6 @@
 {
   "name": "node-editor",
   "version": "1.0.0",
-  "engines": {
-    "node": ">=20.12.0"
-  },
   "scripts": {
     "db:swipe": "rm -rf server/NodeDatabase.db rm server/NodeDatabase.db-shm server/NodeDatabase.db-wal",
     "install:client": "cd client && npm install",
