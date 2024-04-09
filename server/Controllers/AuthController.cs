@@ -39,6 +39,12 @@ public class AuthController(DB db, ILogger<AuthController> logger, IConfiguratio
       return Ok(new
       {
         Token = token,
+        User = new
+        {
+          Id = usr.Id,
+          Username = usr.Username,
+          Role = usr.Role,
+        },
       });
     }
     catch (DbUpdateException dbEx)
