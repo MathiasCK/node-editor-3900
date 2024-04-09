@@ -1,30 +1,36 @@
+import { User } from '@/lib/types';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
 type SettingsState = {
   token?: string;
+  user?: User;
   setToken: (token: string) => void;
-  removeToken: () => void;
+  setUser: (user: User) => void;
+  logout: () => void;
 };
 
-const useToken = create<SettingsState>()(
+const useSession = create<SettingsState>()(
   persist(
     set => ({
       token: undefined,
+      user: undefined,
       setToken: token =>
         set({
           token,
         }),
-      removeToken: () =>
+      setUser: user => set({ user }),
+      logout: () =>
         set({
+          user: undefined,
           token: undefined,
         }),
     }),
     {
-      name: 'token-storage',
+      name: 'session-storage',
       storage: createJSONStorage(() => localStorage),
     }
   )
 );
 
-export default useToken;
+export default useSession;

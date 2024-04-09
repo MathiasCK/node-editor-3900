@@ -1,24 +1,25 @@
+import { useSession } from '@/hooks';
 import { EdgeType, EdgeWithEdgeId } from '@/lib/types';
-import { getSessionDetails, updateNodeRelations } from '@/lib/utils';
-import { actions } from '@/pages/state';
+import { updateNodeRelations } from '@/lib/utils';
 import toast from 'react-hot-toast';
 import { type Edge, type Node } from 'reactflow';
 
 export const fetchEdges = async (): Promise<Edge[] | null> => {
-  const session = getSessionDetails();
+  const { logout, user, token } = useSession.getState();
 
   const response = await fetch(
-    `${import.meta.env.VITE_API_URL}/api/edges/${session?.user.username}/all`,
+    `${import.meta.env.VITE_API_URL}/api/edges/${user?.username}/all`,
     {
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${session?.token}`,
+        Authorization: `Bearer ${token}`,
       },
     }
   );
 
   if (response.status === 401) {
-    actions.logout('UNAHTORIZED');
+    logout();
+    toast.error('Unauthorized');
     return null;
   }
 
@@ -39,19 +40,21 @@ export const createEdge = async (
   setEdges: (edges: Edge[]) => void
 ): Promise<Edge | null> => {
   const loadingToastId = toast.loading('Creating edge...');
-  const session = getSessionDetails();
+  const { token, logout } = useSession.getState();
+
   try {
     const response = await fetch(`${import.meta.env.VITE_API_URL}/api/edges`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${session?.token}`,
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(edge),
     });
 
     if (response.status === 401) {
-      actions.logout('UNAHTORIZED');
+      logout();
+      toast.error('Unauthorized');
       return null;
     }
 
@@ -98,20 +101,22 @@ export const deleteEdge = async (
   }
 
   const loadingToastId = toast.loading('Deleting edge...');
-  const session = getSessionDetails();
+
+  const { token, logout } = useSession.getState();
   try {
     const response = await fetch(
       `${import.meta.env.VITE_API_URL}/api/edges/${edgeToDelete.edgeId}`,
       {
         method: 'DELETE',
         headers: {
-          Authorization: `Bearer ${session?.token}`,
+          Authorization: `Bearer ${token}`,
         },
       }
     );
 
     if (response.status === 401) {
-      actions.logout('UNAHTORIZED');
+      logout();
+      toast.error('Unauthorized');
       return null;
     }
 
@@ -156,19 +161,21 @@ export const updateEdge = async (
 
   edgeToUpdate.type = newConnection;
 
-  const session = getSessionDetails();
+  const { token, logout } = useSession.getState();
+
   try {
     const response = await fetch(`${import.meta.env.VITE_API_URL}/api/edges`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${session?.token}`,
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(edgeToUpdate),
     });
 
     if (response.status === 401) {
-      actions.logout('UNAHTORIZED');
+      logout();
+      toast.error('Unauthorized');
       return null;
     }
 

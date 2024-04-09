@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { addNode, cn, fetchCurrentUser } from '@/lib/utils';
+import { addNode, cn } from '@/lib/utils';
 
 import {
   NavigationMenu,
@@ -11,7 +11,7 @@ import {
   NavigationMenuTrigger,
 } from '@/components/ui/navigation-menu';
 
-import { storeSelector, useStore, useTheme, useToken } from '@/hooks';
+import { storeSelector, useSession, useStore, useTheme } from '@/hooks';
 import { AppPage, AspectType, NavItem, NodeType } from '@/lib/types';
 import { shallow } from 'zustand/shallow';
 import { ThemeToggle, DownloadNodes, Logout, Register } from './_components';
@@ -117,9 +117,8 @@ const navItems: NavItem[] = [
 const Navbar = () => {
   const snap = useSnapshot(state);
   const { nodes, setNodes } = useStore(storeSelector, shallow);
-  const { token } = useToken();
 
-  const user = fetchCurrentUser(token);
+  const { user } = useSession();
   const { theme } = useTheme();
 
   return (

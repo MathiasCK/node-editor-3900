@@ -18,9 +18,10 @@ import {
   AlertDialogTrigger,
 } from '../../alert-dialog';
 
-import { actions } from '@/pages/state';
+import { useSession } from '@/hooks';
 
 const LogoutConfirm = () => {
+  const { logout } = useSession();
   return (
     <AlertDialog>
       <AlertDialogTrigger>
@@ -42,7 +43,7 @@ const LogoutConfirm = () => {
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={() => actions.logout()}>
+          <AlertDialogAction onClick={() => logout()}>
             Continue
           </AlertDialogAction>
         </AlertDialogFooter>

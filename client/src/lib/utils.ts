@@ -11,11 +11,9 @@ import {
   RelationKeys,
   RelationKeysWithChildren,
   RelationType,
-  User,
-  UserWithToken,
 } from './types';
 import { createNode, updateNode } from '@/api/nodes';
-import { actions } from '@/pages/state';
+import { useSession } from '@/hooks';
 
 export const cn = (...inputs: ClassValue[]) => twMerge(clsx(inputs));
 
@@ -338,7 +336,7 @@ export const addNode = async (
   nodes: Node[],
   setNodes: (nodes: Node[]) => void
 ) => {
-  const session = getSessionDetails();
+  const { user } = useSession.getState();
 
   const id =
     nodes.length === 0
@@ -358,7 +356,7 @@ export const addNode = async (
       aspect,
       label: `${type}_${id}`,
       type,
-      createdBy: session?.user.username,
+      createdBy: user?.username,
     },
   };
 
@@ -831,58 +829,4 @@ export const mapNodeRelationsToString = (nodes: Node[]): string => {
   });
 
   return str;
-};
-
-export const fetchCurrentUser = (
-  token: string | undefined,
-  shouldLogout = false
-): User | null => {
-  try {
-    if (!token) {
-      throw new Error('No token found');
-    }
-
-    const decodedToken = JSON.parse(atob(token.split('.')[1]));
-
-    if (
-      !decodedToken ||
-      !decodedToken.id ||
-      !decodedToken.username ||
-      decodedToken.id === '' ||
-      decodedToken.username === '' ||
-      !decodedToken.role ||
-      decodedToken.role === ''
-    ) {
-      throw new Error('Invalid user');
-    }
-
-    return {
-      id: decodedToken.id,
-      username: decodedToken.username,
-      role: decodedToken.role,
-    };
-  } catch (e) {
-    if (shouldLogout) {
-      actions.logout();
-      throw e;
-    }
-    return null;
-  }
-};
-
-export const getSessionDetails = (): UserWithToken | null => {
-  const tokenStorage = localStorage.getItem('token-storage');
-
-  if (!tokenStorage) {
-    actions.logout();
-    return null;
-  }
-
-  const parsed = JSON.parse(tokenStorage);
-
-  const token = parsed?.state?.token ?? undefined;
-  return {
-    token,
-    user: fetchCurrentUser(token) as User,
-  };
 };

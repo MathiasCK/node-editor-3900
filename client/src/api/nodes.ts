@@ -2,22 +2,23 @@ import toast from 'react-hot-toast';
 import { getConnectedEdges, type Node, type Edge } from 'reactflow';
 import { NodeWithNodeId, type UpdateNode } from '@/lib/types';
 import { deleteEdge } from './edges';
-import { getSessionDetails } from '@/lib/utils';
-import { actions } from '@/pages/state';
+import { useSession } from '@/hooks';
 
 export const fetchNodes = async (): Promise<Node[] | null> => {
-  const session = getSessionDetails();
+  const { logout, user, token } = useSession.getState();
+
   const response = await fetch(
-    `${import.meta.env.VITE_API_URL}/api/nodes/${session?.user.username}/all`,
+    `${import.meta.env.VITE_API_URL}/api/nodes/${user?.username}/all`,
     {
       headers: {
-        Authorization: `Bearer ${session?.token}`,
+        Authorization: `Bearer ${token}`,
       },
     }
   );
 
   if (response.status === 401) {
-    actions.logout('UNAHTORIZED');
+    logout();
+    toast.error('Unauthorized');
     return null;
   }
 
@@ -37,7 +38,8 @@ export const createNode = async (
   nodes: Node[],
   setNodes: (nodes: Node[]) => void
 ): Promise<Node | null> => {
-  const session = getSessionDetails();
+  const { logout, token } = useSession.getState();
+
   const loadingToastId = toast.loading('Creating node...');
 
   try {
@@ -45,13 +47,14 @@ export const createNode = async (
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${session?.token}`,
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(node),
     });
 
     if (response.status === 401) {
-      actions.logout('UNAHTORIZED');
+      logout();
+      toast.error('Unauthorized');
       return null;
     }
 
@@ -103,20 +106,21 @@ export const updateNode = async (
       nodeToUpdate.data[key] = newNodeData[key];
     });
   }
-  const session = getSessionDetails();
+  const { token, logout } = useSession.getState();
 
   try {
     const response = await fetch(`${import.meta.env.VITE_API_URL}/api/nodes`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${session?.token}`,
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(nodeToUpdate),
     });
 
     if (response.status === 401) {
-      actions.logout('UNAHTORIZED');
+      logout();
+      toast.error('Unauthorized');
       return null;
     }
 
@@ -159,7 +163,7 @@ export const deleteNode = async (
   edges: Edge[],
   setEdges: (edges: Edge[]) => void
 ): Promise<string | null> => {
-  const session = getSessionDetails();
+  const { token, logout } = useSession.getState();
 
   const nodeToDelete = nodes.find(
     node => node.id === nodeToDeleteId
@@ -190,13 +194,14 @@ export const deleteNode = async (
       {
         method: 'DELETE',
         headers: {
-          Authorization: `Bearer ${session?.token}`,
+          Authorization: `Bearer ${token}`,
         },
       }
     );
 
     if (response.status === 401) {
-      actions.logout('UNAHTORIZED');
+      logout();
+      toast.error('Unauthorized');
       return null;
     }
 

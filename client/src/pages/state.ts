@@ -1,5 +1,4 @@
 import { AppPage } from '@/lib/types';
-import toast from 'react-hot-toast';
 import { proxy } from 'valtio';
 
 export type AppState = {
@@ -13,18 +12,6 @@ const state = proxy<AppState>({
 const actions = {
   setCurrentPage: (page: AppPage) => {
     state.currentPage = page;
-  },
-  logout: (type?: 'UNAHTORIZED' | 'EXPIRED') => {
-    localStorage.removeItem('token-storage');
-    setTimeout(() => {
-      state.currentPage = AppPage.Login;
-      if (type === 'UNAHTORIZED') {
-        toast.error('Unauthorized');
-      }
-      if (type === 'EXPIRED') {
-        toast.error('Session expired');
-      }
-    }, 300);
   },
 };
 

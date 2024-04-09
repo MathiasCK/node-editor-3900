@@ -12,7 +12,6 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 
-import { useToken } from '@/hooks';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { AppPage } from '@/lib/types';
@@ -24,8 +23,6 @@ const formSchema = z.object({
 });
 
 const Login = () => {
-  const { setToken } = useToken();
-
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -35,7 +32,7 @@ const Login = () => {
   });
 
   const handleSubmit = async (values: z.infer<typeof formSchema>) => {
-    const success = await login(values.username, values.password, setToken);
+    const success = await login(values.username, values.password);
 
     if (success) {
       actions.setCurrentPage(AppPage.Home);

@@ -12,18 +12,14 @@ import { shallow } from 'zustand/shallow';
 
 import 'reactflow/dist/style.css';
 import { Block, Connector, Terminal } from '@/components/Nodes';
-import { NodeRelation, UserWithToken } from '@/lib/types';
-import {
-  checkConnection,
-  getSessionDetails,
-  handleNewNodeRelations,
-} from '@/lib/utils';
+import { NodeRelation } from '@/lib/types';
+import { checkConnection, handleNewNodeRelations } from '@/lib/utils';
 import {
   storeSelector,
   useConnection,
+  useSession,
   useStore,
   useTheme,
-  useToken,
 } from '@/hooks';
 
 import { Connected, Fulfilled, Part, Transfer } from '@/components/Edges';
@@ -35,12 +31,9 @@ import {
   lightTheme,
 } from '@/components/ui/styled';
 import { ThemeProvider } from 'styled-components';
-import { Sidebar, Settings, SelectConnection, Spinner } from '@/components/ui';
+import { Sidebar, Settings, SelectConnection } from '@/components/ui';
 import { fetchNodes, updateNode } from '@/api/nodes';
 import { createEdge, fetchEdges } from '@/api/edges';
-import { useQuery } from '@tanstack/react-query';
-import { validateToken } from '@/api/auth';
-import { actions } from './state';
 
 const Home = () => {
   const nodeTypes = useMemo(
@@ -61,13 +54,13 @@ const Home = () => {
     }),
     []
   );
-  const { token } = useToken();
+
   const { theme } = useTheme();
   const { edgeType, openDialog } = useConnection();
   const [params, setParams] = useState<Edge | Connection | null>();
   const [displayDialog, setDisplayDialog] = useState<boolean>(true);
 
-  const session = getSessionDetails();
+  const { user } = useSession();
 
   const { nodes, setNodes, onNodesChange, edges, setEdges, onEdgesChange } =
     useStore(storeSelector, shallow);
@@ -101,20 +94,6 @@ const Home = () => {
     [edgeType, openDialog, nodes]
   );
 
-  const { isPending, error, data } = useQuery({
-    queryKey: ['tokenData', token],
-    queryFn: () => validateToken(token),
-  });
-
-  if (isPending) {
-    return <Spinner />;
-  }
-
-  if (error || !data || !(data as UserWithToken).token) {
-    actions.logout();
-    return null;
-  }
-
   const createNewConnection = async () => {
     if (!params) return;
 
@@ -134,7 +113,7 @@ const Home = () => {
         lockConnection,
         createdAt: currentDate,
         updatedAt: currentDate,
-        createdBy: session?.user?.username,
+        createdBy: user?.username,
       },
     };
 
