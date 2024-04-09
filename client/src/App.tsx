@@ -21,7 +21,9 @@ const App: React.FC = () => {
     document.documentElement.classList.toggle('dark', theme === 'dark');
   }, [theme]);
 
-  if (token) {
+  if (token && snap.currentPage === AppPage.Register) {
+    actions.setCurrentPage(AppPage.Register);
+  } else if (token) {
     actions.setCurrentPage(AppPage.Home);
   } else {
     actions.setCurrentPage(AppPage.Login);
