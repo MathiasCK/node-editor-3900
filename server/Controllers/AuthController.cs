@@ -20,16 +20,11 @@ public class AuthController(DB db, ILogger<AuthController> logger, IConfiguratio
     {
       var usr = await _db.Users.FirstOrDefaultAsync(u => u.Username == user.Username);
 
-      if (usr == null)
-      {
-        return NotFound("User not found");
-      }
+      byte[] salt = Convert.FromBase64String(usr?.Salt ?? "");
 
-      byte[] salt = Convert.FromBase64String(usr.Salt);
+      var match = PasswordHasher.VerifyPassword(user.Password, salt, usr?.Password ?? "");
 
-      var match = PasswordHasher.VerifyPassword(user.Password, salt, usr.Password);
-
-      if (!match)
+      if (!match || usr == null)
       {
         return BadRequest("Invalid credentials");
       }
