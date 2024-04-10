@@ -1,29 +1,82 @@
-import { FC } from 'react';
-import { useConnection } from '@/hooks';
+import { storeSelector, useConnection, useStore } from '@/hooks';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from './dialog';
 
-import { EdgeType } from '@/lib/types';
-import { cn } from '@/lib/utils';
+import { EdgeType, NodeRelation } from '@/lib/types';
+import { addEdge, cn } from '@/lib/utils';
 import { buttonVariants } from '@/lib/config';
 import { Button } from './button';
+import { shallow } from 'zustand/shallow';
+import toast from 'react-hot-toast';
 
-interface Props {
-  displayDialog: boolean;
-  createNewConnection: () => void;
-}
+const SelectConnection = () => {
+  const { dialogOpen, edgeType, setEdgeType, params, closeDialog } =
+    useConnection();
+  const { nodes } = useStore(storeSelector, shallow);
 
-const SelectConnection: FC<Props> = ({
-  createNewConnection,
-  displayDialog,
-}) => {
-  const { dialogOpen, edgeType, setEdgeType, closeDialog } = useConnection();
-  if (!dialogOpen) return null;
+  const createNewConnection = async () => {
+    const newNodeRelations: NodeRelation[] = [];
 
-  if (!displayDialog) {
-    createNewConnection();
+    if (edgeType === EdgeType.Part) {
+      const sourceNode = nodes.find(node => node.id === params!.source);
+
+      if (
+        sourceNode?.data?.directPartOf &&
+        sourceNode?.data?.directPartOf !== ''
+      ) {
+        const partOfNode = nodes.find(
+          node => node.id === sourceNode?.data?.directPartOf
+        );
+
+        toast.error(
+          `${sourceNode.data.customName ?? sourceNode.id} is already part of ${partOfNode?.data?.customName ?? sourceNode?.data?.directPartOf}`
+        );
+      }
+
+      newNodeRelations.push({
+        nodeId: params!.target as string,
+        relations: {
+          directParts: {
+            id: params!.source as string,
+          },
+          children: {
+            id: params!.source as string,
+          },
+        },
+      });
+
+      newNodeRelations.push({
+        nodeId: params!.source as string,
+        relation: {
+          parent: params!.target as string,
+          directPartOf: params!.target as string,
+        },
+      });
+    }
+
+    // Only possible for block to block connections
+    if (edgeType === EdgeType.Fulfilled) {
+      newNodeRelations.push({
+        nodeId: params!.source as string,
+        relations: {
+          fulfilledBy: {
+            id: params!.target as string,
+          },
+        },
+      });
+
+      newNodeRelations.push({
+        nodeId: params!.target as string,
+        relations: {
+          fulfills: {
+            id: params!.source as string,
+          },
+        },
+      });
+    }
+
+    await addEdge(edgeType, newNodeRelations, false);
     closeDialog();
-    return;
-  }
+  };
 
   return (
     <Dialog open={dialogOpen}>
@@ -61,7 +114,6 @@ const SelectConnection: FC<Props> = ({
           <Button
             onClick={() => {
               createNewConnection();
-              closeDialog();
             }}
           >
             Create connection

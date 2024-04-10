@@ -1,4 +1,4 @@
-import { useSession } from '@/hooks';
+import { useSession, useStore } from '@/hooks';
 import { EdgeType, EdgeWithEdgeId } from '@/lib/types';
 import { updateNodeRelations } from '@/lib/utils';
 import toast from 'react-hot-toast';
@@ -34,11 +34,8 @@ export const fetchEdges = async (): Promise<Edge[] | null> => {
   return edges;
 };
 
-export const createEdge = async (
-  edge: Edge,
-  edges: Edge[],
-  setEdges: (edges: Edge[]) => void
-): Promise<Edge | null> => {
+export const createEdge = async (edge: Edge): Promise<Edge | null> => {
+  const { edges, setEdges } = useStore.getState();
   const loadingToastId = toast.loading('Creating edge...');
   const { token, logout } = useSession.getState();
 

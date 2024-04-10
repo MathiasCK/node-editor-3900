@@ -1,9 +1,8 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 
 import {
   type Edge,
   type Node,
-  type Connection,
   Background,
   EdgeTypes,
   NodeTypes,
@@ -12,15 +11,9 @@ import { shallow } from 'zustand/shallow';
 
 import 'reactflow/dist/style.css';
 import { Block, Connector, Terminal } from '@/components/Nodes';
-import { NodeRelation } from '@/lib/types';
-import { checkConnection, handleNewNodeRelations } from '@/lib/utils';
-import {
-  storeSelector,
-  useConnection,
-  useSession,
-  useStore,
-  useTheme,
-} from '@/hooks';
+
+import { onConnect } from '@/lib/utils';
+import { storeSelector, useStore, useTheme } from '@/hooks';
 
 import { Connected, Fulfilled, Part, Transfer } from '@/components/Edges';
 import {
@@ -33,7 +26,7 @@ import {
 import { ThemeProvider } from 'styled-components';
 import { Sidebar, SelectConnection } from '@/components/ui';
 import { fetchNodes, updateNode } from '@/api/nodes';
-import { createEdge, fetchEdges } from '@/api/edges';
+import { fetchEdges } from '@/api/edges';
 
 const Home = () => {
   const nodeTypes = useMemo(
@@ -56,11 +49,6 @@ const Home = () => {
   );
 
   const { theme } = useTheme();
-  const { edgeType, openDialog } = useConnection();
-  const [params, setParams] = useState<Edge | Connection | null>();
-  const [displayDialog, setDisplayDialog] = useState<boolean>(true);
-
-  const { user } = useSession();
 
   const { nodes, setNodes, onNodesChange, edges, setEdges, onEdgesChange } =
     useStore(storeSelector, shallow);
@@ -73,60 +61,6 @@ const Home = () => {
       setEdges(edges as Edge[]);
     })();
   }, [setNodes, setEdges]);
-
-  const onConnect = useCallback(
-    (params: Edge | Connection) => {
-      const { canConnect, lockConnection } = checkConnection(
-        params,
-        edgeType,
-        nodes
-      );
-      if (!canConnect) return;
-
-      if (lockConnection) {
-        setDisplayDialog(false);
-      } else {
-        setDisplayDialog(true);
-      }
-      openDialog();
-      setParams(params);
-    },
-    [edgeType, openDialog, nodes]
-  );
-
-  const createNewConnection = async () => {
-    if (!params) return;
-
-    const { connectionType, lockConnection, newNodeRelations } =
-      checkConnection(params, edgeType, nodes);
-
-    const currentDate = Date.now();
-    const id = edges.length.toString();
-
-    const newEdge = {
-      ...params,
-      id: `reactflow__edge-${params.source}${params.sourceHandle}-${params.target}${params.targetHandle}`,
-      type: connectionType,
-      data: {
-        id,
-        label: `Edge ${id}`,
-        lockConnection,
-        createdAt: currentDate,
-        updatedAt: currentDate,
-        createdBy: user?.id,
-      },
-    };
-
-    const edge = await createEdge(newEdge as Edge, edges, setEdges);
-
-    if (edge) {
-      handleNewNodeRelations(
-        newNodeRelations as NodeRelation[],
-        nodes,
-        setNodes
-      );
-    }
-  };
 
   return (
     <ThemeProvider theme={theme === 'light' ? lightTheme : darkTheme}>
@@ -141,10 +75,7 @@ const Home = () => {
         onNodeDragStop={(_, node) => updateNode(node.id, nodes, setNodes)}
       >
         <Sidebar />
-        <SelectConnection
-          displayDialog={displayDialog}
-          createNewConnection={createNewConnection}
-        />
+        <SelectConnection />
         <ControlsStyled />
         <MiniMapStyled />
         <Background gap={12} size={1} />

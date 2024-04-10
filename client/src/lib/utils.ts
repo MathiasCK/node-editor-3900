@@ -13,30 +13,23 @@ import {
   RelationType,
 } from './types';
 import { createNode, updateNode } from '@/api/nodes';
-import { useSession } from '@/hooks';
+import { useConnection, useSession, useStore } from '@/hooks';
+import { createEdge } from '@/api/edges';
 
 export const cn = (...inputs: ClassValue[]) => twMerge(clsx(inputs));
 
-export const checkConnection = (
-  params: Edge | Connection,
-  edgeType: EdgeType,
-  nodes: Node[]
-): {
-  canConnect: boolean;
-  connectionType?: EdgeType;
-  lockConnection?: boolean;
-  newNodeRelations?: NodeRelation[];
-} => {
-  const newNodeRelations: NodeRelation[] = [];
+export const onConnect = async (params: Edge | Connection) => {
+  const { setParams } = useConnection.getState();
+  setParams(params);
 
-  let connectionType = edgeType;
-  let lockConnection = false;
+  const { nodes } = useStore.getState();
+  const { openDialog } = useConnection.getState();
+
+  const newNodeRelations: NodeRelation[] = [];
 
   if (params.source === params.target) {
     toast.error('Cannot connect node to itself');
-    return {
-      canConnect: false,
-    };
+    return;
   }
 
   // Set terminalOf property for terminal & terminals array for block
@@ -51,13 +44,8 @@ export const checkConnection = (
       toast.error(
         `Terminal ${terminal?.data?.customName ?? params.target} is already a terminal of ${block?.data?.customName ?? terminal?.data?.terminalOf}`
       );
-      return {
-        canConnect: false,
-      };
+      return;
     }
-
-    lockConnection = true;
-    connectionType = EdgeType.Connected;
 
     newNodeRelations.push({
       nodeId: params.target as string,
@@ -74,6 +62,8 @@ export const checkConnection = (
         },
       },
     });
+
+    return addEdge(EdgeType.Connected, newNodeRelations);
   }
 
   // Set terminalOf property for terminal & terminals array for block
@@ -88,13 +78,8 @@ export const checkConnection = (
       toast.error(
         `Terminal ${terminal?.data?.customName ?? params.source} is already a terminal of ${block?.data?.customName ?? terminal?.data?.terminalOf}`
       );
-      return {
-        canConnect: false,
-      };
+      return;
     }
-
-    lockConnection = true;
-    connectionType = EdgeType.Connected;
 
     newNodeRelations.push({
       nodeId: params.source as string,
@@ -111,6 +96,8 @@ export const checkConnection = (
         },
       },
     });
+
+    return addEdge(EdgeType.Connected, newNodeRelations);
   }
 
   if (
@@ -119,9 +106,6 @@ export const checkConnection = (
     (isBlock(params.sourceHandle as string) &&
       isConnector(params.targetHandle as string))
   ) {
-    lockConnection = true;
-    connectionType = EdgeType.Connected;
-
     newNodeRelations.push({
       nodeId: params.source as string,
       relations: {
@@ -139,6 +123,8 @@ export const checkConnection = (
         },
       },
     });
+
+    return addEdge(EdgeType.Connected, newNodeRelations);
   }
 
   // Set transfersTo & transferedBy property for terminals
@@ -153,22 +139,15 @@ export const checkConnection = (
       toast.error(
         `Terminal ${targetTerminal?.data.customName ?? targetTerminal.id} is already being transferred by another terminal`
       );
-      return {
-        canConnect: false,
-      };
+      return;
     }
 
     if (sourceTerminal?.data.transfersTo) {
       toast.error(
         `Terminal ${sourceTerminal?.data.customName ?? sourceTerminal.id} is already transferring to another terminal`
       );
-      return {
-        canConnect: false,
-      };
+      return;
     }
-
-    lockConnection = true;
-    connectionType = EdgeType.Transfer;
 
     newNodeRelations.push({
       nodeId: params.source as string,
@@ -183,6 +162,8 @@ export const checkConnection = (
         transferedBy: params.source as string,
       },
     });
+
+    return addEdge(EdgeType.Transfer, newNodeRelations);
   }
 
   if (
@@ -191,9 +172,6 @@ export const checkConnection = (
     (isConnector(params.sourceHandle as string) &&
       isTerminal(params.targetHandle as string))
   ) {
-    lockConnection = true;
-    connectionType = EdgeType.Connected;
-
     newNodeRelations.push({
       nodeId: params.source as string,
       relations: {
@@ -211,78 +189,48 @@ export const checkConnection = (
         },
       },
     });
+
+    return addEdge(EdgeType.Connected, newNodeRelations);
   }
 
-  // Only possible for block to block connections
-  if (connectionType === EdgeType.Part && !lockConnection) {
-    const sourceNode = nodes.find(node => node.id === params.source);
-
-    if (
-      sourceNode?.data?.directPartOf &&
-      sourceNode?.data?.directPartOf !== ''
-    ) {
-      const partOfNode = nodes.find(
-        node => node.id === sourceNode?.data?.directPartOf
-      );
-
-      toast.error(
-        `${sourceNode.data.customName ?? sourceNode.id} is already part of ${partOfNode?.data?.customName ?? sourceNode?.data?.directPartOf}`
-      );
-      return {
-        canConnect: false,
-      };
-    }
-
-    newNodeRelations.push({
-      nodeId: params.target as string,
-      relations: {
-        directParts: {
-          id: params.source as string,
-        },
-        children: {
-          id: params.source as string,
-        },
-      },
-    });
-
-    newNodeRelations.push({
-      nodeId: params.source as string,
-      relation: {
-        parent: params.target as string,
-        directPartOf: params.target as string,
-      },
-    });
-  }
-
-  // Only possible for block to block connections
-  if (connectionType === EdgeType.Fulfilled && !lockConnection) {
-    newNodeRelations.push({
-      nodeId: params.source as string,
-      relations: {
-        fulfilledBy: {
-          id: params.target as string,
-        },
-      },
-    });
-
-    newNodeRelations.push({
-      nodeId: params.target as string,
-      relations: {
-        fulfills: {
-          id: params.source as string,
-        },
-      },
-    });
-  }
-
-  return { canConnect: true, connectionType, lockConnection, newNodeRelations };
+  return openDialog();
 };
 
-export const handleNewNodeRelations = (
+export const addEdge = async (
+  edgeType: EdgeType,
   newNodeRelations: NodeRelation[],
-  nodes: Node[],
-  setNodes: (nodes: Node[]) => void
+  lockConnection = true
 ) => {
+  const { edges } = useStore.getState();
+  const { params } = useConnection.getState();
+  const { user } = useSession.getState();
+
+  const currentDate = Date.now();
+  const id = edges.length.toString();
+
+  const newEdge = {
+    ...params,
+    id: `reactflow__edge-${params!.source}${params!.sourceHandle}-${params!.target}${params!.targetHandle}`,
+    type: edgeType,
+    data: {
+      id,
+      label: `Edge ${id}`,
+      lockConnection,
+      createdAt: currentDate,
+      updatedAt: currentDate,
+      createdBy: user?.id,
+    },
+  };
+
+  const edge = await createEdge(newEdge as Edge);
+
+  if (edge) {
+    handleNewNodeRelations(newNodeRelations as NodeRelation[]);
+  }
+};
+
+export const handleNewNodeRelations = (newNodeRelations: NodeRelation[]) => {
+  const { nodes, setNodes } = useStore.getState();
   for (const relation of newNodeRelations) {
     const nodeToUpdate = nodes.find(node => node.id === relation.nodeId);
     const index = nodes.findIndex(node => node.id === relation.nodeId);
@@ -313,19 +261,6 @@ export const isBlock = (id: string): boolean => id.includes('block');
 export const isConnector = (id: string): boolean => id.includes('connector');
 
 export const isTerminal = (id: string): boolean => id.includes('terminal');
-
-export const getSymmetricDifference = (arr1: Edge[], arr2: Edge[]): Edge[] => {
-  const set1 = new Set(arr1);
-  const set2 = new Set(arr2);
-
-  const difference = new Set(
-    [...set1]
-      .filter(x => !set2.has(x))
-      .concat([...set2].filter(x => !set1.has(x)))
-  );
-
-  return Array.from(difference);
-};
 
 export const capitalizeFirstLetter = (string: string) =>
   string.charAt(0).toUpperCase() + string.slice(1);
@@ -362,7 +297,6 @@ export const addNode = async (
 
   await createNode(newNode as Node, nodes, setNodes);
 };
-
 export const updateNodeRelations = async (
   currentEdge: Edge,
   nodes: Node[],
