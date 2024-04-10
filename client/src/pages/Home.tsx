@@ -113,7 +113,7 @@ const Home = () => {
         lockConnection,
         createdAt: currentDate,
         updatedAt: currentDate,
-        createdBy: user?.username,
+        createdBy: user?.id,
       },
     };
 

@@ -8,7 +8,7 @@ export const fetchNodes = async (): Promise<Node[] | null> => {
   const { logout, user, token } = useSession.getState();
 
   const response = await fetch(
-    `${import.meta.env.VITE_API_URL}/api/nodes/${user?.username}/all`,
+    `${import.meta.env.VITE_API_URL}/api/nodes/${user?.id}/all`,
     {
       headers: {
         Authorization: `Bearer ${token}`,

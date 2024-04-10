@@ -8,7 +8,7 @@ export const fetchEdges = async (): Promise<Edge[] | null> => {
   const { logout, user, token } = useSession.getState();
 
   const response = await fetch(
-    `${import.meta.env.VITE_API_URL}/api/edges/${user?.username}/all`,
+    `${import.meta.env.VITE_API_URL}/api/edges/${user?.id}/all`,
     {
       headers: {
         'Content-Type': 'application/json',

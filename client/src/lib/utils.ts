@@ -356,7 +356,7 @@ export const addNode = async (
       aspect,
       label: `${type}_${id}`,
       type,
-      createdBy: user?.username,
+      createdBy: user?.id,
     },
   };
 
