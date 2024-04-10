@@ -5,6 +5,8 @@ import { useEffect } from 'react';
 import { useTheme, useSession } from '@/hooks';
 import { useSnapshot } from 'valtio';
 import { actions, state } from './pages/state';
+import { Toaster } from 'react-hot-toast';
+import { Navbar } from './components/ui';
 
 const routeConfig = {
   [AppPage.Login]: Login,
@@ -31,6 +33,8 @@ const App: React.FC = () => {
 
   return (
     <>
+      <Toaster />
+      <Navbar />
       {Object.entries(routeConfig).map(([page, Component]) => (
         <CSSTransition
           key={page}
