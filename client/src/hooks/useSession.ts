@@ -2,7 +2,7 @@ import { User } from '@/lib/types';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
-type SettingsState = {
+type SessionState = {
   token?: string;
   user?: User;
   setToken: (token: string) => void;
@@ -10,7 +10,7 @@ type SettingsState = {
   logout: () => void;
 };
 
-const useSession = create<SettingsState>()(
+const useSession = create<SessionState>()(
   persist(
     set => ({
       token: undefined,

@@ -31,7 +31,7 @@ import {
   lightTheme,
 } from '@/components/ui/styled';
 import { ThemeProvider } from 'styled-components';
-import { Sidebar, Settings, SelectConnection } from '@/components/ui';
+import { Sidebar, SelectConnection } from '@/components/ui';
 import { fetchNodes, updateNode } from '@/api/nodes';
 import { createEdge, fetchEdges } from '@/api/edges';
 
@@ -141,7 +141,6 @@ const Home = () => {
         onNodeDragStop={(_, node) => updateNode(node.id, nodes, setNodes)}
       >
         <Sidebar />
-        <Settings />
         <SelectConnection
           displayDialog={displayDialog}
           createNewConnection={createNewConnection}
