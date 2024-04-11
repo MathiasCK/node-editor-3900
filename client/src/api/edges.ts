@@ -1,4 +1,4 @@
-import { useSession, useStore } from '@/hooks';
+import { useLoading, useSession, useStore } from '@/hooks';
 import { EdgeType, EdgeWithEdgeId } from '@/lib/types';
 import { updateNodeRelations } from '@/lib/utils';
 import toast from 'react-hot-toast';
@@ -35,9 +35,11 @@ export const fetchEdges = async (): Promise<Edge[] | null> => {
 };
 
 export const createEdge = async (edge: Edge): Promise<Edge | null> => {
+  const { startLoading, stopLoading } = useLoading.getState();
   const { edges, setEdges } = useStore.getState();
-  const loadingToastId = toast.loading('Creating edge...');
   const { token, logout } = useSession.getState();
+
+  startLoading();
 
   try {
     const response = await fetch(`${import.meta.env.VITE_API_URL}/api/edges`, {
@@ -76,7 +78,7 @@ export const createEdge = async (edge: Edge): Promise<Edge | null> => {
     toast.error(`Error creating edge: ${(error as Error).message}`);
     throw error;
   } finally {
-    loadingToastId && toast.dismiss(loadingToastId);
+    stopLoading();
   }
 };
 
@@ -97,9 +99,10 @@ export const deleteEdge = async (
     return null;
   }
 
-  const loadingToastId = toast.loading('Deleting edge...');
-
   const { token, logout } = useSession.getState();
+  const { startLoading, stopLoading } = useLoading.getState();
+
+  startLoading();
   try {
     const response = await fetch(
       `${import.meta.env.VITE_API_URL}/api/edges/${edgeToDelete.edgeId}`,
@@ -136,7 +139,7 @@ export const deleteEdge = async (
     toast.error(`Error deleting edge: ${(error as Error).message}`);
     throw error;
   } finally {
-    loadingToastId && toast.dismiss(loadingToastId);
+    stopLoading();
     updateNodeRelations(edgeToDelete, nodes, setNodes, nodeToDeleteId);
   }
 };
@@ -154,7 +157,9 @@ export const updateEdge = async (
     return null;
   }
 
-  const loadingToastId = toast.loading('Updating edge...');
+  const { startLoading, stopLoading } = useLoading.getState();
+
+  startLoading();
 
   edgeToUpdate.type = newConnection;
 
@@ -202,6 +207,6 @@ export const updateEdge = async (
     toast.error(`Error updating edge: ${(error as Error).message}`);
     throw error;
   } finally {
-    loadingToastId && toast.dismiss(loadingToastId);
+    stopLoading();
   }
 };

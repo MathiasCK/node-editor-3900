@@ -88,7 +88,7 @@ const CurrentNode: FC<Props> = ({ currentNode }) => {
     nodeName !== displayName || aspectType !== currentNode?.data?.aspect;
 
   return (
-    <SheetContent className="bg:background flex flex-col justify-between">
+    <SheetContent className="bg:background z-40 flex flex-col justify-between">
       <SheetHeader>
         <SheetTitle className="flex items-center uppercase dark:text-white">
           {!sidebar.edit ? (

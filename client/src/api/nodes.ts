@@ -2,7 +2,7 @@ import toast from 'react-hot-toast';
 import { getConnectedEdges, type Node, type Edge } from 'reactflow';
 import { NodeWithNodeId, type UpdateNode } from '@/lib/types';
 import { deleteEdge } from './edges';
-import { useSession } from '@/hooks';
+import { useLoading, useSession } from '@/hooks';
 
 export const fetchNodes = async (): Promise<Node[] | null> => {
   const { logout, user, token } = useSession.getState();
@@ -39,8 +39,8 @@ export const createNode = async (
   setNodes: (nodes: Node[]) => void
 ): Promise<Node | null> => {
   const { logout, token } = useSession.getState();
-
-  const loadingToastId = toast.loading('Creating node...');
+  const { startLoading, stopLoading } = useLoading.getState();
+  startLoading();
 
   try {
     const response = await fetch(`${import.meta.env.VITE_API_URL}/api/nodes`, {
@@ -67,7 +67,6 @@ export const createNode = async (
     const createdNode = await response.json();
 
     toast.success('Node created successfully!');
-    loadingToastId && toast.dismiss(loadingToastId);
 
     if (createdNode) {
       setNodes([...nodes, createdNode]);
@@ -78,7 +77,7 @@ export const createNode = async (
     toast.error(`Error creating node: ${(error as Error).message}`);
     throw error;
   } finally {
-    loadingToastId && toast.dismiss(loadingToastId);
+    stopLoading();
   }
 };
 
@@ -88,11 +87,6 @@ export const updateNode = async (
   setNodes: (nodes: Node[]) => void,
   newNodeData?: UpdateNode
 ): Promise<Node | null> => {
-  let loadingToastId: string | undefined;
-  if (newNodeData) {
-    loadingToastId = toast.loading('Updating node...');
-  }
-
   const nodeToUpdate = nodes.find(n => n.id === nodeToUpdateId);
 
   if (!nodeToUpdate) {
@@ -100,13 +94,16 @@ export const updateNode = async (
     return null;
   }
 
+  const { token, logout } = useSession.getState();
+  const { startLoading, stopLoading } = useLoading.getState();
+
   if (newNodeData) {
+    startLoading();
     Object.keys(newNodeData).forEach(key => {
       // @ts-ignore
       nodeToUpdate.data[key] = newNodeData[key];
     });
   }
-  const { token, logout } = useSession.getState();
 
   try {
     const response = await fetch(`${import.meta.env.VITE_API_URL}/api/nodes`, {
@@ -152,7 +149,7 @@ export const updateNode = async (
     toast.error(`Error updating node: ${(error as Error).message}`);
     throw error;
   } finally {
-    loadingToastId && toast.dismiss(loadingToastId);
+    stopLoading();
   }
 };
 
@@ -174,7 +171,8 @@ export const deleteNode = async (
     return null;
   }
 
-  const loadingToastId = toast.loading('Deleting node...');
+  const { startLoading, stopLoading } = useLoading.getState();
+  startLoading();
 
   const connectedEdges = getConnectedEdges([nodeToDelete], edges);
   for (const edge of connectedEdges) {
@@ -218,7 +216,7 @@ export const deleteNode = async (
     toast.error(`Error deleting node: ${(error as Error).message}`);
     throw error;
   } finally {
-    loadingToastId && toast.dismiss(loadingToastId);
+    stopLoading();
     const nodes = await fetchNodes();
     if (nodes) {
       setNodes(nodes);

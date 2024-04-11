@@ -1,4 +1,4 @@
-import { useSession } from '@/hooks';
+import { useLoading, useSession } from '@/hooks';
 import { UserWithToken } from '@/lib/types';
 import toast from 'react-hot-toast';
 
@@ -6,8 +6,11 @@ export const login = async (
   username: string,
   password: string
 ): Promise<boolean> => {
+  const { startLoading, stopLoading } = useLoading.getState();
+  startLoading();
   try {
     const { setUser, setToken } = useSession.getState();
+
     const response = await fetch(
       `${import.meta.env.VITE_API_URL}/api/auth/login`,
       {
@@ -37,6 +40,8 @@ export const login = async (
   } catch (error) {
     toast.error('Error logging in. Please try again.');
     throw new Error(`Error logging in: ${error}`);
+  } finally {
+    stopLoading();
   }
 };
 
@@ -44,6 +49,8 @@ export const register = async (
   username: string,
   password: string
 ): Promise<boolean> => {
+  const { startLoading, stopLoading } = useLoading.getState();
+  startLoading();
   try {
     const response = await fetch(
       `${import.meta.env.VITE_API_URL}/api/auth/register`,
@@ -69,5 +76,7 @@ export const register = async (
   } catch (error) {
     toast.error('Error registering user. Please try again.');
     throw new Error(`Error registering user: ${error}`);
+  } finally {
+    stopLoading();
   }
 };

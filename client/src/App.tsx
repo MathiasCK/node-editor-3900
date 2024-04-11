@@ -6,7 +6,7 @@ import { useTheme, useSession } from '@/hooks';
 import { useSnapshot } from 'valtio';
 import { actions, state } from './pages/state';
 import { Toaster } from 'react-hot-toast';
-import { Navbar } from './components/ui';
+import { Navbar, Loader } from './components/ui';
 
 const routeConfig = {
   [AppPage.Login]: Login,
@@ -44,6 +44,7 @@ const App: React.FC = () => {
           unmountOnExit
         >
           <main className="page h-screen w-screen">
+            <Loader />
             <Component />
           </main>
         </CSSTransition>
