@@ -14,8 +14,6 @@ import { Input } from '@/components/ui/input';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { AppPage } from '@/lib/types';
-import { actions } from './state';
 
 const formSchema = z.object({
   username: z.string().min(2, 'Username must contain at least 2 character(s)'),
@@ -31,13 +29,8 @@ const Login = () => {
     },
   });
 
-  const handleSubmit = async (values: z.infer<typeof formSchema>) => {
-    const success = await login(values.username, values.password);
-
-    if (success) {
-      actions.setCurrentPage(AppPage.Home);
-    }
-  };
+  const handleSubmit = async (values: z.infer<typeof formSchema>) =>
+    await login(values.username, values.password);
 
   return (
     <section className="flex h-screen w-screen items-center justify-center">

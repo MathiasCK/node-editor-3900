@@ -3,8 +3,6 @@ import { AppPage } from '@/lib/types';
 import { Login, Home, Register } from '@/pages';
 import { useEffect } from 'react';
 import { useTheme, useSession } from '@/hooks';
-import { useSnapshot } from 'valtio';
-import { actions, state } from './pages/state';
 import { Toaster } from 'react-hot-toast';
 import { Navbar, Loader } from './components/ui';
 
@@ -15,21 +13,22 @@ const routeConfig = {
 };
 
 const App: React.FC = () => {
-  const snap = useSnapshot(state);
   const { theme } = useTheme();
-  const { token } = useSession();
+  const { token, register, currentPage, setCurrentPage } = useSession();
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', theme === 'dark');
   }, [theme]);
 
-  if (token && snap.currentPage === AppPage.Register) {
-    actions.setCurrentPage(AppPage.Register);
-  } else if (token) {
-    actions.setCurrentPage(AppPage.Home);
-  } else {
-    actions.setCurrentPage(AppPage.Login);
-  }
+  useEffect(() => {
+    if (!token) {
+      return setCurrentPage(AppPage.Login);
+    }
+    if (register) {
+      return setCurrentPage(AppPage.Register);
+    }
+    setCurrentPage(AppPage.Home);
+  }, [register, setCurrentPage, token]);
 
   return (
     <>
@@ -38,7 +37,7 @@ const App: React.FC = () => {
       {Object.entries(routeConfig).map(([page, Component]) => (
         <CSSTransition
           key={page}
-          in={page === snap.currentPage}
+          in={page === currentPage}
           timeout={300}
           classNames="page"
           unmountOnExit

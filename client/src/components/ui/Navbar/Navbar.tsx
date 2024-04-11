@@ -14,9 +14,12 @@ import {
 import { storeSelector, useSession, useStore, useTheme } from '@/hooks';
 import { AppPage, AspectType, NavItem, NodeType } from '@/lib/types';
 import { shallow } from 'zustand/shallow';
-import { ThemeToggle, DownloadNodes, Logout, Register } from './_components';
-import { actions, state } from '@/pages/state';
-import { useSnapshot } from 'valtio';
+import {
+  ThemeToggle,
+  DownloadNodes,
+  Logout,
+  RegisterUser,
+} from './_components';
 
 const navItems: NavItem[] = [
   {
@@ -115,23 +118,19 @@ const navItems: NavItem[] = [
 ];
 
 const Navbar = () => {
-  const snap = useSnapshot(state);
   const { nodes, setNodes } = useStore(storeSelector, shallow);
-
   const { user } = useSession();
   const { theme } = useTheme();
+  const { currentPage, setRegister } = useSession();
 
   return (
     <NavigationMenu className="fixed h-12 border-b bg-white dark:bg-navbar-dark">
       <div className="flex w-full items-center justify-between ">
         <div className="flex items-center ">
-          <span
-            className="cursor-pointer"
-            onClick={() => actions.setCurrentPage(AppPage.Home)}
-          >
+          <span className="cursor-pointer" onClick={() => setRegister(false)}>
             <img src={`/logo-${theme}.png`} alt="Logo" className="h-14 p-4" />
           </span>
-          {snap.currentPage === AppPage.Home && (
+          {currentPage === AppPage.Home && (
             <NavigationMenuList>
               {navItems.map(node => (
                 <NavigationMenuItem key={node.title}>
@@ -165,12 +164,12 @@ const Navbar = () => {
           )}
         </div>
         <div className="flex items-center justify-center">
-          {snap.currentPage !== AppPage.Login && user?.username === 'admin' && (
-            <Register />
+          {currentPage !== AppPage.Login && user?.username === 'admin' && (
+            <RegisterUser />
           )}
-          {snap.currentPage !== AppPage.Login && <DownloadNodes />}
+          {currentPage !== AppPage.Login && <DownloadNodes />}
           <ThemeToggle />
-          {snap.currentPage !== AppPage.Login && <Logout />}
+          {currentPage !== AppPage.Login && <Logout />}
         </div>
       </div>
     </NavigationMenu>

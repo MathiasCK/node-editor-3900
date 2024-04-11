@@ -20,8 +20,7 @@ import {
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import toast from 'react-hot-toast';
-import { AppPage } from '@/lib/types';
-import { actions } from './state';
+import { useSession } from '@/hooks';
 
 const formSchema = z
   .object({
@@ -49,6 +48,8 @@ const formSchema = z
   });
 
 const Register = () => {
+  const { setRegister } = useSession();
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -133,7 +134,9 @@ const Register = () => {
           <Button
             className="text-muted-foreground"
             variant="link"
-            onClick={() => actions.setCurrentPage(AppPage.Home)}
+            onClick={() => {
+              setRegister(false);
+            }}
           >
             Back home?
           </Button>

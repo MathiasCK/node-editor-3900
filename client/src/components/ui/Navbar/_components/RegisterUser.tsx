@@ -7,10 +7,11 @@ import {
   TooltipTrigger,
 } from '../../tooltip';
 
-import { AppPage } from '@/lib/types';
-import { actions } from '@/pages/state';
+import { useSession } from '@/hooks';
 
-const Register = () => {
+const RegisterUser = () => {
+  const { setRegister } = useSession();
+
   return (
     <TooltipProvider>
       <Tooltip>
@@ -21,7 +22,9 @@ const Register = () => {
             size="icon"
           >
             <UserPlus
-              onClick={() => actions.setCurrentPage(AppPage.Register)}
+              onClick={() => {
+                setRegister(true);
+              }}
               className="size-5 hover:cursor-pointer"
             />
             <span className="sr-only">Register</span>
@@ -37,4 +40,4 @@ const Register = () => {
   );
 };
 
-export default Register;
+export default RegisterUser;
