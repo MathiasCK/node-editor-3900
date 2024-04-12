@@ -42,7 +42,7 @@ export const onConnect = async (params: Edge | Connection) => {
     if (terminal?.data?.terminalOf) {
       const block = nodes.find(b => b.id === terminal?.data?.terminalOf);
       toast.error(
-        `Terminal ${terminal?.data?.customName ?? params.target} is already a terminal of ${block?.data?.customName ?? terminal?.data?.terminalOf}`
+        `Terminal ${terminal?.data?.customName === '' ? params.target : terminal?.data?.customName} is already a terminal of ${block?.data?.customName === '' ? terminal?.data?.terminalOf : block?.data?.customName}`
       );
       return;
     }
@@ -76,7 +76,7 @@ export const onConnect = async (params: Edge | Connection) => {
     if (terminal?.data?.terminalOf) {
       const block = nodes.find(b => b.id === terminal?.data?.terminalOf);
       toast.error(
-        `Terminal ${terminal?.data?.customName ?? params.source} is already a terminal of ${block?.data?.customName ?? terminal?.data?.terminalOf}`
+        `Terminal ${terminal?.data?.customName === '' ? params.source : terminal?.data?.customName} is already a terminal of ${block?.data?.customName === '' ? terminal?.data?.terminalOf : block?.data?.customName}`
       );
       return;
     }
@@ -137,14 +137,14 @@ export const onConnect = async (params: Edge | Connection) => {
 
     if (targetTerminal?.data.transferedBy) {
       toast.error(
-        `Terminal ${targetTerminal?.data.customName ?? targetTerminal.id} is already being transferred by another terminal`
+        `Terminal ${targetTerminal?.data.customName === '' ? targetTerminal.id : targetTerminal?.data.customName} is already being transferred by another terminal`
       );
       return;
     }
 
     if (sourceTerminal?.data.transfersTo) {
       toast.error(
-        `Terminal ${sourceTerminal?.data.customName ?? sourceTerminal.id} is already transferring to another terminal`
+        `Terminal ${sourceTerminal?.data.customName === '' ? sourceTerminal.id : sourceTerminal?.data.customName} is already transferring to another terminal`
       );
       return;
     }
