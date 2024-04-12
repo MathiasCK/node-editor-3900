@@ -28,8 +28,9 @@ const SelectConnection = () => {
         );
 
         toast.error(
-          `${sourceNode.data.customName ?? sourceNode.id} is already part of ${partOfNode?.data?.customName ?? sourceNode?.data?.directPartOf}`
+          `${sourceNode.data.customName === '' ? sourceNode.id : sourceNode.data.customName} is already part of ${partOfNode?.data?.customName === '' ? sourceNode?.data?.directPartOf : partOfNode?.data?.customName}`
         );
+        return;
       }
 
       newNodeRelations.push({
@@ -53,7 +54,6 @@ const SelectConnection = () => {
       });
     }
 
-    // Only possible for block to block connections
     if (edgeType === EdgeType.Fulfilled) {
       newNodeRelations.push({
         nodeId: params!.source as string,
