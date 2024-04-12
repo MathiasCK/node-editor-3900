@@ -4,12 +4,11 @@ import type { CustomEdgeProps } from '@/lib/types';
 const Part = (props: CustomEdgeProps) => {
   const { openSidebar } = useSidebar();
 
-  const midX1 = (props.sourceX + props.targetX) / 2;
-  const midY1 = props.sourceY;
-  const midX2 = midX1;
-  const midY2 = props.targetY;
+  const firstVerticalEndY =
+    props.sourceY + (props.targetY - props.sourceY) * 0.33;
+  const secondVerticalStartY = props.targetY;
 
-  const pathData = `M${props.sourceX},${props.sourceY} L${midX1},${midY1} L${midX2},${midY2} L${props.targetX},${props.targetY}`;
+  const pathData = `M${props.sourceX},${props.sourceY} L${props.sourceX},${firstVerticalEndY} L${props.targetX},${firstVerticalEndY} L${props.targetX},${secondVerticalStartY}`;
 
   return (
     <g onClick={() => openSidebar({ ...props, type: 'part' })}>
