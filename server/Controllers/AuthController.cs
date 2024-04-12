@@ -78,12 +78,7 @@ public class AuthController(DB db, ILogger<AuthController> logger, IConfiguratio
       await _db.Users.AddAsync(user);
       await _db.SaveChangesAsync();
 
-      var token = JWT.GenerateJwtToken(user, _configuration);
-
-      return Ok(new
-      {
-        Token = token,
-      });
+      return Ok("User registered successfully");
     }
     catch (DbUpdateException dbEx)
     {
