@@ -4,6 +4,7 @@ import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import {
   AspectType,
+  CustomAttribute,
   CustomNodeProps,
   EdgeType,
   NodeRelation,
@@ -715,6 +716,7 @@ export const mapNodeRelationsToString = (nodes: Node[]): string => {
   ];
 
   const relations = new Map<string, string[]>();
+  const customAttributes = new Map<string, CustomAttribute[]>();
 
   for (const node of nodes) {
     const nodeLabel = getNodeRelationLabel(node);
@@ -725,27 +727,34 @@ export const mapNodeRelationsToString = (nodes: Node[]): string => {
       if (!node.data || !node.data[key] || node.data[key].length === 0)
         continue;
 
-      if (
-        typeof node.data[key] === 'string' ||
-        typeof node.data[key] === 'number'
-      ) {
-        const node = nodes.find(node => node.id === node.data[key]);
-        if (node) {
+      if (typeof node.data[key] === 'string') {
+        const id = node.data[key];
+        const currentNode = nodes.find(node => node.id === id);
+
+        if (currentNode) {
           relations
             .get(nodeLabel)
-            ?.push(`${getReadableKey(key)} ${getNodeRelationLabel(node)}`);
+            ?.push(
+              `${getReadableKey(key)} ${getNodeRelationLabel(currentNode)}`
+            );
         }
         continue;
       }
 
       for (const item of node.data[key]) {
-        const node = nodes.find(node => node.id === item.id);
-        if (node) {
+        const currentNode = nodes.find(node => node.id === item.id);
+        if (currentNode) {
           relations
             .get(nodeLabel)
-            ?.push(`${getReadableKey(key)} ${getNodeRelationLabel(node)}`);
+            ?.push(
+              `${getReadableKey(key)} ${getNodeRelationLabel(currentNode)}`
+            );
         }
       }
+    }
+
+    if (node.data.customAttributes.length > 0) {
+      customAttributes.set(nodeLabel, node.data.customAttributes);
     }
   }
 
@@ -759,6 +768,16 @@ export const mapNodeRelationsToString = (nodes: Node[]): string => {
     value.forEach(relation => {
       str += `  ${relation}\n`;
     });
+
+    const attributes = customAttributes.get(key);
+    if (attributes && attributes.length > 0) {
+      str += '\n';
+      str += `  Custom Attributes for ${key}:\n`;
+      customAttributes.get(key)?.forEach(attribute => {
+        str += `    ${attribute.name} : ${attribute.value}\n`;
+      });
+    }
+
     str += '\n';
   });
 
