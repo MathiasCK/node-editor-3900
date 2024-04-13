@@ -36,7 +36,9 @@ public class Relation
 public class NodeData
 {
     public string CustomName { get; set; } = string.Empty;
-    public AspectType Aspect { get; set; } = AspectType.Empty;
+    public List<CustomAttribute> CustomAttributes { get; set; } = [];
+    public AspectType Aspect
+    { get; set; } = AspectType.Empty;
     public string Label { get; set; } = string.Empty;
     public long CreatedAt { get; set; } = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
     public long UpdatedAt { get; set; } = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
@@ -59,4 +61,10 @@ public enum NodeType
     Block,
     Terminal,
     Connector,
+}
+
+public class CustomAttribute
+{
+    public required string Name { get; set; }
+    public required string Value { get; set; }
 }

@@ -37,6 +37,12 @@ public class DB : DbContext
                     v => JsonSerializer.Serialize(v, new JsonSerializerOptions()),
                     v => JsonSerializer.Deserialize<List<Relation>>(v, new JsonSerializerOptions()) ?? new List<Relation>())
                 .HasColumnType("json");
+
+            data.Property(nd => nd.CustomAttributes)
+                .HasConversion(
+                    v => JsonSerializer.Serialize(v, new JsonSerializerOptions()),
+                    v => JsonSerializer.Deserialize<List<CustomAttribute>>(v, new JsonSerializerOptions()) ?? new List<CustomAttribute>())
+                .HasColumnType("json");
         });
         modelBuilder.Entity<Connector>().OwnsOne(c => c.Data, data =>
         {
@@ -50,6 +56,12 @@ public class DB : DbContext
                 .HasConversion(
                     v => JsonSerializer.Serialize(v, new JsonSerializerOptions()),
                     v => JsonSerializer.Deserialize<List<Relation>>(v, new JsonSerializerOptions()) ?? new List<Relation>())
+                .HasColumnType("json");
+
+            data.Property(nd => nd.CustomAttributes)
+                .HasConversion(
+                    v => JsonSerializer.Serialize(v, new JsonSerializerOptions()),
+                    v => JsonSerializer.Deserialize<List<CustomAttribute>>(v, new JsonSerializerOptions()) ?? new List<CustomAttribute>())
                 .HasColumnType("json");
         });
         modelBuilder.Entity<Block>()
@@ -91,6 +103,12 @@ public class DB : DbContext
                             .HasConversion(
                                 v => JsonSerializer.Serialize(v, new JsonSerializerOptions()),
                                 v => JsonSerializer.Deserialize<List<Relation>>(v, new JsonSerializerOptions()) ?? new List<Relation>())
+                            .HasColumnType("json");
+
+                        data.Property(nd => nd.CustomAttributes)
+                            .HasConversion(
+                                v => JsonSerializer.Serialize(v, new JsonSerializerOptions()),
+                                v => JsonSerializer.Deserialize<List<CustomAttribute>>(v, new JsonSerializerOptions()) ?? new List<CustomAttribute>())
                             .HasColumnType("json");
                     });
 

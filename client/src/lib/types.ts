@@ -39,10 +39,19 @@ export enum RelationType {
   Fulfills = 'fulfills',
 }
 
-export type UpdateNode = { customName?: string; aspect?: AspectType };
+export type UpdateNode = {
+  customName?: string;
+  aspect?: AspectType;
+  customAttributes?: CustomAttribute[];
+};
 
 export type Relation = {
   id: string;
+};
+
+export type CustomAttribute = {
+  name: string;
+  value: string;
 };
 
 export type NodeData = {
@@ -56,6 +65,7 @@ export type NodeData = {
   connectedTo?: Relation[];
   connectedBy?: Relation[];
   directParts?: Relation[];
+  customAttributes: CustomAttribute[];
   directPartOf?: string;
   fulfills?: Relation[];
   fulfilledBy?: Relation[];
