@@ -194,6 +194,31 @@ export const onConnect = async (params: Edge | Connection) => {
     return addEdge(EdgeType.Connected, newNodeRelations);
   }
 
+  if (
+    isConnector(params.sourceHandle as string) &&
+    isConnector(params.targetHandle as string)
+  ) {
+    newNodeRelations.push({
+      nodeId: params.source as string,
+      relations: {
+        connectedTo: {
+          id: params.target as string,
+        },
+      },
+    });
+
+    newNodeRelations.push({
+      nodeId: params.target as string,
+      relations: {
+        connectedBy: {
+          id: params.source as string,
+        },
+      },
+    });
+
+    return addEdge(EdgeType.Connected, newNodeRelations);
+  }
+
   return openDialog();
 };
 
