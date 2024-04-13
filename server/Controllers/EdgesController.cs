@@ -115,6 +115,36 @@ public class EdgesController(DB db, ILogger<EdgesController> logger) : Controlle
             return StatusCode(500, "An unexpected error occurred.");
         }
     }
+    [HttpDelete("{id}/all")]
+    public async Task<IActionResult> DeleteEdges(string id)
+    {
+        if (id == null) return BadRequest("Edge id is missing.");
+
+        try
+        {
+            var edges = await _db.Edges.Where(b => b.Data.CreatedBy == id).ToListAsync();
+
+            if (edges == null)
+            {
+                throw new Exception("Edges with id " + id + " do not exist");
+            }
+
+            _db.Edges.RemoveRange(edges);
+            await _db.SaveChangesAsync();
+
+            return Ok("Edges with id " + id + " have been deleted.");
+        }
+        catch (DbUpdateException dbEx)
+        {
+            _logger.LogError("[EdgesController]: Database deletion failed: {Error}", dbEx.Message);
+            return StatusCode(500, "Failed to delete edges due to database error.");
+        }
+        catch (Exception e)
+        {
+            _logger.LogError("[EdgesController]: Failed to delete edges with id {id}: {e}", id, e.Message);
+            return StatusCode(500, "An unexpected error occurred.");
+        }
+    }
 
     [HttpPut]
     public async Task<IActionResult> UpdateEdge(Edge edge)

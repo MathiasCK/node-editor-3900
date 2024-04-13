@@ -19,6 +19,7 @@ import {
   DownloadNodes,
   Logout,
   RegisterUser,
+  Reset,
 } from './_components';
 
 const navItems: NavItem[] = [
@@ -164,6 +165,7 @@ const Navbar = () => {
           )}
         </div>
         <div className="flex items-center justify-center">
+          {nodes.length > 0 && <Reset />}
           {currentPage !== AppPage.Login && user?.username === 'admin' && (
             <RegisterUser />
           )}

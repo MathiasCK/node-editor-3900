@@ -187,6 +187,55 @@ public class NodesController(DB db, ILogger<NodesController> logger) : Controlle
         }
     }
 
+    [HttpDelete("{id}/all")]
+    public async Task<ActionResult<IEnumerable<object>>> DeleteNodes(string id)
+    {
+        if (id == null) return BadRequest("Node id is missing.");
+
+        try
+        {
+            var blocks = await _db.Nodes
+                .OfType<Block>()
+                .Where(b => b.Data.CreatedBy == id)
+                .ToListAsync();
+
+            var terminals = await _db.Nodes
+                .OfType<Terminal>()
+                .Where(b => b.Data.CreatedBy == id)
+                .ToListAsync();
+
+            var connectors = await _db.Nodes
+                .OfType<Connector>()
+                .Where(b => b.Data.CreatedBy == id)
+                .ToListAsync();
+
+            var nodes = new List<Node>();
+            nodes.AddRange(blocks);
+            nodes.AddRange(terminals);
+            nodes.AddRange(connectors);
+
+            if (nodes == null)
+            {
+                throw new Exception("Nodes with id " + id + " do not exist");
+            }
+
+            _db.Nodes.RemoveRange(nodes);
+            await _db.SaveChangesAsync();
+
+            return Ok("Nodes with id " + id + " have been deleted.");
+        }
+        catch (DbUpdateException dbEx)
+        {
+            _logger.LogError("[NodesController]: Database deletion failed: {Error}", dbEx.Message);
+            return StatusCode(500, "Failed to delete nodes due to database error.");
+        }
+        catch (Exception e)
+        {
+            _logger.LogError("[NodesController]: Failed to delete nodes with id {id}: {e}", id, e.Message);
+            return StatusCode(500, "An unexpected error occurred.");
+        }
+    }
+
     [HttpPut]
     public async Task<IActionResult> UpdateNode([FromBody] JsonElement data)
     {

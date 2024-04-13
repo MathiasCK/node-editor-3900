@@ -2,7 +2,7 @@ import toast from 'react-hot-toast';
 import { getConnectedEdges, type Node, type Edge } from 'reactflow';
 import { NodeWithNodeId, type UpdateNode } from '@/lib/types';
 import { deleteEdge } from './edges';
-import { useLoading, useSession } from '@/hooks';
+import { useLoading, useSession, useStore } from '@/hooks';
 
 export const fetchNodes = async (): Promise<Node[] | null> => {
   const { logout, user, token } = useSession.getState();
@@ -221,5 +221,44 @@ export const deleteNode = async (
     if (nodes) {
       setNodes(nodes);
     }
+  }
+};
+
+export const deleteNodes = async (): Promise<boolean> => {
+  const { setNodes } = useStore.getState();
+  const { token, user, logout } = useSession.getState();
+  const { startLoading, stopLoading } = useLoading.getState();
+  startLoading();
+
+  try {
+    const response = await fetch(
+      `${import.meta.env.VITE_API_URL}/api/nodes/${user?.id}/all`,
+      {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (response.status === 401) {
+      logout();
+      toast.error('Unauthorized');
+      return false;
+    }
+
+    if (!response.ok) {
+      const status = response.status;
+      toast.success(`Error deleting nodes - Status: ${status}`);
+      return false;
+    }
+
+    setNodes([]);
+    return true;
+  } catch (error) {
+    toast.error(`Error deleting nodes: ${(error as Error).message}`);
+    throw error;
+  } finally {
+    stopLoading();
   }
 };
