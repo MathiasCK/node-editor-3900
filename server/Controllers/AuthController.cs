@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using server.DAL;
@@ -55,6 +56,7 @@ public class AuthController(DB db, ILogger<AuthController> logger, IConfiguratio
   }
 
   [Route("register")]
+  [Authorize]
   [HttpPost]
   public async Task<IActionResult> Register(User user)
   {

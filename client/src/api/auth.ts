@@ -49,6 +49,7 @@ export const register = async (
   username: string,
   password: string
 ): Promise<boolean> => {
+  const { token } = useSession.getState();
   const { startLoading, stopLoading } = useLoading.getState();
   startLoading();
   try {
@@ -56,7 +57,10 @@ export const register = async (
       `${import.meta.env.VITE_API_URL}/api/auth/register`,
       {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({
           username,
           password,

@@ -69,7 +69,6 @@ if (!app.Environment.IsDevelopment())
 }
 DbInit.Seed(app);
 
-
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
