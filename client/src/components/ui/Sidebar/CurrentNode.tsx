@@ -11,7 +11,7 @@ import {
   displayNewNode,
   cn,
 } from '@/lib/utils';
-import { FC } from 'react';
+import { FC, useState } from 'react';
 import {
   SheetContent,
   SheetDescription,
@@ -161,12 +161,18 @@ const CurrentNode: FC<Props> = ({ currentNode }) => {
     }
   }, 1500);
 
+  const [disabled, setDisabled] = useState<boolean>(true);
+  setTimeout(() => {
+    setDisabled(false);
+  }, 1);
+
   return (
     <SheetContent className="bg:background z-40 flex flex-col justify-between">
       <SheetHeader>
         <SheetTitle className="flex items-center uppercase dark:text-white">
           <Input
             {...register('nodeName')}
+            disabled={disabled}
             value={nodeName}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
               setValue('nodeName', e.target.value);
