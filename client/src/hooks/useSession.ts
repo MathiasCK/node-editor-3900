@@ -29,6 +29,7 @@ const useSession = create<SessionState>()(
       setUser: user => set({ user }),
       logout: () =>
         set({
+          register: undefined,
           user: undefined,
           token: undefined,
         }),
