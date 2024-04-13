@@ -1,6 +1,6 @@
 import { EdgeType, type CustomEdgeProps } from '@/lib/types';
 import { displayNewNode, updateNodeConnectionData } from '@/lib/utils';
-import { FC, useState } from 'react';
+import { FC } from 'react';
 import {
   SheetContent,
   SheetDescription,
@@ -30,20 +30,15 @@ const CurrentEdge: FC<Props> = ({ currentEdge }) => {
   const { openSidebar, closeSidebar } = useSidebar();
   const { edges, setEdges, nodes, setNodes } = useStore();
 
-  const [connectionType, setConnectionType] = useState<string>(
-    currentEdge.type
-  );
-
   const displayName = `Edge ${currentEdge.source} -> ${currentEdge.target}`;
 
-  const handleConnectionTypeChange = async () => {
+  const handleConnectionTypeChange = async (newEdgeType: EdgeType) => {
     const edge = await updateEdge(
       currentEdge.id as string,
       edges,
       setEdges,
-      connectionType as EdgeType
+      newEdgeType
     );
-
     if (edge) {
       await updateNodeConnectionData(
         currentEdge.source,
@@ -53,7 +48,11 @@ const CurrentEdge: FC<Props> = ({ currentEdge }) => {
         currentEdge.type as EdgeType
       );
 
+      currentEdge.type = newEdgeType;
       closeSidebar();
+      setTimeout(() => {
+        openSidebar(currentEdge);
+      }, 300);
     }
   };
 
@@ -115,11 +114,11 @@ const CurrentEdge: FC<Props> = ({ currentEdge }) => {
         <p className="mb-2 text-sm text-muted-foreground">Connection type</p>
         <Select
           disabled={currentEdge.data.lockConnection}
-          value={connectionType}
-          onValueChange={e => setConnectionType(e)}
+          value={currentEdge.type}
+          onValueChange={e => handleConnectionTypeChange(e as EdgeType)}
         >
           <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder={connectionType} />
+            <SelectValue placeholder={currentEdge.type} />
           </SelectTrigger>
           <SelectContent>
             <SelectGroup>
@@ -147,15 +146,6 @@ const CurrentEdge: FC<Props> = ({ currentEdge }) => {
         </Button>
       </div>
       <SheetFooter>
-        {connectionType !== currentEdge.type && (
-          <Button
-            className={buttonVariants.verbose}
-            variant="outline"
-            onClick={handleConnectionTypeChange}
-          >
-            Update
-          </Button>
-        )}
         <Button
           className={buttonVariants.danger}
           variant="outline"
