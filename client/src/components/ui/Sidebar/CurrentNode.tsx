@@ -258,10 +258,8 @@ const CurrentNode: FC<Props> = ({ currentNode }) => {
             className="my-4"
             onSubmit={form.handleSubmit(addCustomAttribute)}
           >
-            <p className="mb-2 text-sm text-muted-foreground">
-              Custom attributes
-            </p>
-            <div className="flex h-[100px] items-center justify-center">
+            <p className="text-sm text-muted-foreground">Custom attributes</p>
+            <div className="flex items-start justify-center">
               <FormField
                 control={form.control}
                 name="name"
@@ -277,7 +275,7 @@ const CurrentNode: FC<Props> = ({ currentNode }) => {
                           })}
                         />
                       </FormControl>
-                      <FormMessage className="mt-2 text-xs text-red-600" />
+                      <FormMessage className="text-xs text-red-600" />
                     </FormItem>
                   </FormControl>
                 )}
@@ -299,17 +297,17 @@ const CurrentNode: FC<Props> = ({ currentNode }) => {
                           })}
                         />
                       </FormControl>
-                      <FormMessage className="mt-2 text-xs text-red-600" />
+                      <FormMessage className="text-xs text-red-600" />
                     </FormItem>
                   </FormControl>
                 )}
               />
-              <Button type="submit" className="w-25" size="sm">
+              <Button type="submit" className="w-25 my-2" size="sm">
                 Add
               </Button>
             </div>
             {currentNode.data.customAttributes.length > 0 && (
-              <div className="my-4">
+              <>
                 {currentNode.data.customAttributes.map((attr, i) => (
                   <div
                     key={i}
@@ -325,7 +323,7 @@ const CurrentNode: FC<Props> = ({ currentNode }) => {
                     </p>
                   </div>
                 ))}
-              </div>
+              </>
             )}
           </form>
         </Form>
