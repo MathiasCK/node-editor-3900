@@ -19,7 +19,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from '../sheet';
-import { Pencil, Trash } from 'lucide-react';
+import { Trash } from 'lucide-react';
 import { useDebounce, useSidebar, useStore } from '@/hooks';
 import { Input } from '../input';
 import { Button } from '../button';
@@ -55,7 +55,7 @@ const CurrentNode: FC<Props> = ({ currentNode }) => {
       : `${currentNode.type} ${currentNode.id}`
   );
 
-  const { sidebar, handleEdit, closeSidebar, openSidebar } = useSidebar();
+  const { closeSidebar, openSidebar } = useSidebar();
   const { edges, setEdges, nodes, setNodes } = useStore();
 
   const nodeRelations = getNodeRelations(currentNode);
@@ -128,10 +128,7 @@ const CurrentNode: FC<Props> = ({ currentNode }) => {
 
     if (deleted) {
       closeSidebar();
-      handleEdit(false);
     }
-    closeSidebar();
-    handleEdit(false);
   };
 
   const form = useForm<z.infer<typeof customAttributeSchema>>({
@@ -156,35 +153,26 @@ const CurrentNode: FC<Props> = ({ currentNode }) => {
       customName: value,
     });
     if (updated) {
-      handleEdit(false);
       currentNode.data.customName = value;
       closeSidebar();
       setTimeout(() => {
         openSidebar(currentNode);
       }, 300);
     }
-  }, 2000);
+  }, 1500);
 
   return (
     <SheetContent className="bg:background z-40 flex flex-col justify-between">
       <SheetHeader>
         <SheetTitle className="flex items-center uppercase dark:text-white">
-          {!sidebar.edit ? (
-            <Pencil
-              onClick={() => handleEdit(true)}
-              size={15}
-              className="text-md font-semibold text-foreground hover:cursor-pointer"
-            />
-          ) : null}
           <Input
-            disabled={!sidebar.edit}
             {...register('nodeName')}
             value={nodeName}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
               setValue('nodeName', e.target.value);
               debouncedHandleChange(e.target.value);
             }}
-            className="border-none text-lg font-semibold text-foreground"
+            className="mr-4 text-lg font-semibold text-foreground"
           />
         </SheetTitle>
         <SheetDescription>

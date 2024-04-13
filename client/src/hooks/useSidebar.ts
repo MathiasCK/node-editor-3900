@@ -4,7 +4,6 @@ import { createJSONStorage, persist } from 'zustand/middleware';
 
 export type Sidebar = {
   open: boolean;
-  edit: boolean;
   currentNode?: CustomNodeProps;
   currentEdge?: CustomEdgeProps;
 };
@@ -13,7 +12,6 @@ type SidebarState = {
   sidebar: Sidebar;
   openSidebar: (data: CustomNodeProps | CustomEdgeProps) => void;
   closeSidebar: () => void;
-  handleEdit: (edit: boolean) => void;
 };
 
 const isEdgeProps = (
@@ -26,13 +24,11 @@ const useSidebar = create<SidebarState>()(
     set => ({
       sidebar: {
         open: false,
-        edit: false,
       },
       openSidebar: data => {
         if (isEdgeProps(data)) {
           set({
             sidebar: {
-              edit: false,
               open: true,
               currentEdge: data,
             },
@@ -40,26 +36,16 @@ const useSidebar = create<SidebarState>()(
         } else {
           set({
             sidebar: {
-              edit: false,
               open: true,
               currentNode: data,
             },
           });
         }
       },
-      handleEdit: (edit: boolean) => {
-        set(state => ({
-          sidebar: {
-            ...state.sidebar,
-            edit: edit,
-          },
-        }));
-      },
       closeSidebar: () =>
         set({
           sidebar: {
             open: false,
-            edit: false,
           },
         }),
     }),
