@@ -105,6 +105,8 @@ export const updateNode = async (
     });
   }
 
+  nodeToUpdate.data.updatedAt = Date.now();
+
   try {
     const response = await fetch(`${import.meta.env.VITE_API_URL}/api/nodes`, {
       method: 'PUT',

@@ -157,13 +157,13 @@ export const updateEdge = async (
     return null;
   }
 
+  const { token, logout } = useSession.getState();
   const { startLoading, stopLoading } = useLoading.getState();
 
   startLoading();
 
   edgeToUpdate.type = newConnection;
-
-  const { token, logout } = useSession.getState();
+  edgeToUpdate.data.updatedAt = Date.now();
 
   try {
     const response = await fetch(`${import.meta.env.VITE_API_URL}/api/edges`, {
