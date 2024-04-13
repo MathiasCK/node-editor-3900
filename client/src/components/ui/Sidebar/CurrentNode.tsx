@@ -1,16 +1,17 @@
 import {
   AspectType,
   type CustomNodeProps,
-  UpdateNode,
   RelationType,
+  CustomAttribute,
 } from '@/lib/types';
 import {
   capitalizeFirstLetter,
   getReadableRelation,
   getNodeRelations,
   displayNewNode,
+  cn,
 } from '@/lib/utils';
-import { FC, useState } from 'react';
+import { FC } from 'react';
 import {
   SheetContent,
   SheetDescription,
@@ -18,8 +19,8 @@ import {
   SheetHeader,
   SheetTitle,
 } from '../sheet';
-import { Pencil } from 'lucide-react';
-import { useSidebar, useStore } from '@/hooks';
+import { Pencil, Trash } from 'lucide-react';
+import { useDebounce, useSidebar, useStore } from '@/hooks';
 import { Input } from '../input';
 import { Button } from '../button';
 import { buttonVariants } from '@/lib/config';
@@ -32,40 +33,88 @@ import {
   SelectItem,
 } from '../select';
 import { updateNode, deleteNode } from '@/api/nodes';
+import { ScrollArea } from '../scroll-area';
+import { z } from 'zod';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Form, FormControl, FormField, FormItem, FormMessage } from '../form';
 
 interface Props {
   currentNode: CustomNodeProps;
 }
 
-const CurrentNode: FC<Props> = ({ currentNode }) => {
-  const { sidebar, handleEdit, closeSidebar, openSidebar } = useSidebar();
-  const { edges, setEdges, nodes, setNodes } = useStore();
+const customAttributeSchema = z.object({
+  name: z.string().min(1, 'Name must contain at least 1 character(s)'),
+  value: z.string().min(1, 'Value must contain at least 1 character(s)'),
+});
 
+const CurrentNode: FC<Props> = ({ currentNode }) => {
   const displayName = capitalizeFirstLetter(
     currentNode?.data?.customName
       ? currentNode?.data?.customName
       : `${currentNode.type} ${currentNode.id}`
   );
 
-  const [nodeName, setNodeName] = useState<string>(displayName);
-  const [aspectType, setAspectType] = useState<string>(currentNode.data.aspect);
+  const { sidebar, handleEdit, closeSidebar, openSidebar } = useSidebar();
+  const { edges, setEdges, nodes, setNodes } = useStore();
 
   const nodeRelations = getNodeRelations(currentNode);
+  const hasNodeRelations = nodeRelations.some(
+    nodeRelation => nodeRelation.children.length > 0
+  );
 
-  const updateNodeData = () => {
-    const newNodeData: UpdateNode = {};
+  const addCustomAttribute = async (
+    values: z.infer<typeof customAttributeSchema>
+  ) => {
+    const newAttributes = [
+      ...currentNode.data.customAttributes,
+      {
+        name: values.name,
+        value: values.value,
+      },
+    ];
+    const updated = await updateNode(currentNode.id, nodes, setNodes, {
+      customAttributes: newAttributes,
+    });
 
-    if (nodeName !== displayName) {
-      newNodeData['customName'] = nodeName;
+    if (updated) {
+      currentNode.data.customAttributes = newAttributes;
+      closeSidebar();
+      setTimeout(() => {
+        openSidebar(currentNode);
+      }, 300);
+      form.reset();
     }
+  };
 
-    if (aspectType !== currentNode?.data?.aspect) {
-      newNodeData['aspect'] = aspectType as AspectType;
+  const handleAspectChange = async (newAspectType: AspectType) => {
+    const updated = await updateNode(currentNode.id, nodes, setNodes, {
+      aspect: newAspectType,
+    });
+    if (updated) {
+      currentNode.data.aspect = newAspectType;
+      closeSidebar();
+      setTimeout(() => {
+        openSidebar(currentNode);
+      }, 300);
     }
+  };
 
-    updateNode(currentNode.id, nodes, setNodes, newNodeData);
-    handleEdit(false);
-    closeSidebar();
+  const deleteCustomAttribute = async ({ name, value }: CustomAttribute) => {
+    const newAttributes = currentNode.data.customAttributes.filter(
+      attr => attr.name !== name && attr.value !== value
+    );
+
+    const updated = await updateNode(currentNode.id, nodes, setNodes, {
+      customAttributes: newAttributes,
+    });
+    if (updated) {
+      currentNode.data.customAttributes = newAttributes;
+      closeSidebar();
+      setTimeout(() => {
+        openSidebar(currentNode);
+      }, 300);
+    }
   };
 
   const handleDelete = async () => {
@@ -84,8 +133,37 @@ const CurrentNode: FC<Props> = ({ currentNode }) => {
     closeSidebar();
     handleEdit(false);
   };
-  const displayEdit =
-    nodeName !== displayName || aspectType !== currentNode?.data?.aspect;
+
+  const form = useForm<z.infer<typeof customAttributeSchema>>({
+    resolver: zodResolver(customAttributeSchema),
+    defaultValues: {
+      name: '',
+      value: '',
+    },
+  });
+
+  const { register, watch, setValue } = useForm<{ nodeName: string }>({
+    defaultValues: {
+      nodeName: displayName,
+    },
+  });
+  const nodeName = watch('nodeName');
+
+  const debouncedHandleChange = useDebounce(async (value: string) => {
+    if (value === '' || nodeName === value) return;
+
+    const updated = await updateNode(currentNode.id, nodes, setNodes, {
+      customName: value,
+    });
+    if (updated) {
+      handleEdit(false);
+      currentNode.data.customName = value;
+      closeSidebar();
+      setTimeout(() => {
+        openSidebar(currentNode);
+      }, 300);
+    }
+  }, 2000);
 
   return (
     <SheetContent className="bg:background z-40 flex flex-col justify-between">
@@ -95,14 +173,17 @@ const CurrentNode: FC<Props> = ({ currentNode }) => {
             <Pencil
               onClick={() => handleEdit(true)}
               size={15}
-              className="text-md font-semibold text-foreground  hover:cursor-pointer"
+              className="text-md font-semibold text-foreground hover:cursor-pointer"
             />
           ) : null}
-
           <Input
             disabled={!sidebar.edit}
+            {...register('nodeName')}
             value={nodeName}
-            onChange={e => setNodeName(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+              setValue('nodeName', e.target.value);
+              debouncedHandleChange(e.target.value);
+            }}
             className="border-none text-lg font-semibold text-foreground"
           />
         </SheetTitle>
@@ -115,66 +196,141 @@ const CurrentNode: FC<Props> = ({ currentNode }) => {
           {new Date(currentNode.data?.updatedAt as number).toLocaleString()}
         </SheetDescription>
       </SheetHeader>
-      <div>
-        <p className="mb-2 text-sm text-muted-foreground">Aspect type</p>
-        <Select value={aspectType} onValueChange={e => setAspectType(e)}>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder={aspectType} />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectGroup>
-              <SelectItem value={AspectType.Function}>Function</SelectItem>
-              <SelectItem value={AspectType.Product}>Product</SelectItem>
-              <SelectItem value={AspectType.Location}>Location</SelectItem>
-              <SelectItem value={AspectType.Empty}>Empty</SelectItem>
-            </SelectGroup>
-          </SelectContent>
-        </Select>
-      </div>
-      {nodeRelations.length > 0 &&
-        nodeRelations.map(nodeRelation => {
-          if (nodeRelation.children?.length === 0) return null;
-
-          return (
-            <div key={nodeRelation.key}>
-              <p className="mb-2 text-sm text-muted-foreground">
-                {getReadableRelation(nodeRelation.key as RelationType)}
-              </p>
-              {nodeRelation.children?.map(c => {
-                const node = nodes.find(node => node.id === c.id);
-
-                return (
-                  <Button
-                    key={`${nodeRelation.key}_${c.id}_link_button`}
-                    variant="ghost"
-                    onClick={() =>
-                      displayNewNode(
-                        c.id as string,
-                        nodes,
-                        openSidebar,
-                        closeSidebar
-                      )
-                    }
-                  >
-                    {node?.data?.customName === ''
-                      ? c.id
-                      : node?.data.customName}
-                  </Button>
-                );
-              })}
-            </div>
-          );
-        })}
-      <SheetFooter>
-        {displayEdit && (
-          <Button
-            className={buttonVariants.verbose}
-            variant="outline"
-            onClick={updateNodeData}
+      <ScrollArea className="h-full">
+        <div className="my-4">
+          <p className="mb-2 text-sm text-muted-foreground">Aspect type</p>
+          <Select
+            value={currentNode.data.aspect}
+            onValueChange={handleAspectChange}
           >
-            Update
-          </Button>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder={currentNode.data.aspect} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectItem value={AspectType.Function}>Function</SelectItem>
+                <SelectItem value={AspectType.Product}>Product</SelectItem>
+                <SelectItem value={AspectType.Location}>Location</SelectItem>
+                <SelectItem value={AspectType.Empty}>Empty</SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        </div>
+        {hasNodeRelations && (
+          <div className="my-8 ">
+            {nodeRelations.map(nodeRelation => {
+              if (nodeRelation.children?.length === 0) return null;
+
+              return (
+                <div key={nodeRelation.key}>
+                  <p className="mb-2 text-sm text-muted-foreground">
+                    {getReadableRelation(nodeRelation.key as RelationType)}
+                  </p>
+                  {nodeRelation.children?.map(c => {
+                    const node = nodes.find(node => node.id === c.id);
+
+                    return (
+                      <Button
+                        key={`${nodeRelation.key}_${c.id}_link_button`}
+                        variant="ghost"
+                        onClick={() =>
+                          displayNewNode(
+                            c.id as string,
+                            nodes,
+                            openSidebar,
+                            closeSidebar
+                          )
+                        }
+                      >
+                        {node?.data?.customName === ''
+                          ? c.id
+                          : node?.data.customName}
+                      </Button>
+                    );
+                  })}
+                </div>
+              );
+            })}
+          </div>
         )}
+        <Form {...form}>
+          <form
+            className="my-4"
+            onSubmit={form.handleSubmit(addCustomAttribute)}
+          >
+            <p className="mb-2 text-sm text-muted-foreground">
+              Custom attributes
+            </p>
+            <div className="flex h-[100px] items-center justify-center">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormControl>
+                    <FormItem>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          placeholder="Name"
+                          className={cn('my-2 mr-2 flex-1', {
+                            'border-red-500': form.formState.errors.value,
+                          })}
+                        />
+                      </FormControl>
+                      <FormMessage className="mt-2 text-xs text-red-600" />
+                    </FormItem>
+                  </FormControl>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="value"
+                render={({ field }) => (
+                  <FormControl>
+                    <FormItem>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          name="value"
+                          placeholder="Value"
+                          className={cn('my-2 mr-2 flex-1', {
+                            'border-red-500': form.formState.errors.value,
+                          })}
+                        />
+                      </FormControl>
+                      <FormMessage className="mt-2 text-xs text-red-600" />
+                    </FormItem>
+                  </FormControl>
+                )}
+              />
+              <Button type="submit" className="w-25" size="sm">
+                Add
+              </Button>
+            </div>
+            {currentNode.data.customAttributes.length > 0 && (
+              <div className="my-4">
+                {currentNode.data.customAttributes.map((attr, i) => (
+                  <div
+                    key={i}
+                    className="my-2 flex items-center text-muted-foreground"
+                  >
+                    <Trash
+                      onClick={() => deleteCustomAttribute(attr)}
+                      size={10}
+                      className="text-md mr-2 font-semibold hover:cursor-pointer hover:text-white"
+                    />
+                    <p className="text-sm ">
+                      {attr.name}: {attr.value}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </form>
+        </Form>
+      </ScrollArea>
+      <SheetFooter>
         <Button
           className={buttonVariants.danger}
           variant="outline"
