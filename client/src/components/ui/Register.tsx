@@ -11,15 +11,9 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-} from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import toast from 'react-hot-toast';
-import { useSession } from '@/hooks';
 import {
   Select,
   SelectContent,
@@ -58,8 +52,6 @@ const formSchema = z
   });
 
 const Register = () => {
-  const { setDashboard } = useSession();
-
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -166,17 +158,6 @@ const Register = () => {
           </form>
         </Form>
       </CardContent>
-      <CardFooter>
-        <Button
-          className="text-muted-foreground"
-          variant="link"
-          onClick={() => {
-            setDashboard(false);
-          }}
-        >
-          Back home?
-        </Button>
-      </CardFooter>
     </Card>
   );
 };
