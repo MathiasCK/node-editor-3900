@@ -5,9 +5,9 @@ import { createJSONStorage, persist } from 'zustand/middleware';
 type SessionState = {
   token?: string;
   user?: User;
-  register: boolean;
+  dashboard: boolean;
   currentPage: AppPage;
-  setRegister: (register: boolean) => void;
+  setDashboard: (manage: boolean) => void;
   setToken: (token: string) => void;
   setUser: (user: User) => void;
   logout: () => void;
@@ -19,9 +19,9 @@ const useSession = create<SessionState>()(
     set => ({
       token: undefined,
       user: undefined,
-      register: false,
+      dashboard: false,
       currentPage: AppPage.Login,
-      setRegister: register => set({ register }),
+      setDashboard: dashboard => set({ dashboard }),
       setToken: token =>
         set({
           token,
@@ -29,7 +29,7 @@ const useSession = create<SessionState>()(
       setUser: user => set({ user }),
       logout: () =>
         set({
-          register: undefined,
+          dashboard: undefined,
           user: undefined,
           token: undefined,
         }),

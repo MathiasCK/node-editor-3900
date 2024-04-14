@@ -1,17 +1,15 @@
+import { Users } from 'lucide-react';
 import { Button } from '../../button';
-import { UserPlus } from 'lucide-react';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from '../../tooltip';
-
 import { useSession } from '@/hooks';
 
-const RegisterUser = () => {
-  const { setRegister } = useSession();
-
+const ManageUsers = () => {
+  const { setDashboard } = useSession();
   return (
     <TooltipProvider>
       <Tooltip>
@@ -21,18 +19,18 @@ const RegisterUser = () => {
             className="border-none bg-transparent"
             size="icon"
           >
-            <UserPlus
+            <Users
               onClick={() => {
-                setRegister(true);
+                setDashboard(true);
               }}
               className="size-5 hover:cursor-pointer"
             />
-            <span className="sr-only">Register</span>
+            <span className="sr-only">Manage users</span>
           </Button>
         </TooltipTrigger>
         <TooltipContent>
           <p className="text-xs text-gray-500 dark:text-gray-400">
-            Register user
+            Manage users
           </p>
         </TooltipContent>
       </Tooltip>
@@ -40,4 +38,4 @@ const RegisterUser = () => {
   );
 };
 
-export default RegisterUser;
+export default ManageUsers;

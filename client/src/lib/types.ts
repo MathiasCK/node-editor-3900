@@ -3,7 +3,7 @@ import type { Edge, EdgeProps, Node, NodeProps } from 'reactflow';
 export enum AppPage {
   Home = 'home',
   Login = 'login',
-  Register = 'register',
+  Dashboard = 'dashboard',
 }
 
 export enum AspectType {
@@ -38,6 +38,8 @@ export enum RelationType {
   TransferedBy = 'transferedBy',
   Fulfills = 'fulfills',
 }
+
+export type Role = 'admin' | 'user';
 
 export type UpdateNode = {
   customName?: string;
@@ -147,7 +149,7 @@ export type EdgeWithEdgeId = Edge & {
 export type User = {
   id: string;
   username: string;
-  role: 'admin' | 'user';
+  role: Role;
 };
 
 export type UserWithToken = {

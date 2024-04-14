@@ -18,8 +18,8 @@ import {
   ThemeToggle,
   DownloadNodes,
   Logout,
-  RegisterUser,
   Reset,
+  ManageUsers,
 } from './_components';
 
 const navItems: NavItem[] = [
@@ -122,13 +122,13 @@ const Navbar = () => {
   const { nodes, setNodes } = useStore(storeSelector, shallow);
   const { user } = useSession();
   const { theme } = useTheme();
-  const { currentPage, setRegister } = useSession();
+  const { currentPage, setDashboard } = useSession();
 
   return (
     <NavigationMenu className="fixed h-12 border-b bg-white dark:bg-navbar-dark">
       <div className="flex w-full items-center justify-between ">
         <div className="flex items-center ">
-          <span className="cursor-pointer" onClick={() => setRegister(false)}>
+          <span className="cursor-pointer" onClick={() => setDashboard(false)}>
             <img src={`/logo-${theme}.png`} alt="Logo" className="h-14 p-4" />
           </span>
           {currentPage === AppPage.Home && (
@@ -166,8 +166,8 @@ const Navbar = () => {
         </div>
         <div className="flex items-center justify-center">
           {nodes.length > 0 && <Reset />}
-          {currentPage !== AppPage.Login && user?.username === 'admin' && (
-            <RegisterUser />
+          {currentPage !== AppPage.Login && user?.role === 'admin' && (
+            <ManageUsers />
           )}
           {currentPage !== AppPage.Login && <DownloadNodes />}
           <ThemeToggle />

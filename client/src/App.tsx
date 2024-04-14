@@ -1,6 +1,6 @@
 import { CSSTransition } from 'react-transition-group';
 import { AppPage } from '@/lib/types';
-import { Login, Home, Register } from '@/pages';
+import { Login, Home, Dashboard } from '@/pages';
 import { useEffect } from 'react';
 import { useTheme, useSession } from '@/hooks';
 import { Toaster } from 'react-hot-toast';
@@ -8,13 +8,13 @@ import { Navbar, Loader } from './components/ui';
 
 const routeConfig = {
   [AppPage.Login]: Login,
-  [AppPage.Register]: Register,
   [AppPage.Home]: Home,
+  [AppPage.Dashboard]: Dashboard,
 };
 
 const App: React.FC = () => {
   const { theme } = useTheme();
-  const { token, register, currentPage, setCurrentPage } = useSession();
+  const { token, dashboard, currentPage, setCurrentPage } = useSession();
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', theme === 'dark');
@@ -24,11 +24,11 @@ const App: React.FC = () => {
     if (!token) {
       return setCurrentPage(AppPage.Login);
     }
-    if (register) {
-      return setCurrentPage(AppPage.Register);
+    if (dashboard) {
+      return setCurrentPage(AppPage.Dashboard);
     }
     setCurrentPage(AppPage.Home);
-  }, [register, setCurrentPage, token]);
+  }, [dashboard, setCurrentPage, token]);
 
   return (
     <>
