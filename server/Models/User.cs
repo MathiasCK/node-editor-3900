@@ -14,7 +14,7 @@ public class UserDto
 
 public class PasswordUpdateModel
 {
-  public string Password { get; set; }
+  public required string Password { get; set; }
 }
 
 public class User

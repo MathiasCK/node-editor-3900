@@ -30,7 +30,7 @@ public class AuthController(DB db, ILogger<AuthController> logger, IConfiguratio
         return BadRequest("Invalid credentials");
       }
 
-      var token = JWT.GenerateJwtToken(user, _configuration);
+      var token = JWT.GenerateJwtToken(usr, _configuration);
 
       return Ok(new
       {
