@@ -94,20 +94,127 @@ public class AuthController(DB db, ILogger<AuthController> logger, IConfiguratio
     }
   }
 
-  [HttpPost("token")]
-  public Task<IActionResult> ValidateToken(TokenData token)
+  [HttpGet("users")]
+  [Authorize]
+  public async Task<IActionResult> GetUsers()
   {
     try
     {
-      JWT.ValidateToken(token.Token, _configuration);
+      var users = await _db.Users.Select(b => new UserDto
+      {
+        Id = b.Id,
+        Username = b.Username,
+        Role = b.Role,
+      }).ToListAsync();
 
-      return Task.FromResult<IActionResult>(Ok());
+      return Ok(users);
+    }
+    catch (DbUpdateException dbEx)
+    {
+      _logger.LogError("[AuthController]: Database fetch failed: {Error}", dbEx.Message);
+      return StatusCode(500, "Failed fetch users due to database error.");
     }
     catch (Exception e)
     {
-      _logger.LogError("[AuthController]: Failed to validate token: {Error}", e.Message);
-      return Task.FromResult<IActionResult>(StatusCode(500, "An unexpected error occurred."));
+      _logger.LogError("[AuthController]: Failed fetch users: {Error}", e.Message);
+      return StatusCode(500, "An unexpected error occurred.");
     }
   }
 
+  [HttpDelete("users/{id}")]
+  [Authorize]
+  public async Task<IActionResult> DeleteUser(string id)
+  {
+    try
+    {
+      var user = await _db.Users.FirstOrDefaultAsync(u => u.Id == id);
+
+      if (user == null)
+      {
+        return BadRequest("User with id " + id + " does not exist");
+      }
+
+      _db.Users.Remove(user);
+      await _db.SaveChangesAsync();
+
+      return Ok("User deleted successfully");
+    }
+    catch (DbUpdateException dbEx)
+    {
+      _logger.LogError("[AuthController]: Database fetch failed: {Error}", dbEx.Message);
+      return StatusCode(500, "Failed delete user due to database error.");
+    }
+    catch (Exception e)
+    {
+      _logger.LogError("[AuthController]: Failed delete user: {Error}", e.Message);
+      return StatusCode(500, "An unexpected error occurred.");
+    }
+  }
+
+  [HttpPut("users/{id}/password")]
+  [Authorize]
+  public async Task<IActionResult> ChangePassword(string id, PasswordUpdateModel password)
+  {
+    try
+    {
+      var existingUser = await _db.Users.FirstOrDefaultAsync(u => u.Id == id);
+
+      if (existingUser == null)
+      {
+        return BadRequest("User with id " + id + " does not exist");
+      }
+
+      byte[] salt = PasswordHasher.GenerateSalt();
+
+      string hashedPassword = PasswordHasher.HashPassword(password.Password, salt);
+
+      existingUser.Salt = Convert.ToBase64String(salt);
+      existingUser.Password = hashedPassword;
+
+      await _db.SaveChangesAsync();
+
+      return Ok("Password changed successfully");
+    }
+    catch (DbUpdateException dbEx)
+    {
+      _logger.LogError("[AuthController]: Database fetch failed: {Error}", dbEx.Message);
+      return StatusCode(500, "Failed change password due to database error.");
+    }
+    catch (Exception e)
+    {
+      _logger.LogError("[AuthController]: Failed change password: {Error}", e.Message);
+      return StatusCode(500, "An unexpected error occurred.");
+    }
+  }
+
+  [HttpPut("users/{id}/role")]
+  [Authorize]
+  public async Task<IActionResult> ChangeRole(string id, User user)
+  {
+    try
+    {
+      var existingUser = await _db.Users.FirstOrDefaultAsync(u => u.Id == id);
+
+      if (existingUser == null)
+      {
+        return BadRequest("User with id " + id + " does not exist");
+      }
+
+      existingUser.Role = user.Role == UserRole.Admin ? UserRole.Admin : UserRole.User;
+
+      await _db.SaveChangesAsync();
+
+      return Ok("Role changed successfully");
+    }
+    catch (DbUpdateException dbEx)
+    {
+      _logger.LogError("[AuthController]: Database fetch failed: {Error}", dbEx.Message);
+      return StatusCode(500, "Failed change role due to database error.");
+    }
+    catch (Exception e)
+    {
+      _logger.LogError("[AuthController]: Failed change role: {Error}", e.Message);
+      return StatusCode(500, "An unexpected error occurred.");
+    }
+  }
 }

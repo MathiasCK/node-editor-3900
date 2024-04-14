@@ -3,6 +3,20 @@ using System.Text.Json.Serialization;
 using server.DAL;
 
 namespace server.Models;
+
+public class UserDto
+{
+  public required string Id { get; set; }
+  public required string Username { get; set; }
+  public required UserRole Role { get; set; }
+
+}
+
+public class PasswordUpdateModel
+{
+  public string Password { get; set; }
+}
+
 public class User
 {
   [Key]

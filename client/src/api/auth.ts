@@ -1,5 +1,5 @@
 import { useLoading, useSession } from '@/hooks';
-import { UserWithToken } from '@/lib/types';
+import { Role, User, UserWithToken } from '@/lib/types';
 import toast from 'react-hot-toast';
 
 export const login = async (
@@ -47,7 +47,8 @@ export const login = async (
 
 export const register = async (
   username: string,
-  password: string
+  password: string,
+  role: Role
 ): Promise<boolean> => {
   const { token } = useSession.getState();
   const { startLoading, stopLoading } = useLoading.getState();
@@ -64,6 +65,7 @@ export const register = async (
         body: JSON.stringify({
           username,
           password,
+          role,
         }),
       }
     );
@@ -80,6 +82,144 @@ export const register = async (
   } catch (error) {
     toast.error('Error registering user. Please try again.');
     throw new Error(`Error registering user: ${error}`);
+  } finally {
+    stopLoading();
+  }
+};
+
+export const fetchAllUsers = async (): Promise<User[]> => {
+  const { token } = useSession.getState();
+  const { startLoading, stopLoading } = useLoading.getState();
+  startLoading();
+  try {
+    const response = await fetch(
+      `${import.meta.env.VITE_API_URL}/api/auth/users`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      const errorBody = await response.text();
+      const errorMessage =
+        errorBody || 'Error fetching users. Please try again.';
+
+      toast.error(errorMessage);
+      return [];
+    }
+
+    return (await response.json()) as User[];
+  } catch (error) {
+    toast.error('Error fetching users. Please try again.');
+    throw new Error(`Error fetching users: ${error}`);
+  } finally {
+    stopLoading();
+  }
+};
+
+export const deleteUser = async (id: string): Promise<boolean> => {
+  const { token } = useSession.getState();
+  const { startLoading, stopLoading } = useLoading.getState();
+  startLoading();
+  try {
+    const response = await fetch(
+      `${import.meta.env.VITE_API_URL}/api/auth/users/${id}`,
+      {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      const errorBody = await response.text();
+      const errorMessage =
+        errorBody || 'Error deleting user. Please try again.';
+
+      toast.error(errorMessage);
+      return false;
+    }
+
+    toast.success('User deleted successfully.');
+    return true;
+  } catch (error) {
+    toast.error('Error deleting user. Please try again.');
+    throw new Error(`Error deleting user: ${error}`);
+  } finally {
+    stopLoading();
+  }
+};
+
+export const updatePassword = async (id: string, newPassword: string) => {
+  const { token } = useSession.getState();
+  const { startLoading, stopLoading } = useLoading.getState();
+  startLoading();
+  try {
+    const response = await fetch(
+      `${import.meta.env.VITE_API_URL}/api/auth/users/${id}/password`,
+      {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ password: newPassword }),
+      }
+    );
+
+    if (!response.ok) {
+      const errorBody = await response.text();
+      const errorMessage =
+        errorBody || 'Error updating password. Please try again.';
+
+      toast.error(errorMessage);
+      return false;
+    }
+
+    toast.success('Password updated successfully.');
+    return true;
+  } catch (error) {
+    toast.error('Error updating password. Please try again.');
+    throw new Error(`Error updating password: ${error}`);
+  } finally {
+    stopLoading();
+  }
+};
+
+export const updateUserRole = async (id: string, role: Role) => {
+  const { token } = useSession.getState();
+  const { startLoading, stopLoading } = useLoading.getState();
+  startLoading();
+  try {
+    const response = await fetch(
+      `${import.meta.env.VITE_API_URL}/api/auth/users/${id}/role`,
+      {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ role }),
+      }
+    );
+
+    if (!response.ok) {
+      const errorBody = await response.text();
+      const errorMessage =
+        errorBody || 'Error updating role. Please try again.';
+
+      toast.error(errorMessage);
+      return false;
+    }
+
+    toast.success('Role updated successfully.');
+    return true;
+  } catch (error) {
+    toast.error('Error updating role. Please try again.');
+    throw new Error(`Error updating role: ${error}`);
   } finally {
     stopLoading();
   }
