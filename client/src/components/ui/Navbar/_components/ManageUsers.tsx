@@ -23,7 +23,7 @@ const ManageUsers = () => {
               onClick={() => {
                 setDashboard(true);
               }}
-              className="size-5 hover:cursor-pointer"
+              className="size-4 hover:cursor-pointer"
             />
             <span className="sr-only">Manage users</span>
           </Button>

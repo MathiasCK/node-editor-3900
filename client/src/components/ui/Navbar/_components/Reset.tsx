@@ -38,7 +38,7 @@ const ResetConfirm = () => {
           className="border-none bg-transparent"
           size="icon"
         >
-          <LucideMonitorX className="size-5 hover:cursor-pointer" />
+          <LucideMonitorX className="size-4 hover:cursor-pointer" />
         </Button>
         <span className="sr-only">Reset</span>
       </AlertDialogTrigger>

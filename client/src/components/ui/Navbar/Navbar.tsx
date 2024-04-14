@@ -165,11 +165,15 @@ const Navbar = () => {
           )}
         </div>
         <div className="flex items-center justify-center">
-          {nodes.length > 0 && <Reset />}
           {currentPage !== AppPage.Login && user?.role === 'admin' && (
             <ManageUsers />
           )}
-          {currentPage !== AppPage.Login && <DownloadNodes />}
+          {currentPage === AppPage.Home && nodes.length > 0 && (
+            <>
+              <DownloadNodes />
+              <Reset />
+            </>
+          )}
           <ThemeToggle />
           {currentPage !== AppPage.Login && <Logout />}
         </div>

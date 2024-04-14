@@ -23,7 +23,7 @@ const DownloadNodes = () => {
           >
             <DownloadCloud
               onClick={() => downloadFile(nodes)}
-              className="size-5 hover:cursor-pointer"
+              className="size-4 hover:cursor-pointer"
             />
             <span className="sr-only">Download</span>
           </Button>

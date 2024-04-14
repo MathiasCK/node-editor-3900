@@ -30,7 +30,7 @@ const LogoutConfirm = () => {
           className="border-none bg-transparent"
           size="icon"
         >
-          <LogOut className="size-5 hover:cursor-pointer" />
+          <LogOut className="size-4 hover:cursor-pointer" />
         </Button>
         <span className="sr-only">Log out</span>
       </AlertDialogTrigger>
