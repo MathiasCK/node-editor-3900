@@ -699,7 +699,7 @@ export const downloadFile = (nodes: Node[]) => {
 };
 
 export const getNodeRelationLabel = (node: Node): string =>
-  `${node.data.customName === '' ? `${capitalizeFirstLetter(node.type!)}_${node.id}` : node.data.customName.replace(' ', '_')}`;
+  `${node.data.customName === '' ? `${capitalizeFirstLetter(node.type!)}_${node.id} (type: ${node.type}, aspect: ${node.data.aspect})` : node.data.customName.replace(' ', '_')}`;
 
 export const getReadableKey = (key: RelationKeys): string => {
   switch (key) {
