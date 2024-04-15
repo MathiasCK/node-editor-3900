@@ -56,7 +56,7 @@ public class AuthController(DB db, ILogger<AuthController> logger, IConfiguratio
   }
 
   [Route("register")]
-  [Authorize]
+  [Authorize(Roles = "admin")]
   [HttpPost]
   public async Task<IActionResult> Register(User user)
   {
@@ -95,7 +95,7 @@ public class AuthController(DB db, ILogger<AuthController> logger, IConfiguratio
   }
 
   [HttpGet("users")]
-  [Authorize]
+  [Authorize(Roles = "admin")]
   public async Task<IActionResult> GetUsers()
   {
     try
@@ -122,7 +122,8 @@ public class AuthController(DB db, ILogger<AuthController> logger, IConfiguratio
   }
 
   [HttpDelete("users/{id}")]
-  [Authorize]
+  [Authorize(Roles = "admin")]
+
   public async Task<IActionResult> DeleteUser(string id)
   {
     try
@@ -152,7 +153,7 @@ public class AuthController(DB db, ILogger<AuthController> logger, IConfiguratio
   }
 
   [HttpPut("users/{id}/password")]
-  [Authorize]
+  [Authorize(Roles = "admin")]
   public async Task<IActionResult> ChangePassword(string id, PasswordUpdateModel password)
   {
     try
@@ -188,7 +189,7 @@ public class AuthController(DB db, ILogger<AuthController> logger, IConfiguratio
   }
 
   [HttpPut("users/{id}/role")]
-  [Authorize]
+  [Authorize(Roles = "admin")]
   public async Task<IActionResult> ChangeRole(string id, User user)
   {
     try
