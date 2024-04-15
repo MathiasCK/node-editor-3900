@@ -674,7 +674,7 @@ export const getReadableRelation = (type: RelationType): string | null => {
   }
 };
 
-export const downloadFile = (nodes: Node[]) => {
+export const downloadTxtFile = (nodes: Node[]) => {
   if (nodes.length === 0) {
     toast.error('No nodes to download');
     return;
@@ -689,6 +689,39 @@ export const downloadFile = (nodes: Node[]) => {
   const link = document.createElement('a');
   link.href = url;
   link.setAttribute('download', 'relations.txt');
+
+  document.body.appendChild(link);
+
+  link.click();
+
+  document.body.removeChild(link);
+  window.URL.revokeObjectURL(url);
+};
+export const downloadNodesFile = (nodes: Node[]) => {
+  const blob = new Blob([JSON.stringify(nodes)], { type: 'text/plain' });
+
+  const url = window.URL.createObjectURL(blob);
+
+  const link = document.createElement('a');
+  link.href = url;
+  link.setAttribute('download', 'nodes.json');
+
+  document.body.appendChild(link);
+
+  link.click();
+
+  document.body.removeChild(link);
+  window.URL.revokeObjectURL(url);
+};
+
+export const downloadEdgesFile = (edges: Edge[]) => {
+  const blob = new Blob([JSON.stringify(edges)], { type: 'text/plain' });
+
+  const url = window.URL.createObjectURL(blob);
+
+  const link = document.createElement('a');
+  link.href = url;
+  link.setAttribute('download', 'edges.json');
 
   document.body.appendChild(link);
 
