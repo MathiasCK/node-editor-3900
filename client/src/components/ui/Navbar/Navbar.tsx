@@ -20,6 +20,7 @@ import {
   Logout,
   Reset,
   ManageUsers,
+  UploadFiles,
 } from './_components';
 
 const navItems: NavItem[] = [
@@ -171,6 +172,7 @@ const Navbar = () => {
           {currentPage === AppPage.Home && nodes.length > 0 && (
             <>
               <DownloadNodes />
+              <UploadFiles />
               <Reset />
             </>
           )}
