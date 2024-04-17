@@ -1,3 +1,4 @@
+import toast from 'react-hot-toast';
 import {
   AspectType,
   type CustomNodeProps,
@@ -148,16 +149,13 @@ const CurrentNode: FC<Props> = ({ currentNode }) => {
 
   const debouncedHandleChange = useDebounce(async (value: string) => {
     if (value === '' || nodeName === value) return;
+    const nodeWithSameName = nodes.some(node => node.data.customName === value);
+    if (nodeWithSameName) {
+      toast.error('Can not create a node with the same name');
+      return;
+    }
 
-    // TODO: Check if node with name === "value" already exists
-    // 1. Bruk array funksjonen nodes.some til å finne en node hvor node.customName === value
-    // Les om array.some metoden her https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/some
-    // 2. Hvis det er en node funnet så vis feilmelding og return
-    // const nodeWithSameName = SKRIV LOGIKKEN HER
-    // if (nodeWithSameName) {
-    // toast.error("SKRIV EN PASSENDE FEILMELDING HER");
-    // return;
-    // }
+  
 
     const updated = await updateNode(currentNode.id, nodes, setNodes, {
       customName: value,
