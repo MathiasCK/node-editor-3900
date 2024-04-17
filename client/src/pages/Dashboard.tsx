@@ -27,7 +27,7 @@ const Dashboard = () => {
   return (
     <Tabs
       defaultValue="manage"
-      className="mt-14 flex h-screen w-screen flex-col items-center justify-start"
+      className="mt-14 flex w-screen flex-col items-center justify-start"
     >
       <TabsList className="bg-tansparent grid w-[300px] grid-cols-3">
         <TabsTrigger value="manage">Manage users</TabsTrigger>
