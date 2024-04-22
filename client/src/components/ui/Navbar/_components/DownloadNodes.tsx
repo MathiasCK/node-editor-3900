@@ -1,12 +1,7 @@
-import {
-  downloadEdgesFile,
-  downloadNodesFile,
-  downloadTxtFile,
-} from '@/lib/utils';
+import { downloadZipFile } from '@/lib/utils';
 import { Button } from '../../button';
 import { DownloadCloud } from 'lucide-react';
-import { storeSelector, useStore } from '@/hooks';
-import { shallow } from 'zustand/shallow';
+
 import {
   Tooltip,
   TooltipContent,
@@ -15,7 +10,6 @@ import {
 } from '../../tooltip';
 
 const DownloadNodes = () => {
-  const { nodes, edges } = useStore(storeSelector, shallow);
   return (
     <TooltipProvider>
       <Tooltip>
@@ -26,11 +20,7 @@ const DownloadNodes = () => {
             size="icon"
           >
             <DownloadCloud
-              onClick={() => {
-                downloadTxtFile(nodes);
-                downloadNodesFile(nodes);
-                downloadEdgesFile(edges);
-              }}
+              onClick={downloadZipFile}
               className="size-4 hover:cursor-pointer"
             />
             <span className="sr-only">Download</span>
