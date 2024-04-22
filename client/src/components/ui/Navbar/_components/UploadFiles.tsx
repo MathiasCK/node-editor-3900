@@ -19,6 +19,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { validateJsonFiles } from '@/lib/validators';
 import { useStore } from '@/hooks';
 import toast from 'react-hot-toast';
+import { createNode } from '@/api/nodes';
+import { createEdge } from '@/api/edges';
 
 const filesSchema = z.object({
   files: z
@@ -28,7 +30,7 @@ const filesSchema = z.object({
 });
 
 const UploadFileDialog = () => {
-  const { nodes, edges } = useStore();
+  const { nodes, edges, setNodes } = useStore();
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
 
   const {
@@ -53,9 +55,19 @@ const UploadFileDialog = () => {
     clearErrors('files');
     data.files.forEach(file => {
       const reader = new FileReader();
-      reader.onload = (e: ProgressEvent<FileReader>) => {
-        // eslint-disable-next-line no-console
-        console.log('File Content:', JSON.parse(e.target!.result as string));
+
+      reader.onload = async (e: ProgressEvent<FileReader>) => {
+        if (file.name === 'nodes.json') {
+          const nodeData = JSON.parse(e.target!.result as string);
+          for (const node of nodeData) {
+            await createNode(node, nodes, setNodes);
+          }
+        } else {
+          const edgeData = JSON.parse(e.target!.result as string);
+          for (const edge of edgeData) {
+            await createEdge(edge);
+          }
+        }
       };
       reader.readAsText(file);
     });
