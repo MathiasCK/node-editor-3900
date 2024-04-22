@@ -28,7 +28,7 @@ const SelectConnection = () => {
         );
 
         toast.error(
-          `${sourceNode.data.customName === '' ? sourceNode.id : sourceNode.data.customName} is already part of ${partOfNode?.data?.customName === '' ? sourceNode?.data?.directPartOf : partOfNode?.data?.customName}`
+          `${sourceNode.data.customName === '' ? sourceNode.data.label : sourceNode.data.customName} is already part of ${partOfNode?.data?.customName === '' ? sourceNode?.data?.label : partOfNode?.data?.customName}`
         );
         return;
       }

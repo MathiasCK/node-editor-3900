@@ -53,7 +53,7 @@ const CurrentNode: FC<Props> = ({ currentNode }) => {
   const displayName = capitalizeFirstLetter(
     currentNode?.data?.customName
       ? currentNode?.data?.customName
-      : `${currentNode.type} ${currentNode.id}`
+      : currentNode?.data?.label
   );
 
   const { closeSidebar, openSidebar } = useSidebar();
@@ -243,7 +243,7 @@ const CurrentNode: FC<Props> = ({ currentNode }) => {
                         }
                       >
                         {node?.data?.customName === ''
-                          ? c.id
+                          ? node.data?.label
                           : node?.data.customName}
                       </Button>
                     );

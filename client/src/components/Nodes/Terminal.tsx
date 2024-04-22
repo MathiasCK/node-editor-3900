@@ -25,7 +25,7 @@ const Terminal = (props: CustomNodeProps) => {
                   className={`truncate text-center text-xs text-${props.data.aspect}-foreground-light dark:text-${props.data.aspect}-foreground-dark`}
                 >
                   {props.data.customName === ''
-                    ? props.id
+                    ? props.data.label.replace('terminal', 'T')
                     : props.data.customName}
                 </p>
               </header>

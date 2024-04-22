@@ -3,6 +3,7 @@ import { type Connection, type Edge, type Node, Position } from 'reactflow';
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import JSZip from 'jszip';
+import { v4 as uuidv4 } from 'uuid';
 import {
   AspectType,
   CustomAttribute,
@@ -35,16 +36,13 @@ export const onConnect = async (params: Edge | Connection) => {
   }
 
   // Set terminalOf property for terminal & terminals array for block
-  if (
-    isTerminal(params.targetHandle as string) &&
-    isBlock(params.sourceHandle as string)
-  ) {
+  if (isTerminal(params.target as string) && isBlock(params.source as string)) {
     const terminal = nodes.find(t => t.id === params.target);
 
     if (terminal?.data?.terminalOf) {
       const block = nodes.find(b => b.id === terminal?.data?.terminalOf);
       toast.error(
-        `Terminal ${terminal?.data?.customName === '' ? params.target : terminal?.data?.customName} is already a terminal of ${block?.data?.customName === '' ? terminal?.data?.terminalOf : block?.data?.customName}`
+        `Terminal ${terminal?.data?.customName === '' ? terminal?.data?.label : terminal?.data?.customName} is already a terminal of ${block?.data?.customName === '' ? terminal?.data?.terminalOf : block?.data?.customName}`
       );
       return;
     }
@@ -69,16 +67,13 @@ export const onConnect = async (params: Edge | Connection) => {
   }
 
   // Set terminalOf property for terminal & terminals array for block
-  if (
-    isBlock(params.targetHandle as string) &&
-    isTerminal(params.sourceHandle as string)
-  ) {
+  if (isBlock(params.target as string) && isTerminal(params.source as string)) {
     const terminal = nodes.find(t => t.id === params.source);
 
     if (terminal?.data?.terminalOf) {
       const block = nodes.find(b => b.id === terminal?.data?.terminalOf);
       toast.error(
-        `Terminal ${terminal?.data?.customName === '' ? params.source : terminal?.data?.customName} is already a terminal of ${block?.data?.customName === '' ? terminal?.data?.terminalOf : block?.data?.customName}`
+        `Terminal ${terminal?.data?.customName === '' ? terminal?.data?.label : terminal?.data?.customName} is already a terminal of ${block?.data?.customName === '' ? block?.data?.label : block?.data?.customName}`
       );
       return;
     }
@@ -103,10 +98,9 @@ export const onConnect = async (params: Edge | Connection) => {
   }
 
   if (
-    (isConnector(params.sourceHandle as string) &&
-      isBlock(params.targetHandle as string)) ||
-    (isBlock(params.sourceHandle as string) &&
-      isConnector(params.targetHandle as string))
+    (isConnector(params.source as string) &&
+      isBlock(params.target as string)) ||
+    (isBlock(params.source as string) && isConnector(params.target as string))
   ) {
     newNodeRelations.push({
       nodeId: params.source as string,
@@ -131,22 +125,22 @@ export const onConnect = async (params: Edge | Connection) => {
 
   // Set transfersTo & transferedBy property for terminals
   if (
-    isTerminal(params.sourceHandle as string) &&
-    isTerminal(params.targetHandle as string)
+    isTerminal(params.source as string) &&
+    isTerminal(params.target as string)
   ) {
     const targetTerminal = nodes.find(node => node.id === params.target);
     const sourceTerminal = nodes.find(node => node.id === params.source);
 
     if (targetTerminal?.data.transferedBy) {
       toast.error(
-        `Terminal ${targetTerminal?.data.customName === '' ? targetTerminal.id : targetTerminal?.data.customName} is already being transferred by another terminal`
+        `Terminal ${targetTerminal?.data.customName === '' ? targetTerminal.data.label : targetTerminal?.data.customName} is already being transferred by another terminal`
       );
       return;
     }
 
     if (sourceTerminal?.data.transfersTo) {
       toast.error(
-        `Terminal ${sourceTerminal?.data.customName === '' ? sourceTerminal.id : sourceTerminal?.data.customName} is already transferring to another terminal`
+        `Terminal ${sourceTerminal?.data.customName === '' ? sourceTerminal.data.label : sourceTerminal?.data.customName} is already transferring to another terminal`
       );
       return;
     }
@@ -169,10 +163,10 @@ export const onConnect = async (params: Edge | Connection) => {
   }
 
   if (
-    (isTerminal(params.sourceHandle as string) &&
-      isConnector(params.targetHandle as string)) ||
-    (isConnector(params.sourceHandle as string) &&
-      isTerminal(params.targetHandle as string))
+    (isTerminal(params.source as string) &&
+      isConnector(params.target as string)) ||
+    (isConnector(params.source as string) &&
+      isTerminal(params.target as string))
   ) {
     newNodeRelations.push({
       nodeId: params.source as string,
@@ -196,8 +190,8 @@ export const onConnect = async (params: Edge | Connection) => {
   }
 
   if (
-    isConnector(params.sourceHandle as string) &&
-    isConnector(params.targetHandle as string)
+    isConnector(params.source as string) &&
+    isConnector(params.target as string)
   ) {
     newNodeRelations.push({
       nodeId: params.source as string,
@@ -300,23 +294,37 @@ export const addNode = async (
 ) => {
   const { user } = useSession.getState();
 
-  const id =
+  const labelNum =
     nodes.length === 0
       ? '0'
       : nodes
-          .reduce((max, obj) => Math.max(max, Number(obj.id) + 1), 0)
+          .reduce(
+            (max, obj) =>
+              Math.max(
+                max,
+                Number(obj.data.label.charAt(obj.data.label.length - 1)) + 1
+              ),
+            0
+          )
           .toString();
+
+  const label =
+    type === 'block'
+      ? `Block${labelNum}`
+      : type === 'terminal'
+        ? `T${labelNum}`
+        : `C${labelNum}`;
 
   const newNode: Node = {
     type,
-    id,
+    id: `${type}-${uuidv4()}`,
     position: {
       x: window.innerWidth / 2,
       y: window.innerHeight / 2,
     },
     data: {
       aspect,
-      label: `${type}_${id}`,
+      label,
       type,
       createdBy: user?.id,
     },
@@ -330,10 +338,7 @@ export const updateNodeRelations = async (
   setNodes: (nodes: Node[]) => void,
   nodeIdToDelete?: string
 ) => {
-  if (
-    isTerminal(currentEdge.sourceHandle!) &&
-    isTerminal(currentEdge.targetHandle!)
-  ) {
+  if (isTerminal(currentEdge.source!) && isTerminal(currentEdge.target!)) {
     // Deleting a terminal -> terminal connection where "transfersTo" should be updated
     const sourceTerminal = nodes.find(
       terminal => terminal.id === currentEdge.source
@@ -359,10 +364,7 @@ export const updateNodeRelations = async (
   }
 
   // Deleting a terminal -> block connection
-  if (
-    isTerminal(currentEdge.sourceHandle!) &&
-    isBlock(currentEdge.targetHandle!)
-  ) {
+  if (isTerminal(currentEdge.source!) && isBlock(currentEdge.target!)) {
     const terminal = nodes.find(node => node.id === currentEdge.source);
     const block = nodes.find(node => node.id === currentEdge.target);
 
@@ -387,10 +389,7 @@ export const updateNodeRelations = async (
   }
 
   // Deleting a block -> terminal connection
-  if (
-    isTerminal(currentEdge.targetHandle!) &&
-    isBlock(currentEdge.sourceHandle!)
-  ) {
+  if (isTerminal(currentEdge.target!) && isBlock(currentEdge.source!)) {
     const terminal = nodes.find(node => node.id === currentEdge.target);
     const block = nodes.find(node => node.id === currentEdge.source);
 

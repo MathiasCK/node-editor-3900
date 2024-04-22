@@ -30,7 +30,10 @@ const CurrentEdge: FC<Props> = ({ currentEdge }) => {
   const { openSidebar, closeSidebar } = useSidebar();
   const { edges, setEdges, nodes, setNodes } = useStore();
 
-  const displayName = `Edge ${currentEdge.source} -> ${currentEdge.target}`;
+  const sourceNode = nodes.find(node => node.id === currentEdge.source);
+  const targetNode = nodes.find(node => node.id === currentEdge.target);
+
+  const displayName = `Edge ${sourceNode?.data.customName ? sourceNode.data.customName : sourceNode?.data.label} -> ${targetNode?.data.customName ? targetNode.data.customName : targetNode?.data.label}`;
 
   const handleConnectionTypeChange = async (newEdgeType: EdgeType) => {
     const edge = await updateEdge(
@@ -68,16 +71,13 @@ const CurrentEdge: FC<Props> = ({ currentEdge }) => {
     closeSidebar();
   };
 
-  const sourceNode = nodes.find(node => node.id === currentEdge.source);
-  const targetNode = nodes.find(node => node.id === currentEdge.target);
-
   const sourceNodeLabel =
     sourceNode?.data?.customName === ''
-      ? currentEdge.source
+      ? sourceNode?.data?.label
       : sourceNode?.data?.customName;
   const targetNodeLabel =
     targetNode?.data?.customName === ''
-      ? currentEdge.target
+      ? targetNode?.data?.label
       : targetNode?.data?.customName;
 
   return (

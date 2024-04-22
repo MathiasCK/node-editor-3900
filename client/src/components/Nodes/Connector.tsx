@@ -25,7 +25,7 @@ const Connector = (props: CustomNodeProps) => {
                   className={`truncate text-center text-${props.data.aspect}-foreground-light dark:text-${props.data.aspect}-foreground-dark`}
                 >
                   {props.data.customName === ''
-                    ? props.id
+                    ? props.data.label
                     : props.data.customName}
                 </p>
               </header>

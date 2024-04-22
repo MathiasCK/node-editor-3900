@@ -1,6 +1,7 @@
 import Handles from './Handles';
 import { useSidebar } from '@/hooks';
 import type { CustomNodeProps } from '@/lib/types';
+import { capitalizeFirstLetter } from '@/lib/utils';
 
 const Block = (props: CustomNodeProps) => {
   const { openSidebar } = useSidebar();
@@ -15,7 +16,9 @@ const Block = (props: CustomNodeProps) => {
           <p
             className={`text-center text-${props.data.aspect}-foreground-light dark:text-${props.data.aspect}-foreground-dark`}
           >
-            {props.data.customName === '' ? props.id : props.data.customName}
+            {props.data.customName === ''
+              ? capitalizeFirstLetter(props.data.label)
+              : props.data.customName}
           </p>
         </header>
       </div>
