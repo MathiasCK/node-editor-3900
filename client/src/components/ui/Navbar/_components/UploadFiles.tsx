@@ -13,9 +13,54 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '../../tooltip';
+import { z } from 'zod';
+import { Controller, SubmitHandler, useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { validateJsonFiles } from '@/lib/validators';
+import { useStore } from '@/hooks';
+import toast from 'react-hot-toast';
+
+const filesSchema = z.object({
+  files: z
+    .array(z.instanceof(File))
+    .min(2, { message: 'Two JSON files are required' })
+    .max(2, { message: 'Only two JSON files are allowed' }),
+});
 
 const UploadFileDialog = () => {
+  const { nodes, edges } = useStore();
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
+
+  const {
+    control,
+    handleSubmit,
+    setError,
+    clearErrors,
+    formState: { errors },
+  } = useForm<{ files: File[] }>({
+    resolver: zodResolver(filesSchema),
+  });
+
+  const onSubmit: SubmitHandler<{ files: File[] }> = async (
+    data: z.infer<typeof filesSchema>
+  ) => {
+    const errorMessage = await validateJsonFiles(data.files);
+    if (errorMessage) {
+      setError('files', { type: 'manual', message: errorMessage });
+      return;
+    }
+
+    clearErrors('files');
+    data.files.forEach(file => {
+      const reader = new FileReader();
+      reader.onload = (e: ProgressEvent<FileReader>) => {
+        // eslint-disable-next-line no-console
+        console.log('File Content:', JSON.parse(e.target!.result as string));
+      };
+      reader.readAsText(file);
+    });
+  };
+
   return (
     <Dialog
       open={dialogOpen}
@@ -23,22 +68,47 @@ const UploadFileDialog = () => {
         if (!e) setDialogOpen(false);
       }}
     >
-      <DialogTrigger onClick={() => setDialogOpen(true)}>
+      <DialogTrigger
+        onClick={() => {
+          if (nodes.length > 0 || edges.length > 0) {
+            toast.error(
+              'Please clear the current editor before uploading new files'
+            );
+            return;
+          }
+          setDialogOpen(true);
+        }}
+      >
         <Button
           variant="outline"
           className="border-none bg-transparent"
           size="icon"
         >
           <UploadCloud className="size-4 hover:cursor-pointer" />
-          <span className="sr-only">Upload</span>
+          <span className="sr-only">Upload nodes.json & edges.json</span>
         </Button>
       </DialogTrigger>
       <DialogContent>
-        <DialogHeader>Upload Files</DialogHeader>
-        <form>
-          <input type="file" required />
-          <input required type="file" />
-          <button type="submit">Submit</button>
+        <DialogHeader>Upload nodes.json & edges.json</DialogHeader>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <Controller
+            name="files"
+            control={control}
+            defaultValue={[]}
+            render={({ field: { onChange, onBlur } }) => (
+              <input
+                type="file"
+                onBlur={onBlur}
+                onChange={e => onChange([...e.target.files!])}
+                multiple
+                required
+              />
+            )}
+          />
+          {errors.files && (
+            <p className="my-2 text-red-500">{errors.files.message}</p>
+          )}
+          <Button type="submit">Submit</Button>
         </form>
       </DialogContent>
     </Dialog>

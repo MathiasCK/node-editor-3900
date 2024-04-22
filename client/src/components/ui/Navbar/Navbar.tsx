@@ -171,11 +171,11 @@ const Navbar = () => {
           )}
           {currentPage === AppPage.Home && nodes.length > 0 && (
             <>
-              <DownloadNodes />
-              <UploadFiles />
               <Reset />
+              <DownloadNodes />
             </>
           )}
+          <UploadFiles />
           <ThemeToggle />
           {currentPage !== AppPage.Login && <Logout />}
         </div>
