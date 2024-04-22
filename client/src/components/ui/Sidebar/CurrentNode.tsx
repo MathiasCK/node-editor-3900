@@ -151,11 +151,9 @@ const CurrentNode: FC<Props> = ({ currentNode }) => {
     if (value === '' || nodeName === value) return;
     const nodeWithSameName = nodes.some(node => node.data.customName === value);
     if (nodeWithSameName) {
-      toast.error('Can not create a node with the same name');
+      toast.error(`A node with the name "${value}" already exists`);
       return;
     }
-
-  
 
     const updated = await updateNode(currentNode.id, nodes, setNodes, {
       customName: value,
