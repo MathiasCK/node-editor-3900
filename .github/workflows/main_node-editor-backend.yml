@@ -19,7 +19,7 @@ jobs:
       - name: Set up .NET Core
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: "8.x"
+          dotnet-version: '8.x'
           include-prerelease: true
 
       - name: Build with dotnet
@@ -38,10 +38,8 @@ jobs:
     runs-on: windows-latest
     needs: build
     environment:
-      name: "Production"
+      name: 'Production'
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
-    permissions:
-      id-token: write #This is required for requesting the JWT
 
     steps:
       - name: Download artifact from build job
@@ -49,17 +47,11 @@ jobs:
         with:
           name: .net-app
 
-      - name: Login to Azure
-        uses: azure/login@v1
-        with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_67D2436444BF44BF9492CE1E1C672A0F }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_090CB0D1FA4E4C60BB9BECAB5957DCF4 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_A8953025711346A3BA456A3FD5BB8546 }}
-
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v2
         with:
-          app-name: "node-editor-backend"
-          slot-name: "Production"
+          app-name: 'node-editor-backend'
+          slot-name: 'Production'
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_F4FFAECAAF25455E9D47EF0DD6E5AF7E }}
           package: .
