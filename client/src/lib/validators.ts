@@ -68,10 +68,10 @@ export const validateNodesJson = (nodes: ValidUploadNode[]) => {
         throw new Error(`Block ${node.id} must be a direct part of`);
       }
       if (!node.height) {
-        throw new Error(`Block ${node.id} must have a height`);
+        node.width = 48;
       }
       if (!node.width) {
-        throw new Error(`Block ${node.id} must have a width`);
+        node.width = 96;
       }
       if (!node.position.x) {
         throw new Error(`Block ${node.id} must have an x position`);
@@ -94,10 +94,10 @@ export const validateNodesJson = (nodes: ValidUploadNode[]) => {
         throw new Error(`Connector ${node.id} must be connected by`);
       }
       if (!node.height) {
-        throw new Error(`Connector ${node.id} must have a height`);
+        node.height = 32;
       }
       if (!node.width) {
-        throw new Error(`Connector ${node.id} must have a width`);
+        node.width = 32;
       }
       if (!node.position.x) {
         throw new Error(`Connector ${node.id} must have an x position`);
@@ -129,10 +129,10 @@ export const validateNodesJson = (nodes: ValidUploadNode[]) => {
         throw new Error(`Terminal ${node.id} must transfer by`);
       }
       if (!node.height) {
-        throw new Error(`Terminal ${node.id} must have a height`);
+        node.height = 26;
       }
       if (!node.width) {
-        throw new Error(`Terminal ${node.id} must have a width`);
+        node.width = 24;
       }
       if (!node.position.x) {
         throw new Error(`Terminal ${node.id} must have an x position`);
