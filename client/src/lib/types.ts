@@ -156,3 +156,86 @@ export type UserWithToken = {
   user: User;
   token: string;
 };
+
+type CommonData = {
+  createdAt: number;
+  updatedAt: number;
+  createdBy: string;
+  customName: string;
+  customAttributes: CustomAttribute[];
+  aspect: string;
+  label: string;
+};
+
+type NodePosition = {
+  x: number;
+  y: number;
+};
+
+type BlockData = CommonData & {
+  parent: string;
+  children: string[];
+  terminals: string[];
+  fulfilledBy: string[];
+  fulfills: string[];
+  directParts: string[];
+  connectedTo: string[];
+  connectedBy: string[];
+  directPartOf: string;
+};
+
+type Block = {
+  data: BlockData;
+  nodeId: string;
+  id: string;
+  position: NodePosition;
+  type: 'block';
+  width: number;
+  height: number;
+};
+
+type ConnectorData = CommonData & {
+  connectedTo: string[];
+  connectedBy: string[];
+};
+
+type Connector = {
+  data: ConnectorData;
+  nodeId: string;
+  id: string;
+  position: NodePosition;
+  type: 'connector';
+  width: number;
+  height: number;
+};
+
+type TerminalData = CommonData & {
+  terminalOf: string;
+  connectedTo: string[];
+  connectedBy: string[];
+  transfersTo: string;
+  transferedBy: string;
+};
+
+type Terminal = {
+  data: TerminalData;
+  nodeId: string;
+  id: string;
+  position: NodePosition;
+  type: 'terminal';
+  width: number;
+  height: number;
+};
+
+export type ValidUploadNode = Block | Terminal | Connector;
+
+export type ValidUploadEdge = {
+  edgeId: string;
+  id: string;
+  source: string;
+  sourceHandle: string;
+  target: string;
+  targetHandle: string;
+  type: EdgeType;
+  data: EdgeData;
+};
