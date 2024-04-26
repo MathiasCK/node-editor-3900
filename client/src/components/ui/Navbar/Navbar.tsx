@@ -175,7 +175,7 @@ const Navbar = () => {
               <DownloadNodes />
             </>
           )}
-          <UploadFiles />
+          {currentPage === AppPage.Home && <UploadFiles />}
           <ThemeToggle />
           {currentPage !== AppPage.Login && <Logout />}
         </div>
