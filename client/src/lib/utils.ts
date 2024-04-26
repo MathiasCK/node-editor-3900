@@ -805,3 +805,13 @@ export const mapNodeRelationsToString = (nodes: Node[]): string => {
 
   return str;
 };
+
+export const generateNewNodeId = (currentId: string): string => {
+  if (isBlock(currentId)) {
+    return `block-${uuidv4()}`;
+  }
+  if (isConnector(currentId)) {
+    return `connector-${uuidv4()}`;
+  }
+  return `terminal-${uuidv4()}`;
+};

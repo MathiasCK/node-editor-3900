@@ -17,10 +17,12 @@ import { z } from 'zod';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { validateJsonFiles } from '@/lib/validators';
-import { useStore } from '@/hooks';
+import { useSession, useStore } from '@/hooks';
 import toast from 'react-hot-toast';
-import { createNode } from '@/api/nodes';
-import { createEdge } from '@/api/edges';
+import { uploadNodes } from '@/api/nodes';
+import { uploadEdges } from '@/api/edges';
+import { EdgeWithEdgeId, NodeWithNodeId } from '@/lib/types';
+import { generateNewNodeId } from '@/lib/utils';
 
 const filesSchema = z.object({
   files: z
@@ -30,7 +32,8 @@ const filesSchema = z.object({
 });
 
 const UploadFileDialog = () => {
-  const { nodes, edges, setNodes } = useStore();
+  const { user } = useSession();
+  const { nodes, edges } = useStore();
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
 
   const {
@@ -53,24 +56,76 @@ const UploadFileDialog = () => {
     }
 
     clearErrors('files');
-    data.files.forEach(file => {
-      const reader = new FileReader();
 
-      reader.onload = async (e: ProgressEvent<FileReader>) => {
-        if (file.name === 'nodes.json') {
-          const nodeData = JSON.parse(e.target!.result as string);
-          for (const node of nodeData) {
-            await createNode(node, nodes, setNodes);
+    const dataToUpload: { nodes: NodeWithNodeId[]; edges: EdgeWithEdgeId[] } = {
+      nodes: [],
+      edges: [],
+    };
+
+    const fileReadPromises = data.files.map(file => {
+      return new Promise<void>((resolve, reject) => {
+        const reader = new FileReader();
+
+        reader.onload = (e: ProgressEvent<FileReader>) => {
+          try {
+            if (file.name === 'nodes.json') {
+              dataToUpload.nodes = JSON.parse(e.target!.result as string);
+            } else {
+              dataToUpload.edges = JSON.parse(e.target!.result as string);
+            }
+            resolve();
+          } catch (error) {
+            reject(error);
           }
-        } else {
-          const edgeData = JSON.parse(e.target!.result as string);
-          for (const edge of edgeData) {
-            await createEdge(edge);
+        };
+
+        reader.onerror = () => reject(reader.error);
+
+        reader.readAsText(file);
+      });
+    });
+
+    try {
+      await Promise.all(fileReadPromises);
+
+      for (const node of dataToUpload.nodes) {
+        const currentDate = Date.now();
+        // @ts-ignore
+        delete node.nodeId;
+        node.data.createdBy = user?.id;
+        node.data.createdAt = currentDate;
+        node.data.updatedAt = currentDate;
+
+        const connectedEdges = dataToUpload.edges.filter(edge =>
+          edge.id.includes(node.id)
+        );
+
+        const newNodeId = generateNewNodeId(node.id);
+
+        for (const edge of connectedEdges) {
+          // @ts-ignore
+          delete edge.edgeId;
+          edge.id = edge.id.replace(node.id, newNodeId);
+          edge.data.createdBy = user?.id;
+          edge.data.createdAt = currentDate;
+          edge.data.updatedAt = currentDate;
+          if (edge.source === node.id) {
+            edge.source = newNodeId;
+          } else {
+            edge.target = newNodeId;
           }
         }
-      };
-      reader.readAsText(file);
-    });
+        node.id = newNodeId;
+      }
+
+      const uploadedNodes = await uploadNodes(dataToUpload.nodes);
+      const uploadedEdges = await uploadEdges(dataToUpload.edges);
+      if (uploadedNodes && uploadedEdges) {
+        setDialogOpen(false);
+      }
+    } catch (error) {
+      toast.error('There was an error processing the files');
+    }
   };
 
   return (
