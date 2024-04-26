@@ -110,6 +110,55 @@ public class NodesController(DB db, ILogger<NodesController> logger) : Controlle
         }
     }
 
+    [HttpPost("upload")]
+    public async Task<IActionResult> UploadNodes([FromBody] JsonElement data)
+    {
+        if (data.ValueKind == JsonValueKind.Undefined)
+        {
+            return BadRequest("Node data is missing.");
+        }
+
+        try
+        {
+            foreach (var node in data.EnumerateArray())
+            {
+                var type = node.GetProperty("type").GetString();
+                var id = node.GetProperty("id").GetString();
+                var label = node.GetProperty("data").GetProperty("label").GetString();
+                var aspect = node.GetProperty("data").GetProperty("aspect").GetString();
+                var createdBy = node.GetProperty("data").GetProperty("createdBy").GetString();
+                var position = new Position
+                {
+                    X = node.GetProperty("position").GetProperty("x").GetDouble(),
+                    Y = node.GetProperty("position").GetProperty("y").GetDouble()
+                };
+
+                if (id == null || type == null || label == null || aspect == null || createdBy == null || position == null)
+                {
+                    return BadRequest("Node data is missing required fields.");
+                }
+
+                Node newNode = Utils.CreateNode(type, id, position, aspect, label, createdBy);
+
+                await _db.Nodes.AddAsync(newNode);
+            }
+
+            await _db.SaveChangesAsync();
+
+            return Ok();
+        }
+        catch (DbUpdateException dbEx)
+        {
+            _logger.LogError("[NodesController]: Database update failed: {Error}", dbEx.Message);
+            return StatusCode(500, "Failed to save node data due to database error.");
+        }
+        catch (Exception e)
+        {
+            _logger.LogError("[NodesController]: Failed to create node: {Error}", e.Message);
+            return StatusCode(500, "An unexpected error occurred.");
+        }
+    }
+
     [HttpPost]
     public async Task<IActionResult> CreateNode([FromBody] JsonElement data)
     {

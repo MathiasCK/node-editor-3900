@@ -61,6 +61,30 @@ public class EdgesController(DB db, ILogger<EdgesController> logger) : Controlle
         }
     }
 
+    [HttpPost("upload")]
+    public async Task<IActionResult> UploadEdges(IEnumerable<Edge> edges)
+    {
+        if (edges == null) return BadRequest("Edges data is missing.");
+
+        try
+        {
+            await _db.Edges.AddRangeAsync(edges);
+            await _db.SaveChangesAsync();
+
+            return Ok();
+        }
+        catch (DbUpdateException dbEx)
+        {
+            _logger.LogError("[EdgesController]: Database update failed: {Error}", dbEx.Message);
+            return StatusCode(500, "Failed to save edges data due to database error.");
+        }
+        catch (Exception e)
+        {
+            _logger.LogError("[EdgesController]: Failed to create edges: {Error}", e.Message);
+            return StatusCode(500, "An unexpected error occurred.");
+        }
+    }
+
     [HttpPost]
     public async Task<IActionResult> CreateEdge(Edge edge)
     {

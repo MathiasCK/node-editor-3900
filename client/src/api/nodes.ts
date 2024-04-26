@@ -33,6 +33,51 @@ export const fetchNodes = async (): Promise<Node[] | null> => {
   return nodes;
 };
 
+export const uploadNodes = async (nodesToAdd: Node[]): Promise<boolean> => {
+  const { setNodes } = useStore.getState();
+  const { logout, token } = useSession.getState();
+  const { startLoading, stopLoading } = useLoading.getState();
+  startLoading();
+
+  try {
+    const response = await fetch(
+      `${import.meta.env.VITE_API_URL}/api/nodes/upload`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(nodesToAdd),
+      }
+    );
+
+    if (response.status === 401) {
+      logout();
+      toast.error('Unauthorized');
+      return false;
+    }
+
+    if (!response.ok) {
+      const status = response.status;
+      toast.error(`Error uploading nodes - Status: ${status}`);
+      return false;
+    }
+
+    toast.success('Nodes uploaded successfully!');
+
+    return true;
+  } catch (error) {
+    toast.error(`Error uploading nodes: ${(error as Error).message}`);
+    throw error;
+  } finally {
+    stopLoading();
+    const nodes = await fetchNodes();
+    if (nodes) {
+      setNodes(nodes);
+    }
+  }
+};
 export const createNode = async (
   node: Node,
   nodes: Node[],
@@ -80,7 +125,6 @@ export const createNode = async (
     stopLoading();
   }
 };
-
 export const updateNode = async (
   nodeToUpdateId: string,
   nodes: Node[],

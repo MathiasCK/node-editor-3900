@@ -82,6 +82,52 @@ export const createEdge = async (edge: Edge): Promise<Edge | null> => {
   }
 };
 
+export const uploadEdges = async (edgesToAdd: Edge[]): Promise<boolean> => {
+  const { setEdges } = useStore.getState();
+  const { token, logout } = useSession.getState();
+  const { startLoading, stopLoading } = useLoading.getState();
+
+  startLoading();
+
+  try {
+    const response = await fetch(
+      `${import.meta.env.VITE_API_URL}/api/edges/upload`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(edgesToAdd),
+      }
+    );
+
+    if (response.status === 401) {
+      logout();
+      toast.error('Unauthorized');
+      return false;
+    }
+
+    if (!response.ok) {
+      const status = response.status;
+      toast.error(`Error uploading edges - Status: ${status}`);
+      return false;
+    }
+
+    toast.success('Edges uploaded successfully!');
+
+    return true;
+  } catch (error) {
+    toast.error(`Error uploading edges: ${(error as Error).message}`);
+    throw error;
+  } finally {
+    stopLoading();
+    const edges = await fetchEdges();
+    if (edges) {
+      setEdges(edges);
+    }
+  }
+};
 export const deleteEdge = async (
   edgeIdToDelete: string,
   edges: Edge[],
