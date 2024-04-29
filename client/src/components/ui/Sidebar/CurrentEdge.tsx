@@ -1,5 +1,11 @@
 import { EdgeType, type CustomEdgeProps } from '@/lib/types';
-import { displayNewNode, updateNodeConnectionData } from '@/lib/utils';
+import {
+  cn,
+  displayNewNode,
+  isBlock,
+  isConnector,
+  updateNodeConnectionData,
+} from '@/lib/utils';
 import { FC } from 'react';
 import {
   SheetContent,
@@ -48,7 +54,8 @@ const CurrentEdge: FC<Props> = ({ currentEdge }) => {
         currentEdge.target,
         nodes,
         setNodes,
-        currentEdge.type as EdgeType
+        currentEdge.type as EdgeType,
+        newEdgeType
       );
 
       currentEdge.type = newEdgeType;
@@ -79,6 +86,12 @@ const CurrentEdge: FC<Props> = ({ currentEdge }) => {
     targetNode?.data?.customName === ''
       ? targetNode?.data?.label
       : targetNode?.data?.customName;
+
+  const displayFulfilledBy =
+    isBlock(sourceNode?.id as string) && isBlock(targetNode?.id as string);
+  const displayConnectedTo =
+    isConnector(sourceNode?.id as string) ||
+    isConnector(targetNode?.id as string);
 
   return (
     <SheetContent className="bg:background z-40 flex flex-col justify-between">
@@ -123,10 +136,22 @@ const CurrentEdge: FC<Props> = ({ currentEdge }) => {
           <SelectContent>
             <SelectGroup>
               <SelectItem value={EdgeType.Part}>Part of</SelectItem>
-              <SelectItem value={EdgeType.Connected} className="hidden">
+              <SelectItem
+                value={EdgeType.Connected}
+                className={cn('', {
+                  hidden: !displayConnectedTo,
+                })}
+              >
                 Connected to
               </SelectItem>
-              <SelectItem value={EdgeType.Fulfilled}>Fulfilled by</SelectItem>
+              <SelectItem
+                value={EdgeType.Fulfilled}
+                className={cn('', {
+                  hidden: !displayFulfilledBy,
+                })}
+              >
+                Fulfilled by
+              </SelectItem>
               <SelectItem className="hidden" value={EdgeType.Transfer}>
                 Transfer
               </SelectItem>

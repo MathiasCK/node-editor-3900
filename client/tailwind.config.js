@@ -9,6 +9,9 @@ module.exports = {
   ],
   purge: {
     safelist: [
+      'border-connected',
+      'text-connected',
+      'bg-connected',
       'bg-function-light',
       'bg-function-dark',
       'bg-product-light',

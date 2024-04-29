@@ -63,6 +63,13 @@ public class DB : DbContext
                     v => JsonSerializer.Serialize(v, new JsonSerializerOptions()),
                     v => JsonSerializer.Deserialize<List<CustomAttribute>>(v, new JsonSerializerOptions()) ?? new List<CustomAttribute>())
                 .HasColumnType("json");
+
+            data.Property(nd => nd.DirectParts)
+                .HasConversion(
+                    v => JsonSerializer.Serialize(v, new JsonSerializerOptions()),
+                    v => JsonSerializer.Deserialize<List<Relation>>(v, new JsonSerializerOptions()) ?? new List<Relation>())
+                .HasColumnType("json");
+
         });
         modelBuilder.Entity<Block>()
                     .OwnsOne(n => n.Data, data =>

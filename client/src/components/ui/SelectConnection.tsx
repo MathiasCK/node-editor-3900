@@ -7,10 +7,18 @@ import { buttonVariants } from '@/lib/config';
 import { Button } from './button';
 import { shallow } from 'zustand/shallow';
 import toast from 'react-hot-toast';
+import { useEffect } from 'react';
 
 const SelectConnection = () => {
-  const { dialogOpen, edgeType, setEdgeType, params, closeDialog } =
-    useConnection();
+  const {
+    dialogOpen,
+    edgeType,
+    setEdgeType,
+    params,
+    closeDialog,
+    blockConnection,
+  } = useConnection();
+
   const { nodes } = useStore(storeSelector, shallow);
 
   const createNewConnection = async () => {
@@ -54,6 +62,26 @@ const SelectConnection = () => {
       });
     }
 
+    if (edgeType === EdgeType.Connected) {
+      newNodeRelations.push({
+        nodeId: params!.source as string,
+        relations: {
+          connectedTo: {
+            id: params!.target as string,
+          },
+        },
+      });
+
+      newNodeRelations.push({
+        nodeId: params!.target as string,
+        relations: {
+          connectedBy: {
+            id: params!.source as string,
+          },
+        },
+      });
+    }
+
     if (edgeType === EdgeType.Fulfilled) {
       newNodeRelations.push({
         nodeId: params!.source as string,
@@ -74,9 +102,13 @@ const SelectConnection = () => {
       });
     }
 
-    await addEdge(edgeType, newNodeRelations, false);
+    await addEdge(edgeType as EdgeType, newNodeRelations, false);
     closeDialog();
   };
+
+  useEffect(() => {
+    setEdgeType(null);
+  }, [dialogOpen, setEdgeType]);
 
   return (
     <Dialog open={dialogOpen}>
@@ -99,18 +131,34 @@ const SelectConnection = () => {
           >
             Part of
           </button>
-          <button
-            className={cn(
-              `${buttonVariants.edge} border-dotted border-amber-300 text-amber-300 hover:bg-amber-300`,
-              {
-                'border-transparent bg-amber-300 text-white':
-                  edgeType === EdgeType.Fulfilled,
-              }
-            )}
-            onClick={() => setEdgeType(EdgeType.Fulfilled)}
-          >
-            Fulfilled by
-          </button>
+          {!blockConnection && (
+            <button
+              className={cn(
+                `${buttonVariants.edge} border-2 border-connected text-connected hover:bg-connected`,
+                {
+                  'border-transparent bg-connected text-white':
+                    edgeType === EdgeType.Connected,
+                }
+              )}
+              onClick={() => setEdgeType(EdgeType.Connected)}
+            >
+              Connected to
+            </button>
+          )}
+          {blockConnection && (
+            <button
+              className={cn(
+                `${buttonVariants.edge} border-dotted border-amber-300 text-amber-300 hover:bg-amber-300`,
+                {
+                  'border-transparent bg-amber-300 text-white':
+                    edgeType === EdgeType.Fulfilled,
+                }
+              )}
+              onClick={() => setEdgeType(EdgeType.Fulfilled)}
+            >
+              Fulfilled by
+            </button>
+          )}
           <Button
             onClick={() => {
               createNewConnection();

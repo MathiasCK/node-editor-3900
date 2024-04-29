@@ -96,31 +96,31 @@ export const onConnect = async (params: Edge | Connection) => {
     return addEdge(EdgeType.Connected, newNodeRelations);
   }
 
-  if (
-    (isConnector(params.source as string) &&
-      isBlock(params.target as string)) ||
-    (isBlock(params.source as string) && isConnector(params.target as string))
-  ) {
-    newNodeRelations.push({
-      nodeId: params.source as string,
-      relations: {
-        connectedTo: {
-          id: params.target as string,
-        },
-      },
-    });
+  // if (
+  //   (isConnector(params.source as string) &&
+  //     isBlock(params.target as string)) ||
+  //   (isBlock(params.source as string) && isConnector(params.target as string))
+  // ) {
+  //   newNodeRelations.push({
+  //     nodeId: params.source as string,
+  //     relations: {
+  //       connectedTo: {
+  //         id: params.target as string,
+  //       },
+  //     },
+  //   });
 
-    newNodeRelations.push({
-      nodeId: params.target as string,
-      relations: {
-        connectedBy: {
-          id: params.source as string,
-        },
-      },
-    });
+  //   newNodeRelations.push({
+  //     nodeId: params.target as string,
+  //     relations: {
+  //       connectedBy: {
+  //         id: params.source as string,
+  //       },
+  //     },
+  //   });
 
-    return addEdge(EdgeType.Connected, newNodeRelations);
-  }
+  //   return addEdge(EdgeType.Connected, newNodeRelations);
+  // }
 
   // Set transfersTo & transferedBy property for terminals
   if (
@@ -213,7 +213,9 @@ export const onConnect = async (params: Edge | Connection) => {
     return addEdge(EdgeType.Connected, newNodeRelations);
   }
 
-  return openDialog();
+  return openDialog(
+    isBlock(params.source as string) && isBlock(params.target as string)
+  );
 };
 
 export const addEdge = async (
@@ -411,10 +413,7 @@ export const updateNodeRelations = async (
     return;
   }
 
-  if (
-    currentEdge.type === EdgeType.Connected &&
-    !currentEdge.data.lockCoonection
-  ) {
+  if (currentEdge.type === EdgeType.Connected) {
     const sourceNode = nodes.find(node => node.id === currentEdge.source);
     const targetNode = nodes.find(node => node.id === currentEdge.target);
 
@@ -583,7 +582,8 @@ export const updateNodeConnectionData = async (
   targetNodeId: string,
   nodes: Node[],
   setNodes: (nodes: Node[]) => void,
-  oldConnection: EdgeType
+  oldConnection: EdgeType,
+  newConnection: EdgeType
 ): Promise<boolean> => {
   const targetNode = nodes.find(node => node.id === targetNodeId);
   const sourceNode = nodes.find(node => node.id === sourceNodeId);
@@ -602,7 +602,61 @@ export const updateNodeConnectionData = async (
 
     targetNode.data.directParts = filteredParts.length > 0 ? filteredParts : [];
     sourceNode.data.directPartOf = '';
+  } else if (oldConnection === EdgeType.Connected) {
+    const filteredConnectedBy = targetNode.data.connectedBy.filter(
+      (node: { id: string }) => node.id !== sourceNodeId
+    );
 
+    targetNode.data.connectedBy =
+      filteredConnectedBy.length > 0 ? filteredConnectedBy : [];
+
+    const filteredConnectedTo = sourceNode.data.connectedTo.filter(
+      (node: { id: string }) => node.id !== targetNodeId
+    );
+
+    sourceNode.data.connectedTo =
+      filteredConnectedTo.length > 0 ? filteredConnectedTo : [];
+  } else {
+    // oldConnection === EdgeType.Fulfilled
+    const filteredFulfilledBy = sourceNode.data.fulfilledBy.filter(
+      (node: { id: string }) => node.id !== targetNodeId
+    );
+
+    sourceNode.data.fulfilledBy =
+      filteredFulfilledBy.length > 0 ? filteredFulfilledBy : [];
+
+    const filteredFulfills = targetNode.data.fulfills.filter(
+      (node: { id: string }) => node.id !== sourceNodeId
+    );
+
+    targetNode.data.fulfills =
+      filteredFulfills.length > 0 ? filteredFulfills : [];
+  }
+
+  if (newConnection === EdgeType.Part) {
+    sourceNode.data.directPartOf = targetNodeId;
+    targetNode.data.directParts = [
+      ...(targetNode.data.directParts ?? []),
+      {
+        id: sourceNodeId,
+      },
+    ];
+  } else if (newConnection === EdgeType.Connected) {
+    sourceNode.data.connectedTo = [
+      ...(sourceNode.data.connectedTo ?? []),
+      {
+        id: targetNodeId,
+      },
+    ];
+
+    targetNode.data.connectedBy = [
+      ...(targetNode.data.connectedBy ?? []),
+      {
+        id: sourceNodeId,
+      },
+    ];
+  } else {
+    // newConnection === EdgeType.Fulfilled
     sourceNode.data.fulfilledBy = [
       ...(sourceNode.data.fulfilledBy ?? []),
       {
@@ -612,28 +666,6 @@ export const updateNodeConnectionData = async (
 
     targetNode.data.fulfills = [
       ...(targetNode.data.fulfills ?? []),
-      {
-        id: sourceNodeId,
-      },
-    ];
-  } else {
-    // oldConnection === EdgeType.Fulfilled
-    const filteredFulfilledBy = sourceNode.data.fulfilledBy.filter(
-      (node: { id: string }) => node.id !== targetNodeId
-    );
-
-    sourceNode.data.fulfilledBy =
-      filteredFulfilledBy.length > 0 ? filteredFulfilledBy : [];
-    sourceNode.data.directPartOf = targetNodeId;
-
-    const filteredFulfills = targetNode.data.fulfills.filter(
-      (node: { id: string }) => node.id !== sourceNodeId
-    );
-
-    targetNode.data.fulfills =
-      filteredFulfills.length > 0 ? filteredFulfills : [];
-    targetNode.data.directParts = [
-      ...(targetNode.data.directParts ?? []),
       {
         id: sourceNodeId,
       },

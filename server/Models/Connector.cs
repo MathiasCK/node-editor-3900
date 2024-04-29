@@ -13,6 +13,8 @@ public class ConnectorData : NodeData
 {
   public List<Relation> ConnectedTo { get; set; } = [];
   public List<Relation> ConnectedBy { get; set; } = [];
+  public List<Relation> DirectParts { get; set; } = [];
+  public string DirectPartOf { get; set; } = string.Empty;
 }
 
 public class Connector : Node
