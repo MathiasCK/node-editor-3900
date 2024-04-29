@@ -6,7 +6,6 @@ import JSZip from 'jszip';
 import { v4 as uuidv4 } from 'uuid';
 import {
   AspectType,
-  CustomAttribute,
   CustomNodeProps,
   EdgeType,
   NodeRelation,
@@ -701,23 +700,23 @@ export const getNodeRelationLabel = (node: Node): string =>
 export const getReadableKey = (key: RelationKeys): string => {
   switch (key) {
     case 'connectedTo':
-      return 'connected_to';
+      return 'connectedTo';
     case 'connectedBy':
-      return 'connected_by';
+      return 'connectedBy';
     case 'directParts':
-      return 'has_part';
+      return 'hasPart';
     case 'fulfilledBy':
-      return 'fulfilled_by';
+      return 'fulfilledBy';
     case 'terminals':
-      return 'has_terminal';
+      return 'hasTerminal';
     case 'terminalOf':
-      return 'terminal_of';
+      return 'terminalOf';
     case 'directPartOf':
-      return 'part_of';
+      return 'partOf';
     case 'transfersTo':
-      return 'transferring_to';
+      return 'transfersTo';
     case 'transferedBy':
-      return 'being transferred_by';
+      return 'transferedBy';
     case 'fulfills':
       return 'fulfills';
   }
@@ -738,10 +737,11 @@ export const mapNodeRelationsToString = (nodes: Node[]): string => {
   ];
 
   const relations = new Map<string, string[]>();
-  const customAttributes = new Map<string, CustomAttribute[]>();
 
   for (const node of nodes) {
-    const nodeLabel = getNodeRelationLabel(node);
+    const nodeLabel = node.data.customName
+      ? node.data.customName.replace(/ /g, '_')
+      : node.data.label;
 
     relations.set(nodeLabel, []);
 
@@ -753,55 +753,64 @@ export const mapNodeRelationsToString = (nodes: Node[]): string => {
         const id = node.data[key];
         const currentNode = nodes.find(node => node.id === id);
 
+        const currentLabel = currentNode?.data.customName
+          ? currentNode.data.customName.replace(/ /g, '_')
+          : currentNode?.data.label;
+
         if (currentNode) {
           relations
             .get(nodeLabel)
-            ?.push(
-              `${getReadableKey(key)} ${getNodeRelationLabel(currentNode)}`
-            );
+            ?.push(`${getReadableKey(key)} ${currentLabel}`);
         }
         continue;
       }
 
       for (const item of node.data[key]) {
         const currentNode = nodes.find(node => node.id === item.id);
+
+        const currentLabel = currentNode?.data.customName
+          ? currentNode.data.customName.replace(/ /g, '_')
+          : currentNode?.data.label;
         if (currentNode) {
           relations
             .get(nodeLabel)
-            ?.push(
-              `${getReadableKey(key)} ${getNodeRelationLabel(currentNode)}`
-            );
+            ?.push(`${getReadableKey(key)} ${currentLabel}`);
         }
       }
-    }
-
-    if (node.data.customAttributes.length > 0) {
-      customAttributes.set(nodeLabel, node.data.customAttributes);
     }
   }
 
   let str =
-    'Fulfilledby - inverse of fulfills\nConnectedBy - inverse of connectedTo\nTransferedBy - inverse of transfersTo\nPartOf - inverse of directParts\nTerminalOf - inverse of terminals\n\n\n';
+    '@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n@prefix imf: <http://ns.imfid.org/imf#> .\n@prefix owl: <http://www.w3.org/2002/07/owl#> .\n@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .\n@prefix skos: <http://www.w3.org/2004/02/skos/core#> .\n@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .\n@prefix imfgui: http://example.org/imfgui# .\n\n';
 
-  relations.forEach((value, key) => {
-    if (value.length === 0) return;
+  for (const node of nodes) {
+    str += `imgui:${node.data.customName ? node.data.customName.replace(/ /g, '_') : node.data.label} rdf:type imf:${capitalizeFirstLetter(node.type!)};\n`;
+    str += `    imf:hasAspect imf:${node.data.aspect};\n`;
+    str += `    skos:preLabel "${node.data.customName === '' ? node.data.label : node.data.customName.replace(/ /g, '_')}".\n\n`;
+  }
 
-    str += `${key}:\n`;
-    value.forEach(relation => {
-      str += `  ${relation}\n`;
-    });
-
-    const attributes = customAttributes.get(key);
-    if (attributes && attributes.length > 0) {
-      str += '\n';
-      str += `  Custom Attributes for ${key}:\n`;
-      customAttributes.get(key)?.forEach(attribute => {
-        str += `    ${attribute.name} : ${attribute.value}\n`;
-      });
+  for (const relation of relations) {
+    const [key, value] = relation;
+    for (const v of value) {
+      const parts = v.split(' ');
+      str += `imgui:${key} imf:${parts[0]} imgui:${parts[1]}.\n`;
     }
-
     str += '\n';
-  });
+  }
+  str += '\n';
+
+  for (const node of nodes) {
+    for (let i = 0; i < node.data.customAttributes.length; i++) {
+      const nodeLabel = node.data.customName
+        ? node.data.customName.replace(/ /g, '_')
+        : node.data.label;
+
+      const attributeName = `${nodeLabel}-attribute${i}`;
+      str += `imfgui:${nodeLabel} imf:hasAttribute imfgui:${attributeName}.\n`;
+      str += `imfgui:${attributeName} rdfs:label "${node.data.customAttributes[i].name}".\n`;
+      str += `imfgui:${attributeName} imf:value "${node.data.customAttributes[i].value}".\n`;
+    }
+  }
 
   return str;
 };
