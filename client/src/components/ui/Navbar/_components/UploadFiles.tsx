@@ -88,6 +88,9 @@ const UploadFileDialog = () => {
     try {
       await Promise.all(fileReadPromises);
 
+      const idsToReplace: Record<string, string> = {};
+
+      // Make sure node data is updated with new data
       for (const node of dataToUpload.nodes) {
         const currentDate = Date.now();
         // @ts-ignore
@@ -101,7 +104,9 @@ const UploadFileDialog = () => {
         );
 
         const newNodeId = generateNewNodeId(node.id);
+        idsToReplace[node.id] = newNodeId;
 
+        // Make sure all edges with relation to old node ids are updated with new ones
         for (const edge of connectedEdges) {
           // @ts-ignore
           delete edge.edgeId;
@@ -116,6 +121,26 @@ const UploadFileDialog = () => {
           }
         }
         node.id = newNodeId;
+      }
+
+      // Make sure all nodes with relation to old node ids are updated with new ones
+      for (const node of dataToUpload.nodes) {
+        for (const key in node.data) {
+          if (typeof node.data[key] === 'string') {
+            if (Object.keys(idsToReplace).includes(node.data[key])) {
+              node.data[key] = idsToReplace[node.data[key]];
+            }
+          }
+
+          if (Array.isArray(node.data[key])) {
+            node.data[key] = node.data[key].map((value: { id: string }) => {
+              if (Object.keys(idsToReplace).includes(value.id)) {
+                value.id = idsToReplace[value.id];
+              }
+              return value;
+            });
+          }
+        }
       }
 
       const uploadedNodes = await uploadNodes(dataToUpload.nodes);

@@ -133,12 +133,28 @@ public class NodesController(DB db, ILogger<NodesController> logger) : Controlle
                     Y = node.GetProperty("position").GetProperty("y").GetDouble()
                 };
 
+                var customName = node.GetProperty("data").GetProperty("customName").GetString() ?? "";
+                var customAttributes = node.GetProperty("data").TryGetProperty("customAttributes", out var customAttributesProp) ? customAttributesProp.GetRawText() : "";
+                var connectedTo = node.GetProperty("data").TryGetProperty("connectedTo", out var connectedToProp) ? connectedToProp.GetRawText() : "";
+                var connectedBy = node.GetProperty("data").TryGetProperty("connectedBy", out var connectedByProp) ? connectedByProp.GetRawText() : "";
+
+                var children = node.GetProperty("data").TryGetProperty("children", out var childrenProp) ? childrenProp.GetRawText() : "";
+                var directParts = node.GetProperty("data").TryGetProperty("directParts", out var directPartsProp) ? directPartsProp.GetRawText() : "";
+                var directPartOf = node.GetProperty("data").TryGetProperty("directPartOf", out var directPartOfProp) ? directPartOfProp.GetRawText() : "";
+                var terminals = node.GetProperty("data").TryGetProperty("terminals", out var terminalsProp) ? terminalsProp.GetRawText() : "";
+                var fulfills = node.GetProperty("data").TryGetProperty("fulfills", out var fulfillsProp) ? fulfillsProp.GetRawText() : "";
+                var fulfilledBy = node.GetProperty("data").TryGetProperty("fulfilledBy", out var fulfilledByProp) ? fulfilledByProp.GetRawText() : "";
+
+                var terminalOf = node.GetProperty("data").TryGetProperty("terminalOf", out var terminalOfProp) ? terminalOfProp.GetRawText() : "";
+                var transfersTo = node.GetProperty("data").TryGetProperty("transfersTo", out var transfersToProp) ? transfersToProp.GetRawText() : "";
+                var transferedBy = node.GetProperty("data").TryGetProperty("transferedBy", out var transferedByProp) ? transferedByProp.GetRawText() : "";
+
                 if (id == null || type == null || label == null || aspect == null || createdBy == null || position == null)
                 {
                     return BadRequest("Node data is missing required fields.");
                 }
 
-                Node newNode = Utils.CreateNode(type, id, position, aspect, label, createdBy);
+                Node newNode = Utils.CreateNode(type, id, position, aspect, label, createdBy, customName, children, directParts, directPartOf, terminals, terminalOf, transfersTo, transferedBy, fulfills, fulfilledBy, connectedTo, connectedBy, customAttributes);
 
                 await _db.Nodes.AddAsync(newNode);
             }
