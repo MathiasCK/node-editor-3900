@@ -42,8 +42,7 @@ const navItems: NavItem[] = [
       },
       {
         title: 'Terminal',
-        description:
-          'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quibusdam, laboriosam!',
+        description: 'Block port. Point where medium passes the block boundary',
         nodeType: NodeType.Terminal,
       },
     ],
@@ -101,7 +100,7 @@ const navItems: NavItem[] = [
       {
         title: 'Block',
         description:
-          'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quibusdam, laboriosam!',
+          'Any entity at any abstraction level. Abstraction mechanism',
         nodeType: NodeType.Block,
       },
       {
