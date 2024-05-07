@@ -16,7 +16,7 @@ Ideal for software developers, project managers, and system architects, it allow
 - **Edge Management**: Define and edit relationships with simple yet powerful tools that allow you to connect nodes through various types of edges, such as connected by, part of, fulfills etc. 🔗
 - **Interactive Visualization**: With React Flow, visualize complex diagrams that are not only easy to navigate but also pleasing to the eye. 📊
 - **Data Persistence**: Changes are backed by a .NET and SQLite backend, allowing for robust data management and recovery. 💾
-Export/Import Capability: Nodes and their relationships can be downloaded providing a simple way to share and document network structures outside the platform. 📁
+- **Export/Import Capability**: Nodes and their relationships can be downloaded providing a simple way to share and document network structures outside the platform. 📁
 - **Role-Based Authentication**: Secure access with JWT (JSON Web Tokens) for handling different user roles, ensuring that sensitive project data remains protected and accessible only to authorized personnel. 🔐
 
 ## Prerequisites 📋
