@@ -8,10 +8,10 @@ import {
 import {
   capitalizeFirstLetter,
   getReadableRelation,
-  getNodeRelations,
-  displayNewNode,
+  displayNode,
   cn,
 } from '@/lib/utils';
+import { getNodeRelations } from '@/lib/utils/nodes';
 import { FC, useState } from 'react';
 import {
   SheetContent,
@@ -57,7 +57,7 @@ const CurrentNode: FC<Props> = ({ currentNode }) => {
   );
 
   const { closeSidebar, openSidebar } = useSidebar();
-  const { edges, setEdges, nodes, setNodes } = useStore();
+  const { nodes } = useStore();
 
   const nodeRelations = getNodeRelations(currentNode);
   const hasNodeRelations = nodeRelations.some(
@@ -74,7 +74,7 @@ const CurrentNode: FC<Props> = ({ currentNode }) => {
         value: values.value,
       },
     ];
-    const updated = await updateNode(currentNode.id, nodes, setNodes, {
+    const updated = await updateNode(currentNode.id, {
       customAttributes: newAttributes,
     });
 
@@ -89,7 +89,7 @@ const CurrentNode: FC<Props> = ({ currentNode }) => {
   };
 
   const handleAspectChange = async (newAspectType: AspectType) => {
-    const updated = await updateNode(currentNode.id, nodes, setNodes, {
+    const updated = await updateNode(currentNode.id, {
       aspect: newAspectType,
     });
     if (updated) {
@@ -106,7 +106,7 @@ const CurrentNode: FC<Props> = ({ currentNode }) => {
       attr => attr.name !== name && attr.value !== value
     );
 
-    const updated = await updateNode(currentNode.id, nodes, setNodes, {
+    const updated = await updateNode(currentNode.id, {
       customAttributes: newAttributes,
     });
     if (updated) {
@@ -119,13 +119,7 @@ const CurrentNode: FC<Props> = ({ currentNode }) => {
   };
 
   const handleDelete = async () => {
-    const deleted = await deleteNode(
-      currentNode.id as string,
-      nodes,
-      setNodes,
-      edges,
-      setEdges
-    );
+    const deleted = await deleteNode(currentNode.id as string);
 
     if (deleted) {
       closeSidebar();
@@ -155,7 +149,7 @@ const CurrentNode: FC<Props> = ({ currentNode }) => {
       return;
     }
 
-    const updated = await updateNode(currentNode.id, nodes, setNodes, {
+    const updated = await updateNode(currentNode.id, {
       customName: value,
     });
     if (updated) {
@@ -233,14 +227,7 @@ const CurrentNode: FC<Props> = ({ currentNode }) => {
                       <Button
                         key={`${nodeRelation.key}_${c.id}_link_button`}
                         variant="ghost"
-                        onClick={() =>
-                          displayNewNode(
-                            c.id as string,
-                            nodes,
-                            openSidebar,
-                            closeSidebar
-                          )
-                        }
+                        onClick={() => displayNode(c.id as string)}
                       >
                         {node?.data?.customName === ''
                           ? node.data?.label

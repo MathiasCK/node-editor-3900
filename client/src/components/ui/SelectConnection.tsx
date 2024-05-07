@@ -2,7 +2,8 @@ import { storeSelector, useConnection, useStore } from '@/hooks';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from './dialog';
 
 import { EdgeType, NodeRelation } from '@/lib/types';
-import { addEdge, cn } from '@/lib/utils';
+import { cn } from '@/lib/utils';
+import { addEdge } from '@/lib/utils/edges';
 import { buttonVariants } from '@/lib/config';
 import { Button } from './button';
 import { shallow } from 'zustand/shallow';

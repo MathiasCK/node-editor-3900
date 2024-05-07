@@ -1,4 +1,4 @@
-import { ValidUploadEdge, ValidUploadNode } from './types';
+import { ValidUploadEdge, ValidUploadNode } from '@/lib/types';
 
 export const validateJsonFiles = async (
   files: File[]

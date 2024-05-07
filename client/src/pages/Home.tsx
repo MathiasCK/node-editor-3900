@@ -12,7 +12,7 @@ import { shallow } from 'zustand/shallow';
 import 'reactflow/dist/style.css';
 import { Block, Connector, Terminal } from '@/components/Nodes';
 
-import { onConnect } from '@/lib/utils';
+import { onConnect } from '@/lib/utils/edges';
 import { storeSelector, useStore, useTheme } from '@/hooks';
 
 import { Connected, Fulfilled, Part, Transfer } from '@/components/Edges';
@@ -72,7 +72,7 @@ const Home = () => {
         onConnect={onConnect}
         nodeTypes={nodeTypes as unknown as NodeTypes}
         edgeTypes={edgeTypes as unknown as EdgeTypes}
-        onNodeDragStop={(_, node) => updateNode(node.id, nodes, setNodes)}
+        onNodeDragStop={(_, node) => updateNode(node.id)}
       >
         <Sidebar />
         <SelectConnection />

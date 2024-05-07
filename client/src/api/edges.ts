@@ -1,8 +1,8 @@
 import { useLoading, useSession, useStore } from '@/hooks';
 import { EdgeType, EdgeWithEdgeId } from '@/lib/types';
-import { updateNodeRelations } from '@/lib/utils';
+import { updateNodeRelations } from '@/lib/utils/nodes';
 import toast from 'react-hot-toast';
-import { type Edge, type Node } from 'reactflow';
+import { type Edge } from 'reactflow';
 
 export const fetchEdges = async (): Promise<Edge[] | null> => {
   const { logout, user, token } = useSession.getState();
@@ -128,14 +128,12 @@ export const uploadEdges = async (edgesToAdd: Edge[]): Promise<boolean> => {
     }
   }
 };
+
 export const deleteEdge = async (
   edgeIdToDelete: string,
-  edges: Edge[],
-  setEdges: (edges: Edge[]) => void,
-  nodes: Node[],
-  setNodes: (nodes: Node[]) => void,
   nodeToDeleteId?: string
 ): Promise<string | null> => {
+  const { edges, setEdges } = useStore.getState();
   const edgeToDelete = edges.find(
     edge => edge.id === edgeIdToDelete
   ) as EdgeWithEdgeId;
@@ -186,16 +184,15 @@ export const deleteEdge = async (
     throw error;
   } finally {
     stopLoading();
-    updateNodeRelations(edgeToDelete, nodes, setNodes, nodeToDeleteId);
+    updateNodeRelations(edgeToDelete, nodeToDeleteId);
   }
 };
 
 export const updateEdge = async (
   edgeToUpdateId: string,
-  edges: Edge[],
-  setEdges: (edges: Edge[]) => void,
   newConnection: EdgeType
 ): Promise<Edge | null> => {
+  const { edges, setEdges } = useStore.getState();
   const edgeToUpdate = edges.find(edge => edge.id === edgeToUpdateId);
 
   if (!edgeToUpdate) {
@@ -256,7 +253,6 @@ export const updateEdge = async (
     stopLoading();
   }
 };
-
 export const deleteEdges = async (): Promise<boolean> => {
   const { setEdges } = useStore.getState();
   const { token, user, logout } = useSession.getState();

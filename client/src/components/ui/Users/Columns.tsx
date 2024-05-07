@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import { Role, User } from '@/lib/types';
 import { ColumnDef } from '@tanstack/react-table';
 import {
@@ -61,6 +62,7 @@ const formSchema = z
       });
     }
   });
+
 const UserActions = ({ username, id }: { username: string; id: string }) => {
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
   return (

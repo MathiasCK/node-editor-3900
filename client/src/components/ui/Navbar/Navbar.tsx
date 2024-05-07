@@ -1,6 +1,7 @@
 import * as React from 'react';
 
-import { addNode, cn } from '@/lib/utils';
+import { cn } from '@/lib/utils';
+import { addNode } from '@/lib/utils/nodes';
 
 import {
   NavigationMenu,
@@ -119,7 +120,7 @@ const navItems: NavItem[] = [
 ];
 
 const Navbar = () => {
-  const { nodes, setNodes } = useStore(storeSelector, shallow);
+  const { nodes } = useStore(storeSelector, shallow);
   const { user } = useSession();
   const { theme } = useTheme();
   const { currentPage, setDashboard } = useSession();
@@ -148,9 +149,7 @@ const Navbar = () => {
                           onClick={() =>
                             addNode(
                               node.title.toLowerCase() as AspectType,
-                              component.nodeType,
-                              nodes,
-                              setNodes
+                              component.nodeType
                             )
                           }
                         >

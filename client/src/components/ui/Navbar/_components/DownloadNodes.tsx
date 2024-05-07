@@ -1,4 +1,4 @@
-import { downloadZipFile } from '@/lib/utils';
+import { downloadZipFile } from '@/lib/utils/download';
 import { Button } from '../../button';
 import { DownloadCloud } from 'lucide-react';
 

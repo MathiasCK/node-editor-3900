@@ -1,5 +1,5 @@
 import toast from 'react-hot-toast';
-import { getConnectedEdges, type Node, type Edge } from 'reactflow';
+import { getConnectedEdges, type Node } from 'reactflow';
 import { type UpdateNode } from '@/lib/types';
 import { deleteEdge } from './edges';
 import { useLoading, useSession, useStore } from '@/hooks';
@@ -78,11 +78,9 @@ export const uploadNodes = async (nodesToAdd: Node[]): Promise<boolean> => {
     }
   }
 };
-export const createNode = async (
-  node: Node,
-  nodes: Node[],
-  setNodes: (nodes: Node[]) => void
-): Promise<Node | null> => {
+
+export const createNode = async (node: Node): Promise<Node | null> => {
+  const { nodes, setNodes } = useStore.getState();
   const { logout, token } = useSession.getState();
   const { startLoading, stopLoading } = useLoading.getState();
   startLoading();
@@ -125,12 +123,12 @@ export const createNode = async (
     stopLoading();
   }
 };
+
 export const updateNode = async (
   nodeToUpdateId: string,
-  nodes: Node[],
-  setNodes: (nodes: Node[]) => void,
   newNodeData?: UpdateNode
 ): Promise<Node | null> => {
+  const { nodes, setNodes } = useStore.getState();
   const nodeToUpdate = nodes.find(n => n.id === nodeToUpdateId);
 
   if (!nodeToUpdate) {
@@ -200,12 +198,9 @@ export const updateNode = async (
 };
 
 export const deleteNode = async (
-  nodeToDeleteId: string,
-  nodes: Node[],
-  setNodes: (nodes: Node[]) => void,
-  edges: Edge[],
-  setEdges: (edges: Edge[]) => void
+  nodeToDeleteId: string
 ): Promise<string | null> => {
+  const { nodes, setNodes, edges } = useStore.getState();
   const { token, logout } = useSession.getState();
 
   const nodeToDelete = nodes.find(node => node.id === nodeToDeleteId);
@@ -220,14 +215,7 @@ export const deleteNode = async (
 
   const connectedEdges = getConnectedEdges([nodeToDelete], edges);
   for (const edge of connectedEdges) {
-    await deleteEdge(
-      edge.id as string,
-      edges,
-      setEdges,
-      nodes,
-      setNodes,
-      nodeToDeleteId
-    );
+    await deleteEdge(edge.id as string, nodeToDeleteId);
   }
 
   try {
