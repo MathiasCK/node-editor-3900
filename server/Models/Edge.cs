@@ -7,7 +7,6 @@ namespace server.Models;
 public class Edge
 {
     [Key]
-    public string EdgeId { get; set; }
     public required string Id { get; set; }
     public required string Source { get; set; }
     public required string SourceHandle { get; set; }
@@ -15,11 +14,6 @@ public class Edge
     public required string TargetHandle { get; set; }
     public required EdgeType Type { get; set; }
     public required EdgeData Data { get; set; }
-
-    public Edge()
-    {
-        EdgeId = Guid.NewGuid().ToString();
-    }
 }
 
 public class EdgeData

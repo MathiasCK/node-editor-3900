@@ -1,4 +1,4 @@
-import type { Edge, EdgeProps, Node, NodeProps } from 'reactflow';
+import type { Edge, EdgeProps, NodeProps } from 'reactflow';
 
 export enum AppPage {
   Home = 'home',
@@ -136,10 +136,6 @@ export type RelationKeys =
 export type RelationKeysWithChildren = {
   key: RelationKeys;
   children: { id: string }[];
-};
-
-export type NodeWithNodeId = Node & {
-  nodeId: string;
 };
 
 export type EdgeWithEdgeId = Edge & {

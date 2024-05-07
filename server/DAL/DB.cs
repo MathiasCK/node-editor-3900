@@ -21,8 +21,6 @@ public class DB : DbContext
 
         modelBuilder.Entity<Node>()
                 .OwnsOne(n => n.Position);
-        modelBuilder.Entity<Node>().HasKey(e => e.NodeId);
-        modelBuilder.Entity<Node>().Property(e => e.NodeId).HasMaxLength(255);
 
         modelBuilder.Entity<Terminal>().OwnsOne(t => t.Data, data =>
         {
@@ -121,8 +119,6 @@ public class DB : DbContext
 
         modelBuilder.Entity<Edge>()
 .OwnsOne(e => e.Data);
-        modelBuilder.Entity<Edge>().HasKey(e => e.EdgeId);
-        modelBuilder.Entity<Edge>().Property(e => e.EdgeId).HasMaxLength(255);
     }
 
     public DbSet<Node> Nodes { get; set; }

@@ -100,6 +100,7 @@ public class EdgesController(DB db, ILogger<EdgesController> logger) : Controlle
         catch (DbUpdateException dbEx)
         {
             _logger.LogError("[EdgesController]: Database update failed: {Error}", dbEx.Message);
+            Console.WriteLine(dbEx.InnerException);
             return StatusCode(500, "Failed to save edge data due to database error.");
         }
         catch (Exception e)

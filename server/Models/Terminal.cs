@@ -2,7 +2,6 @@ namespace server.Models;
 
 public class TerminalDto
 {
-  public required string NodeId { get; set; }
   public required string Id { get; set; }
   public required Position Position { get; set; }
   public NodeType Type { get; set; }

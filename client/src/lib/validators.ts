@@ -79,9 +79,6 @@ export const validateNodesJson = (nodes: ValidUploadNode[]) => {
       if (!node.position.y) {
         throw new Error(`Block ${node.id} must have a y position`);
       }
-      if (!node.nodeId) {
-        throw new Error(`Block ${node.id} must have a nodeId`);
-      }
       if (!node.id) {
         throw new Error(`Block ${node.id} must have an id`);
       }
@@ -104,9 +101,6 @@ export const validateNodesJson = (nodes: ValidUploadNode[]) => {
       }
       if (!node.position.y) {
         throw new Error(`Connector ${node.id} must have a y position`);
-      }
-      if (!node.nodeId) {
-        throw new Error(`Connector ${node.id} must have a nodeId`);
       }
       if (!node.id) {
         throw new Error(`Connector ${node.id} must have an id`);
@@ -140,9 +134,6 @@ export const validateNodesJson = (nodes: ValidUploadNode[]) => {
       if (!node.position.y) {
         throw new Error(`Terminal ${node.id} must have a y position`);
       }
-      if (!node.nodeId) {
-        throw new Error(`Terminal ${node.id} must have a nodeId`);
-      }
       if (!node.id) {
         throw new Error(`Terminal ${node.id} must have an id`);
       }
@@ -153,43 +144,40 @@ export const validateNodesJson = (nodes: ValidUploadNode[]) => {
 export const validateEdgesJson = (edges: ValidUploadEdge[]) => {
   for (const edge of edges) {
     if (!edge.source) {
-      throw new Error(`Èdge ${edge.edgeId} must have a source`);
+      throw new Error(`Èdge ${edge.id} must have a source`);
     }
     if (!edge.target) {
-      throw new Error(`Èdge ${edge.edgeId} must have a target`);
+      throw new Error(`Èdge ${edge.id} must have a target`);
     }
     if (!edge.id) {
-      throw new Error(`Èdge ${edge.edgeId} must have an id`);
-    }
-    if (!edge.edgeId) {
-      throw new Error(`Èdge ${edge.edgeId} must have an edgeId`);
+      throw new Error(`Èdge ${edge.id} must have an id`);
     }
     if (!edge.type) {
-      throw new Error(`Èdge ${edge.edgeId} must have a type`);
+      throw new Error(`Èdge ${edge.id} must have a type`);
     }
     if (!edge.sourceHandle) {
-      throw new Error(`Èdge ${edge.edgeId} must have a sourceHandle`);
+      throw new Error(`Èdge ${edge.id} must have a sourceHandle`);
     }
     if (!edge.targetHandle) {
-      throw new Error(`Èdge ${edge.edgeId} must have a targetHandle`);
+      throw new Error(`Èdge ${edge.id} must have a targetHandle`);
     }
     if (!edge.data) {
-      throw new Error(`Èdge ${edge.edgeId} must have data`);
+      throw new Error(`Èdge ${edge.id} must have data`);
     }
     if (!edge.data.createdAt) {
-      throw new Error(`Èdge ${edge.edgeId} must have a createdAt`);
+      throw new Error(`Èdge ${edge.id} must have a createdAt`);
     }
     if (!edge.data.updatedAt) {
-      throw new Error(`Èdge ${edge.edgeId} must have an updatedAt`);
+      throw new Error(`Èdge ${edge.id} must have an updatedAt`);
     }
     if (!edge.data.createdBy) {
-      throw new Error(`Èdge ${edge.edgeId} must have a createdBy`);
+      throw new Error(`Èdge ${edge.id} must have a createdBy`);
     }
     if (!edge.data.label) {
-      throw new Error(`Èdge ${edge.edgeId} must have a label`);
+      throw new Error(`Èdge ${edge.id} must have a label`);
     }
     if (edge.data.lockConnection == null) {
-      throw new Error(`Èdge ${edge.edgeId} must have a lockConnection`);
+      throw new Error(`Èdge ${edge.id} must have a lockConnection`);
     }
   }
 };

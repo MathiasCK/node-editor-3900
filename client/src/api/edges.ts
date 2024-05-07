@@ -140,7 +140,7 @@ export const deleteEdge = async (
     edge => edge.id === edgeIdToDelete
   ) as EdgeWithEdgeId;
 
-  if (!edgeToDelete.edgeId) {
+  if (!edgeToDelete.id) {
     toast.error(`Error deleting edge - ${edgeIdToDelete} not found`);
     return null;
   }
@@ -151,7 +151,7 @@ export const deleteEdge = async (
   startLoading();
   try {
     const response = await fetch(
-      `${import.meta.env.VITE_API_URL}/api/edges/${edgeToDelete.edgeId}`,
+      `${import.meta.env.VITE_API_URL}/api/edges/${edgeToDelete.id}`,
       {
         method: 'DELETE',
         headers: {

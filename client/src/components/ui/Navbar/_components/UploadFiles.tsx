@@ -21,8 +21,8 @@ import { useSession, useStore } from '@/hooks';
 import toast from 'react-hot-toast';
 import { uploadNodes } from '@/api/nodes';
 import { uploadEdges } from '@/api/edges';
-import { EdgeWithEdgeId, NodeWithNodeId } from '@/lib/types';
 import { generateNewNodeId } from '@/lib/utils';
+import { Edge, Node } from 'reactflow';
 
 const filesSchema = z.object({
   files: z
@@ -57,7 +57,7 @@ const UploadFileDialog = () => {
 
     clearErrors('files');
 
-    const dataToUpload: { nodes: NodeWithNodeId[]; edges: EdgeWithEdgeId[] } = {
+    const dataToUpload: { nodes: Node[]; edges: Edge[] } = {
       nodes: [],
       edges: [],
     };
@@ -93,8 +93,6 @@ const UploadFileDialog = () => {
       // Make sure node data is updated with new data
       for (const node of dataToUpload.nodes) {
         const currentDate = Date.now();
-        // @ts-ignore
-        delete node.nodeId;
         node.data.createdBy = user?.id;
         node.data.createdAt = currentDate;
         node.data.updatedAt = currentDate;
@@ -108,8 +106,6 @@ const UploadFileDialog = () => {
 
         // Make sure all edges with relation to old node ids are updated with new ones
         for (const edge of connectedEdges) {
-          // @ts-ignore
-          delete edge.edgeId;
           edge.id = edge.id.replace(node.id, newNodeId);
           edge.data.createdBy = user?.id;
           edge.data.createdAt = currentDate;

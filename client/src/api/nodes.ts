@@ -1,6 +1,6 @@
 import toast from 'react-hot-toast';
 import { getConnectedEdges, type Node, type Edge } from 'reactflow';
-import { NodeWithNodeId, type UpdateNode } from '@/lib/types';
+import { type UpdateNode } from '@/lib/types';
 import { deleteEdge } from './edges';
 import { useLoading, useSession, useStore } from '@/hooks';
 
@@ -208,11 +208,9 @@ export const deleteNode = async (
 ): Promise<string | null> => {
   const { token, logout } = useSession.getState();
 
-  const nodeToDelete = nodes.find(
-    node => node.id === nodeToDeleteId
-  ) as NodeWithNodeId;
+  const nodeToDelete = nodes.find(node => node.id === nodeToDeleteId);
 
-  if (!nodeToDelete.nodeId) {
+  if (!nodeToDelete?.id) {
     toast.error(`Error deleting node - ${nodeToDeleteId} not found`);
     return null;
   }
@@ -234,7 +232,7 @@ export const deleteNode = async (
 
   try {
     const response = await fetch(
-      `${import.meta.env.VITE_API_URL}/api/nodes/${nodeToDelete.nodeId}`,
+      `${import.meta.env.VITE_API_URL}/api/nodes/${nodeToDelete.id}`,
       {
         method: 'DELETE',
         headers: {

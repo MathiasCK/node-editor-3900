@@ -27,7 +27,6 @@ public class NodesController(DB db, ILogger<NodesController> logger) : Controlle
                 .AsNoTracking()
                 .Select(b => (object)new BlockDto
                 {
-                    NodeId = b.NodeId,
                     Id = b.Id,
                     Position = b.Position,
                     Type = b.Type,
@@ -42,7 +41,6 @@ public class NodesController(DB db, ILogger<NodesController> logger) : Controlle
                 .AsNoTracking()
                 .Select(t => (object)new TerminalDto
                 {
-                    NodeId = t.NodeId,
                     Id = t.Id,
                     Position = t.Position,
                     Type = t.Type,
@@ -57,7 +55,6 @@ public class NodesController(DB db, ILogger<NodesController> logger) : Controlle
                 .AsNoTracking()
                 .Select(c => (object)new ConnectorDto
                 {
-                    NodeId = c.NodeId,
                     Id = c.Id,
                     Position = c.Position,
                     Type = c.Type,
