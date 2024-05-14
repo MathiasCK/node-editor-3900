@@ -141,6 +141,15 @@ const CurrentNode: FC<Props> = ({ currentNode }) => {
   });
   const nodeName = watch('nodeName');
 
+  const focusNodeName = () => {
+    setTimeout(() => {
+      const input = document.querySelector(
+        'input[name="nodeName"]'
+      ) as HTMLInputElement;
+      input?.focus();
+    }, 100);
+  };
+
   const debouncedHandleChange = useDebounce(async (value: string) => {
     if (value === '' || nodeName === value) return;
     const nodeWithSameName = nodes.some(node => node.data.customName === value);
@@ -157,6 +166,7 @@ const CurrentNode: FC<Props> = ({ currentNode }) => {
       closeSidebar();
       setTimeout(() => {
         openSidebar(currentNode);
+        focusNodeName();
       }, 300);
     }
   }, 1500);
