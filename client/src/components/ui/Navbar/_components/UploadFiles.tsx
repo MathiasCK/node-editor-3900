@@ -157,6 +157,7 @@ const UploadFileDialog = () => {
       }}
     >
       <DialogTrigger
+        asChild
         onClick={() => {
           if (nodes.length > 0 || edges.length > 0) {
             toast.error(
@@ -167,14 +168,10 @@ const UploadFileDialog = () => {
           setDialogOpen(true);
         }}
       >
-        <Button
-          variant="outline"
-          className="border-none bg-transparent"
-          size="icon"
-        >
+        <div className="flex items-center justify-center rounded-sm p-3 hover:bg-muted">
           <UploadCloud className="size-4 hover:cursor-pointer" />
           <span className="sr-only">Upload nodes.json & edges.json</span>
-        </Button>
+        </div>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>Upload nodes.json & edges.json</DialogHeader>

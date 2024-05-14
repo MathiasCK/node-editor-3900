@@ -1,5 +1,4 @@
 import { LogOut } from 'lucide-react';
-import { Button } from '../../button';
 import {
   Tooltip,
   TooltipContent,
@@ -24,15 +23,11 @@ const LogoutConfirm = () => {
   const { logout } = useSession();
   return (
     <AlertDialog>
-      <AlertDialogTrigger>
-        <Button
-          variant="outline"
-          className="border-none bg-transparent"
-          size="icon"
-        >
+      <AlertDialogTrigger asChild>
+        <div className="flex items-center justify-center rounded-sm p-3 hover:bg-muted">
           <LogOut className="size-4 hover:cursor-pointer" />
-        </Button>
-        <span className="sr-only">Log out</span>
+          <span className="sr-only">Log out</span>
+        </div>
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>

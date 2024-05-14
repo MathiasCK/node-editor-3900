@@ -1,5 +1,4 @@
 import { downloadZipFile } from '@/lib/utils/download';
-import { Button } from '../../button';
 import { DownloadCloud } from 'lucide-react';
 
 import {
@@ -14,17 +13,13 @@ const DownloadNodes = () => {
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger>
-          <Button
-            variant="outline"
-            className="border-none bg-transparent"
-            size="icon"
-          >
+          <div className="flex items-center justify-center rounded-sm p-3 hover:bg-muted">
             <DownloadCloud
               onClick={downloadZipFile}
               className="size-4 hover:cursor-pointer"
             />
             <span className="sr-only">Download</span>
-          </Button>
+          </div>
         </TooltipTrigger>
         <TooltipContent>
           <p className="text-xs text-gray-500 dark:text-gray-400">

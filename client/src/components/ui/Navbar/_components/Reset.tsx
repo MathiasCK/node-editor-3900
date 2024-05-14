@@ -1,4 +1,3 @@
-import { Button } from '../../button';
 import {
   Tooltip,
   TooltipContent,
@@ -32,15 +31,11 @@ const ResetConfirm = () => {
   };
   return (
     <AlertDialog>
-      <AlertDialogTrigger>
-        <Button
-          variant="outline"
-          className="border-none bg-transparent"
-          size="icon"
-        >
+      <AlertDialogTrigger asChild>
+        <div className="flex items-center justify-center rounded-sm p-3 hover:bg-muted">
           <LucideMonitorX className="size-4 hover:cursor-pointer" />
-        </Button>
-        <span className="sr-only">Reset</span>
+          <span className="sr-only">Reset</span>
+        </div>
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
