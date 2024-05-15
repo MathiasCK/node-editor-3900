@@ -23,7 +23,6 @@ public class AuthController(DB db, ILogger<AuthController> logger, IConfiguratio
 
       byte[] salt = Convert.FromBase64String(usr?.Salt ?? "");
 
-      // Check if the password matches the hashed password in the database
       var match = PasswordHasher.VerifyPassword(user.Password, salt, usr?.Password ?? "");
 
       if (!match || usr == null)
@@ -70,16 +69,11 @@ public class AuthController(DB db, ILogger<AuthController> logger, IConfiguratio
         return BadRequest("User with username " + user.Username + " already exists");
       }
 
-      // Generate unique salt value for user
       byte[] salt = PasswordHasher.GenerateSalt();
-      // Hash the password with the generated salt
       string hashedPassword = PasswordHasher.HashPassword(user.Password, salt);
 
-      // Store salt value to user
       user.Salt = Convert.ToBase64String(salt);
-      // Store hashed password to user
       user.Password = hashedPassword;
-      // Set user role to admin if it is admin, otherwise set it to user
       user.Role = user.Role == UserRole.Admin ? UserRole.Admin : UserRole.User;
 
       await _db.Users.AddAsync(user);
