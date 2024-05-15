@@ -96,6 +96,16 @@ The server will be accessible at [http://localhost:5000](http://localhost:5000),
   - **Username**: `admin`
   - **Password**: `admin`
 
+## Testing 🧪
+
+The server tests are located in the `/server/Controllers/Tests`
+
+To run these tests, you can use the following command in your terminal:
+
+```bash
+npm run server:test
+```
+
 ## Tools & Dependencies 🛠️🧰
 
 ### Backend Dependencies 🖥️
